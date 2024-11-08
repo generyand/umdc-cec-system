@@ -1,5 +1,5 @@
 {
-  "name": "UMDC Community Extension",
+  "name": "umdc-community-extension",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

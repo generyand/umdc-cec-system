@@ -1,4 +1,4 @@
-# University of Mindanao Digos College Community Extension Center Management System (UM-CECMS)
+# University of Mindanao Digos College Community Extension Center Management System (UMDC-CECMS)
 
 The University of Mindanao Digos College Community Extension Center Management System (UMDC-CECMS) is a comprehensive web-based platform designed to streamline the management and execution of community extension programs. This system serves as a central hub for planning, implementing, monitoring, and evaluating community outreach initiatives undertaken by the University of Mindanao Digos College.
 
@@ -84,7 +84,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👏 Acknowledgments
 
-- University of Mindanao for the opportunity to develop this system
+- University of Mindanao Digos College for the opportunity to develop this system
 - All contributors and stakeholders involved in the project
 
 ## 📧 Contact
@@ -92,4 +92,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For any queries or support, please contact:
 
 - Project Maintainer: [Gene Ryan](mailto:generyan.dep@gmail.com), [Vincent Ace Rivera](augusto08rivera12@gmail.com), [Asnari Pacalna](asnaripacalna@gmail.com)
-- University of Mindanao CEC: [umdigoscec@umindanao.edu.ph](mailto:umdigoscec@umindanao.edu.ph)
+- University of Mindanao Digos College CEC: [umdigoscec@umindanao.edu.ph](mailto:umdigoscec@umindanao.edu.ph)

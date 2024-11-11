@@ -1,12 +1,12 @@
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
-import { initializeConfig } from "./config/app.config";
+import { initializeConfig } from "./config/app.config.js";
 import {
   testDatabaseConnection,
   setupGracefulShutdown,
-} from "./services/startup.service";
-import { errorHandler } from "./middleware/error.middleware";
+} from "./services/startup.service.js";
+import { errorHandler } from "./middleware/error.middleware.js";
 // import { Server } from "http";
 
 async function createServer() {

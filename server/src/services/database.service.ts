@@ -1,4 +1,4 @@
-import pool from "../config/database.config";
+import pool from "../config/database.config.js";
 import { QueryResult } from "pg";
 
 export const DatabaseService = {

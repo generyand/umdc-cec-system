@@ -10,8 +10,8 @@
     "lib": ["ES2022"],
 
     /* Modules */
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "paths": {
       "@/*": ["*"]
     },

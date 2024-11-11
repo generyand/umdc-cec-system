@@ -1,4 +1,4 @@
-import { DatabaseService } from "./database.service";
+import { DatabaseService } from "./database.service.js";
 import type { Server } from "http";
 
 export async function testDatabaseConnection() {

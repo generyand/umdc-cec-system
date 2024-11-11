@@ -7,6 +7,7 @@ import {
   setupGracefulShutdown,
 } from "./services/startup.service.js";
 import { errorHandler } from "./middleware/error.middleware.js";
+import authRoutes from "./routes/auth.route.js";
 // import { Server } from "http";
 
 async function createServer() {
@@ -26,6 +27,8 @@ async function createServer() {
   app.get("/health", (req, res) => {
     res.json({ status: "healthy" });
   });
+
+  app.use("/auth", authRoutes);
 
   // Error handling middleware (should be last)
   app.use(errorHandler);

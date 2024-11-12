@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import axios from "axios";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,10 +24,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Icons } from "../../components/icons";
+import { Icons } from "../../components/icons"; // TODO: fix this import
 
 const formSchema = z
   .object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Please enter a valid email address"),
     password: z
       .string()
@@ -41,10 +44,12 @@ const formSchema = z
 export default function RegisterPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -53,16 +58,27 @@ export default function RegisterPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    setError(null);
 
     try {
-      // Add your registration logic here
-      console.log(values);
+      await axios.post("http://localhost:3000/api/auth/register", {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      });
 
-      // On successful registration, redirect to login
+      toast.success("Registration successful!");
       navigate("/auth/login");
     } catch (error) {
-      // Handle registration error
-      console.error(error);
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.errors[0]?.message || "Registration failed";
+        setError(errorMessage);
+        toast.error(errorMessage);
+      } else {
+        setError("An unexpected error occurred");
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -80,8 +96,30 @@ export default function RegisterPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="p-2 mb-4 text-sm text-red-500 bg-red-50 rounded border border-red-200">
+              {error}
+            </div>
+          )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="John Doe"
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="email"

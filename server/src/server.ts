@@ -28,7 +28,7 @@ async function createServer() {
     res.json({ status: "healthy" });
   });
 
-  app.use("/auth", authRoutes);
+  app.use("/api/auth", authRoutes);
 
   // Error handling middleware (should be last)
   app.use(errorHandler);

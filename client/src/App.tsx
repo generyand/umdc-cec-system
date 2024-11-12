@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import RegisterPage from "./pages/auth/register";
+import { Toaster } from "sonner";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
           {/* Add a catch-all route for 404s */}
           <Route path="*" element={<Navigate to="/auth/register" replace />} />
         </Routes>
+        <Toaster />
       </div>
     </BrowserRouter>
   );

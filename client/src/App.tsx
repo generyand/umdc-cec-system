@@ -1,19 +1,24 @@
-import { motion } from "framer-motion";
-
-import { Button } from "@/components/ui/button";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import RegisterPage from "./pages/auth/register";
 
 const App = () => {
   return (
-    <div className="flex flex-col justify-center items-center h-screen text-3xl font-bold">
-      <p className="mb-4">Hello, World! 🚀</p>
-      <motion.div
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 400, damping: 17 }}
-      >
-        <Button>Click me</Button>
-      </motion.div>
-    </div>
+    <BrowserRouter>
+      <div className="flex flex-col justify-center items-center h-screen">
+        <Routes>
+          {/* Redirect root to register page for now */}
+          <Route path="/" element={<Navigate to="/auth/register" replace />} />
+
+          {/* Auth routes */}
+          <Route path="/auth/register" element={<RegisterPage />} />
+          {/* Add login route when ready */}
+          {/* <Route path="/auth/login" element={<LoginPage />} /> */}
+
+          {/* Add a catch-all route for 404s */}
+          <Route path="*" element={<Navigate to="/auth/register" replace />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 };
 

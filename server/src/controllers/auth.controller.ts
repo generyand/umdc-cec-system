@@ -43,11 +43,13 @@ export const register: Handler = async (req, res, next) => {
       user,
       accessToken,
     });
+
+    console.log("User registered successfully");
   } catch (error) {
     next(error);
   }
 
-  console.log("register");
+  // console.log("register controller");
 };
 
 export const login: Handler = async (req, res, next) => {
@@ -69,6 +71,8 @@ export const login: Handler = async (req, res, next) => {
       user,
       accessToken,
     });
+
+    console.log("User logged in successfully");
   } catch (error) {
     next(error);
   }

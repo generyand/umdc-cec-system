@@ -73,7 +73,7 @@ export default function RegisterPage() {
       if (axios.isAxiosError(error)) {
         const errorMessage =
           error.response?.data?.errors[0]?.message || "Registration failed";
-        setError(errorMessage);
+        // setError(errorMessage);
         toast.error(errorMessage);
       } else {
         setError("An unexpected error occurred");
@@ -89,10 +89,10 @@ export default function RegisterPage() {
       <Card className="w-full max-w-[400px]">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center">
-            Create an account
+            Create your account
           </CardTitle>
           <CardDescription className="text-center">
-            Enter your email and password to register
+            Enter your details below to create your account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -108,12 +108,13 @@ export default function RegisterPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Full Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="John Doe"
+                        placeholder="Enter your full name"
                         {...field}
                         disabled={isLoading}
+                        autoComplete="name"
                       />
                     </FormControl>
                     <FormMessage />
@@ -125,13 +126,15 @@ export default function RegisterPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Email Address</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="name@example.com"
+                        placeholder="Enter your email address"
                         {...field}
                         disabled={isLoading}
+                        autoComplete="email"
+                        autoCapitalize="none"
                       />
                     </FormControl>
                     <FormMessage />
@@ -147,9 +150,10 @@ export default function RegisterPage() {
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Enter your password"
+                        placeholder="Create a secure password"
                         {...field}
                         disabled={isLoading}
+                        autoComplete="new-password"
                       />
                     </FormControl>
                     <FormMessage />
@@ -165,20 +169,30 @@ export default function RegisterPage() {
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Confirm your password"
+                        placeholder="Verify your password"
                         {...field}
                         disabled={isLoading}
+                        autoComplete="new-password"
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading && (
-                  <Icons.spinner className="mr-2 w-4 h-4 animate-spin" />
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
+                size="lg"
+              >
+                {isLoading ? (
+                  <>
+                    <Icons.spinner className="mr-2 w-4 h-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  "Create Account"
                 )}
-                Register
               </Button>
             </form>
           </Form>
@@ -188,9 +202,9 @@ export default function RegisterPage() {
             Already have an account?{" "}
             <Link
               to="/auth/login"
-              className="text-primary underline-offset-4 hover:underline"
+              className="font-medium text-primary underline-offset-4 hover:underline"
             >
-              Login
+              Sign in
             </Link>
           </div>
         </CardFooter>

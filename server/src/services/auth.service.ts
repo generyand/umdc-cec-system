@@ -35,14 +35,6 @@ export const authService = {
 
   // Existing methods
   async register({ email, password, name }: RegisterInput) {
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      throw new ValidationError("Email already registered");
-    }
-
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.create({

@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Icons } from "../../components/icons"; // TODO: fix this import
+import { Icons } from "@/components/icons/icons";
 
 const formSchema = z
   .object({
@@ -61,23 +61,24 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      await axios.post("http://localhost:3000/api/auth/register", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
         name: values.name,
         email: values.email,
         password: values.password,
       });
 
-      toast.success("Registration successful!");
-      navigate("/auth/login");
+      toast.success("Registration successful! Redirecting to login...");
+
+      setTimeout(() => {
+        navigate("/auth/login");
+      }, 1500);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage =
           error.response?.data?.errors[0]?.message || "Registration failed";
-        // setError(errorMessage);
-        toast.error(errorMessage);
+        setError(errorMessage);
       } else {
         setError("An unexpected error occurred");
-        toast.error("An unexpected error occurred");
       }
     } finally {
       setIsLoading(false);
@@ -85,130 +86,129 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="container flex flex-col justify-center items-center w-screen h-screen">
-      <Card className="w-full max-w-[400px]">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">
-            Create your account
-          </CardTitle>
-          <CardDescription className="text-center">
-            Enter your details below to create your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <div className="p-2 mb-4 text-sm text-red-500 bg-red-50 rounded border border-red-200">
-              {error}
-            </div>
-          )}
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter your full name"
-                        {...field}
-                        disabled={isLoading}
-                        autoComplete="name"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Enter your email address"
-                        {...field}
-                        disabled={isLoading}
-                        autoComplete="email"
-                        autoCapitalize="none"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Create a secure password"
-                        {...field}
-                        disabled={isLoading}
-                        autoComplete="new-password"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Verify your password"
-                        {...field}
-                        disabled={isLoading}
-                        autoComplete="new-password"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-                size="lg"
-              >
-                {isLoading ? (
-                  <>
-                    <Icons.spinner className="mr-2 w-4 h-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  "Create Account"
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
-          <div className="text-sm text-center text-muted-foreground">
-            Already have an account?{" "}
-            <Link
-              to="/auth/login"
-              className="font-medium text-primary underline-offset-4 hover:underline"
+    <Card className="bg-transparent border-0 shadow-none">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl text-center">
+          Create your account
+        </CardTitle>
+        <CardDescription className="text-center">
+          Enter your details below to create your account
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+              <div className="p-3 text-sm rounded-md text-destructive bg-destructive/10">
+                {error}
+              </div>
+            )}
+
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your full name"
+                      {...field}
+                      disabled={isLoading}
+                      autoComplete="name"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email address"
+                      {...field}
+                      disabled={isLoading}
+                      autoComplete="email"
+                      autoCapitalize="none"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Create a secure password"
+                      {...field}
+                      disabled={isLoading}
+                      autoComplete="new-password"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Verify your password"
+                      {...field}
+                      disabled={isLoading}
+                      autoComplete="new-password"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              className="w-full bg-primary"
+              disabled={isLoading}
+              size="lg"
             >
-              Sign in
-            </Link>
-          </div>
-        </CardFooter>
-      </Card>
-    </div>
+              {isLoading ? (
+                <>
+                  <Icons.spinner className="mr-2 w-4 h-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                "Create Account"
+              )}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+      <CardFooter className="flex flex-col space-y-4">
+        <div className="text-sm text-center text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            to="/auth/login"
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Sign in
+          </Link>
+        </div>
+      </CardFooter>
+    </Card>
   );
 }

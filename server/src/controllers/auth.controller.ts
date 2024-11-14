@@ -26,6 +26,24 @@ import { prisma } from "../lib/prisma.js";
 export const register: Handler = async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
+
+    // Check if email exists first
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      res.status(409).json({
+        errors: [
+          {
+            message: "Email already registered",
+            field: "email",
+          },
+        ],
+      });
+      return;
+    }
+
     const { user, accessToken, refreshToken } = await authService.register({
       email,
       password,
@@ -45,11 +63,11 @@ export const register: Handler = async (req, res, next) => {
     });
 
     console.log("User registered successfully");
+    return;
   } catch (error) {
     next(error);
+    return;
   }
-
-  // console.log("register controller");
 };
 
 export const login: Handler = async (req, res, next) => {

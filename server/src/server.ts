@@ -7,13 +7,13 @@ import {
   setupGracefulShutdown,
 } from "./services/startup.service.js";
 import { errorHandler } from "./middleware/error.middleware.js";
-import authRoutes from "./routes/auth.route.js";
+import authRoutes from "./routes/auth/auth.route.js";
 // import { Server } from "http";
 
 async function createServer() {
   // Initialize configuration
-  const config = initializeConfig();
-  console.log(`Current environment: ${config.nodeEnv}`);
+  // const config = initializeConfig();
+  // console.log(`Current environment: ${config.nodeEnv}`);
 
   // Create Express app
   const app = express();

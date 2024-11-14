@@ -1,18 +1,18 @@
 import { Router } from "express";
-import { validateRequest } from "../middleware/validateRequest.js";
+import { validateRequest } from "../../middleware/validateRequest.js";
 import {
   loginSchema,
   registerSchema,
   resetPasswordSchema,
-} from "../schemas/auth.schema.js";
+} from "../../schemas/auth.schema.js";
 import {
   login,
   register,
   logout,
   resetPassword,
   refreshToken,
-} from "../controllers/auth.controller.js";
-import { authenticateToken } from "../middleware/auth.middleware.js";
+} from "../../controllers/auth.controller.js";
+import { authenticateToken } from "../../middleware/auth.middleware.js";
 import { rateLimit } from "express-rate-limit";
 
 const authLimiter = rateLimit({

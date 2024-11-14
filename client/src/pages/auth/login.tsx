@@ -138,7 +138,7 @@ export default function LoginPage() {
             </div>
             <Button
               type="submit"
-              className="w-full bg-primary"
+              className="w-full bg-primary dark:text-white"
               disabled={isLoading}
               size="lg"
             >

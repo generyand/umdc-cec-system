@@ -182,7 +182,7 @@ export default function RegisterPage() {
             />
             <Button
               type="submit"
-              className="w-full bg-primary"
+              className="w-full bg-primary dark:text-white"
               disabled={isLoading}
               size="lg"
             >

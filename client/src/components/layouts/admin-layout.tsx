@@ -1,5 +1,5 @@
 // import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Sidebar } from "../admin-view/sidebar";
+import { Sidebar } from "../admin/sidebar";
 import { Menu } from "lucide-react";
 
 export default function AdminLayout({

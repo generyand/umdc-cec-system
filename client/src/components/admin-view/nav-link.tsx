@@ -18,7 +18,7 @@ export function NavLink({ href, icon: Icon, children }: NavLinkProps) {
       to={href}
       className={cn(
         buttonVariants({ variant: "ghost" }),
-        "w-full justify-start gap-2 hover:bg-accent hover:text-white",
+        "w-full justify-start gap-2 bg hover:text-white",
         isActive && "bg-muted font-medium"
       )}
     >

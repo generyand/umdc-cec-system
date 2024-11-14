@@ -1,6 +1,6 @@
-# University of Mindanao Digos College Community Extension Center Management System (UMDC-CECMS)
+# UM Digos College Community Extension Center Management System (UMDC-CECMS)
 
-The University of Mindanao Digos College Community Extension Center Management System (UMDC-CECMS) is a comprehensive web-based platform designed to streamline the management and execution of community extension programs. This system serves as a central hub for planning, implementing, monitoring, and evaluating community outreach initiatives undertaken by the University of Mindanao Digos College.
+The UM Digos College Community Extension Center Management System (UMDC-CECMS) is a comprehensive web-based platform designed to streamline the management and execution of community extension programs. This system serves as a central hub for planning, implementing, monitoring, and evaluating community outreach initiatives undertaken by the UM Digos College.
 
 ## Purpose
 
@@ -32,15 +32,44 @@ UMDC-CECMS empowers faculty members, staff, and administrators to efficiently ma
 - Tailwind CSS
 - Shadcn UI
 - Vite
-- Redux Toolkit
+- Zustand (State Management)
+- TanStack React Query (Server State Management)
+- Axios (HTTP Client)
 - React Router DOM
 
 ### Backend
 
 - Node.js
 - Express.js
+- TypeScript
 - PostgreSQL
 - Prisma ORM
+
+### Backend Dependencies
+
+- **Security**
+
+  - `helmet` (Security headers)
+  - `bcryptjs` (Password hashing)
+  - `jsonwebtoken` (JWT authentication)
+  - `express-rate-limit` (Rate limiting)
+  - `cors` (Cross-Origin Resource Sharing)
+
+- **Database**
+
+  - `@prisma/client` (Prisma ORM)
+  - `pg` (PostgreSQL driver)
+
+- **Validation & Types**
+
+  - `zod` (Schema validation)
+  - `typescript` (Type safety)
+
+- **Development Tools**
+  - `tsx` (TypeScript execution)
+  - `nodemon` (Development server)
+  - `dotenv` (Environment variables)
+  - `source-map-support` (Source map support for stack traces)
 
 ## 🌟 Features
 

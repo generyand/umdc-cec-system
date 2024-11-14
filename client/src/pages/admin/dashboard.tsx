@@ -22,7 +22,7 @@ import {
 import { Award, HandHeart, Target, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
-import AdminLayout from "@/components/admin-view/admin-layout";
+import AdminLayout from "@/components/layouts/admin-layout";
 
 // Dummy data for demonstration
 const projectStats = [

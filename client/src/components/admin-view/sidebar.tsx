@@ -28,7 +28,7 @@ export function Sidebar({ className }: SidebarProps) {
     >
       <div className="flex flex-col h-screen">
         <div className="px-3 py-4">
-          <h2 className="px-4 mb-2 text-lg font-semibold">UMDC CMS</h2>
+          <h2 className="px-4 mb-2 text-lg font-semibold">UMDC CEC</h2>
         </div>
         <nav className="flex-1 px-3 space-y-4">
           <div className="py-2">

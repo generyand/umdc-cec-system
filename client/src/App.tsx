@@ -1,14 +1,17 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
-import MainLayout from "@/components/layouts/MainLayout";
+import { ThemeSynchronizer } from "@/store/theme-store";
+
+import MainLayout from "@/components/layouts/main-layout";
 import RegisterPage from "@/pages/auth/register";
-import AuthLayout from "@/components/auth/layout";
+import AuthLayout from "@/components/layouts/auth-layout";
 import LoginPage from "@/pages/auth/login";
-import DashboardPage from "@/pages/admin-view/dashboard";
+import DashboardPage from "@/pages/admin/dashboard";
 
 const App = () => {
   return (
     <BrowserRouter>
+      <ThemeSynchronizer />
       <MainLayout>
         <Routes>
           {/* Root route - redirect to login */}
@@ -27,7 +30,7 @@ const App = () => {
           {/* Catch all route - redirect to login */}
           <Route path="*" element={<Navigate to="/auth/login" replace />} />
         </Routes>
-        <Toaster />
+        <Toaster theme="system" />
       </MainLayout>
     </BrowserRouter>
   );

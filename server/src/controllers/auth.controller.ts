@@ -5,24 +5,6 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../lib/prisma.js";
 import { Request, Response, NextFunction } from "express";
 
-// Define types for request bodies
-// interface RegisterRequest {
-//   email: string;
-//   password: string;
-//   name: string;
-// }
-
-// interface LoginRequest {
-//   email: string;
-//   password: string;
-// }
-
-// interface ResetPasswordRequest {
-//   email: string;
-//   token: string;
-//   newPassword: string;
-// }
-
 // Update controller types
 export const register: Handler = async (req, res, next) => {
   try {
@@ -60,7 +42,7 @@ export const register: Handler = async (req, res, next) => {
 
     res.status(201).json({
       user,
-      accessToken,
+      token: accessToken,
     });
 
     console.log("User registered successfully");
@@ -88,10 +70,13 @@ export const login: Handler = async (req, res, next) => {
 
     res.status(200).json({
       user,
-      accessToken,
+      token: accessToken,
     });
 
+    console.log(user);
+
     console.log("User logged in successfully");
+    return;
   } catch (error) {
     next(error);
   }
@@ -103,18 +88,22 @@ export const logout = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      res.status(401).json({ message: "User not authenticated" });
-      return;
-    }
-
-    await prisma.user.update({
-      where: { id: userId },
-      data: { refreshToken: null },
+    // Even if the user is not authenticated, we should still clear their cookies
+    console.log("Clearing cookies");
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
 
-    res.clearCookie("refreshToken");
+    // If we have a user ID, clear their refresh token in the database
+    if (req.user?.id) {
+      await prisma.user.update({
+        where: { id: req.user.id },
+        data: { refreshToken: null },
+      });
+    }
+
     res.status(200).json({ message: "Logged out successfully" });
     return;
   } catch (error) {

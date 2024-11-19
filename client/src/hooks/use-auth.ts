@@ -19,14 +19,18 @@ interface User {
 
 interface AuthState {
   user: User | null;
-  accessToken: string | null;
+  token: string | null;
   isLoading: boolean;
   error: string | null;
 
   login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: () => Promise<boolean | undefined>;
   register: (email: string, password: string, name: string) => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
+  resetPassword: (
+    email: string,
+    token: string,
+    newPassword: string
+  ) => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
@@ -34,7 +38,7 @@ export const useAuth = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
-      accessToken: null,
+      token: null,
       isLoading: false,
       error: null,
 
@@ -52,7 +56,7 @@ export const useAuth = create<AuthState>()(
 
           set({
             user: data.user,
-            accessToken: data.token,
+            token: data.token,
             isLoading: false,
           });
         } catch (error) {
@@ -66,26 +70,42 @@ export const useAuth = create<AuthState>()(
       },
 
       logout: async () => {
+        const currentState = get();
+
+        // Prevent recursive state updates and duplicate logouts
+        if (currentState.isLoading || !currentState.user) {
+          return false;
+        }
+
         try {
           set({ isLoading: true, error: null });
 
-          // Don't send a request body for logout
+          // Clear state first to prevent interceptor issues
+          set({
+            user: null,
+            token: null,
+            isLoading: false,
+            error: null,
+          });
+
+          // Clear auth header
+          delete api.defaults.headers.common["Authorization"];
+
+          // Call logout endpoint last
           await api.post("/api/auth/logout");
 
-          // Clear user state
-          set({ user: null, isLoading: false });
-
-          // Optionally navigate to login
-          window.location.href = "/auth/login";
+          return true;
         } catch (error) {
+          console.error("Logout error:", error);
+          // Don't restore state on error, just update error message
           set({
             error: axios.isAxiosError(error)
               ? error.response?.data?.message || "Failed to logout"
               : "An error occurred",
             isLoading: false,
           });
-          console.error("Failed to logout", error);
-          throw error;
+
+          return false;
         }
       },
 
@@ -104,7 +124,7 @@ export const useAuth = create<AuthState>()(
 
           set({
             user: data.user,
-            accessToken: data.token,
+            token: data.token,
             isLoading: false,
           });
         } catch (error) {
@@ -117,11 +137,19 @@ export const useAuth = create<AuthState>()(
         }
       },
 
-      resetPassword: async (email: string) => {
+      resetPassword: async (
+        email: string,
+        token: string,
+        newPassword: string
+      ) => {
         try {
           set({ isLoading: true, error: null });
 
-          await api.post("/api/auth/reset-password", { email });
+          await api.post("/api/auth/reset-password", {
+            email,
+            token,
+            newPassword,
+          });
 
           set({ isLoading: false });
         } catch (error) {
@@ -143,7 +171,7 @@ export const useAuth = create<AuthState>()(
             data,
             {
               headers: {
-                Authorization: `Bearer ${get().accessToken}`,
+                Authorization: `Bearer ${get().token}`,
               },
             }
           );
@@ -166,7 +194,7 @@ export const useAuth = create<AuthState>()(
       name: "auth-storage",
       partialize: (state) => ({
         user: state.user,
-        accessToken: state.accessToken,
+        token: state.token,
       }),
     }
   )
@@ -175,9 +203,9 @@ export const useAuth = create<AuthState>()(
 // Add request interceptor to add token to all requests
 api.interceptors.request.use(
   (config) => {
-    const { accessToken } = useAuth.getState();
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    const { token } = useAuth.getState();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -186,27 +214,35 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle token expiration
+// Add refresh token functionality to response interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // If the error is 401 and we haven't retried yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes("/logout") &&
+      !originalRequest.url?.includes("/refresh-token")
+    ) {
       originalRequest._retry = true;
 
       try {
-        // Implement token refresh logic here if needed
-        // const { data } = await api.post("/api/auth/refresh-token");
-        // useAuth.setState({ accessToken: data.token });
-        // originalRequest.headers.Authorization = `Bearer ${data.token}`;
-        // return api(originalRequest);
+        // Try to refresh the token
+        const { data } = await api.post("/api/auth/refresh-token");
+        const { token } = data;
 
-        // For now, just logout on 401
-        useAuth.getState().logout();
-      } catch (error) {
-        return Promise.reject(error);
+        // Update auth store with new token
+        useAuth.setState({ token });
+
+        // Retry original request with new token
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        // If refresh fails, logout
+        await useAuth.getState().logout();
+        return Promise.reject(refreshError);
       }
     }
 

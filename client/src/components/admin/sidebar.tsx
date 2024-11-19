@@ -1,6 +1,4 @@
 import { cn } from "@/lib/utils";
-// import { Button } from "@/components/ui/button";
-// import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -8,7 +6,6 @@ import {
   Building2,
   Calendar,
   FileText,
-  Settings,
   BarChart3,
   HandHeart,
   GraduationCap,
@@ -32,11 +29,8 @@ export function Sidebar({ className }: SidebarProps) {
         className
       )}
     >
-      <div className="flex flex-col h-screen">
-        <div className="flex items-center px-4 my-2 h-14">
-          {isOpen && <h2 className="text-lg font-semibold">Gevias</h2>}
-        </div>
-        <nav className="flex-1 px-2 space-y-2">
+      <div className="flex flex-col py-2 h-screen">
+        <nav className="overflow-y-auto flex-1 px-2 space-y-2">
           <div className="space-y-1">
             <NavLink collapsed={!isOpen} href="/admin/" icon={Home}>
               Home
@@ -122,22 +116,6 @@ export function Sidebar({ className }: SidebarProps) {
                 icon={MessageSquare}
               >
                 Feedback
-              </NavLink>
-            </div>
-          </div>
-          <div className="pt-4">
-            {isOpen && (
-              <h2 className="px-3 mb-2 text-xs font-medium tracking-wider uppercase text-muted-foreground">
-                System
-              </h2>
-            )}
-            <div className="space-y-1">
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/settings"
-                icon={Settings}
-              >
-                Settings
               </NavLink>
             </div>
           </div>

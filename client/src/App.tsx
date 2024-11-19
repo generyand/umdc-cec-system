@@ -10,6 +10,8 @@ import AdminLayout from "./components/layouts/admin-layout";
 import DashboardPage from "./pages/admin/dashboard";
 import ProjectsPage from "./pages/admin/projects";
 import SettingsPage from "./pages/admin/settings";
+import AdminProfile from "./pages/admin/profile";
+
 const App = () => {
   return (
     <MainLayout>
@@ -27,6 +29,7 @@ const App = () => {
         {/* Protected routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<HomePage />} />
+          <Route path="/admin/profile" element={<AdminProfile />} />
           <Route path="/admin/dashboard" element={<DashboardPage />} />
           <Route path="/admin/projects" element={<ProjectsPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />

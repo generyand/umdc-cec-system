@@ -34,7 +34,6 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
-import AdminLayout from "@/components/layouts/admin-layout";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -175,506 +174,500 @@ const impactIndicators = [
 
 export default function DashboardPage() {
   return (
-    <AdminLayout>
-      <div className="p-8 h-full">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">
-              Community Extension Dashboard
-            </h2>
-            <p className="text-muted-foreground">
-              Monitor and analyze community engagement activities
-            </p>
-          </div>
-          <DatePickerWithRange className="w-[300px]" />
+    <div className="p-8 h-full">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Community Extension Dashboard
+          </h2>
+          <p className="text-muted-foreground">
+            Monitor and analyze community engagement activities
+          </p>
         </div>
+        <DatePickerWithRange className="w-[300px]" />
+      </div>
 
-        <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="justify-start w-full">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="projects">Projects</TabsTrigger>
-            <TabsTrigger value="engagement">Engagement</TabsTrigger>
-            <TabsTrigger value="impact">Impact</TabsTrigger>
-          </TabsList>
+      <Tabs defaultValue="overview" className="space-y-8">
+        <TabsList className="justify-start w-full">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="projects">Projects</TabsTrigger>
+          <TabsTrigger value="engagement">Engagement</TabsTrigger>
+          <TabsTrigger value="impact">Impact</TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-                  <CardTitle className="text-sm font-medium">
-                    Active Projects
-                  </CardTitle>
-                  <Target className="w-4 h-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">42</div>
-                  <p className="text-xs text-muted-foreground">
-                    +8 new this month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-                  <CardTitle className="text-sm font-medium">
-                    Total Participants
-                  </CardTitle>
-                  <Users className="w-4 h-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">2,845</div>
-                  <p className="text-xs text-muted-foreground">
-                    +312 this quarter
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-                  <CardTitle className="text-sm font-medium">
-                    Partner Organizations
-                  </CardTitle>
-                  <HandHeart className="w-4 h-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">18</div>
-                  <p className="text-xs text-muted-foreground">
-                    +3 new partnerships
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-                  <CardTitle className="text-sm font-medium">
-                    Impact Score
-                  </CardTitle>
-                  <Award className="w-4 h-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">92%</div>
-                  <p className="text-xs text-muted-foreground">
-                    +5% from last quarter
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-7">
-              <Card className="lg:col-span-4">
-                <CardHeader>
-                  <CardTitle>Project Statistics</CardTitle>
-                  <CardDescription>
-                    Monthly overview of project status
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={projectStats}>
-                      <XAxis dataKey="name" stroke="#888888" fontSize={12} />
-                      <YAxis stroke="#888888" fontSize={12} />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="completed" stackId="a" fill="#0088FE" />
-                      <Bar dataKey="ongoing" stackId="a" fill="#00C49F" />
-                      <Bar dataKey="planned" stackId="a" fill="#FFBB28" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              <Card className="lg:col-span-3">
-                <CardHeader>
-                  <CardTitle>Program Distribution</CardTitle>
-                  <CardDescription>By category</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <PieChart>
-                      <Pie
-                        data={programDistribution}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {programDistribution.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <Card>
+              <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium">
+                  Active Projects
+                </CardTitle>
+                <Target className="w-4 h-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">42</div>
+                <p className="text-xs text-muted-foreground">
+                  +8 new this month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium">
+                  Total Participants
+                </CardTitle>
+                <Users className="w-4 h-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">2,845</div>
+                <p className="text-xs text-muted-foreground">
+                  +312 this quarter
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium">
+                  Partner Organizations
+                </CardTitle>
+                <HandHeart className="w-4 h-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">18</div>
+                <p className="text-xs text-muted-foreground">
+                  +3 new partnerships
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium">
+                  Impact Score
+                </CardTitle>
+                <Award className="w-4 h-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">92%</div>
+                <p className="text-xs text-muted-foreground">
+                  +5% from last quarter
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-7">
+            <Card className="lg:col-span-4">
               <CardHeader>
-                <CardTitle>Stakeholder Participation Trends</CardTitle>
+                <CardTitle>Project Statistics</CardTitle>
                 <CardDescription>
-                  Weekly participation breakdown
+                  Monthly overview of project status
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={participationData}>
+                  <BarChart data={projectStats}>
                     <XAxis dataKey="name" stroke="#888888" fontSize={12} />
                     <YAxis stroke="#888888" fontSize={12} />
                     <Tooltip />
                     <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="students"
-                      stroke="#0088FE"
-                      strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="faculty"
-                      stroke="#00C49F"
-                      strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="community"
-                      stroke="#FFBB28"
-                      strokeWidth={2}
-                    />
-                  </LineChart>
+                    <Bar dataKey="completed" stackId="a" fill="#0088FE" />
+                    <Bar dataKey="ongoing" stackId="a" fill="#00C49F" />
+                    <Bar dataKey="planned" stackId="a" fill="#FFBB28" />
+                  </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          {/* Projects Tab */}
-          <TabsContent value="projects" className="space-y-6">
-            {/* Project Metrics Overview */}
-            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
-              <Card className="transition-shadow hover:shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex gap-2 items-center text-sm font-medium">
-                    <Wallet className="w-4 h-4 text-muted-foreground" />
-                    Total Budget
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {projectMetrics.totalBudget}
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Allocated for all projects
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex gap-2 items-center text-sm font-medium">
-                    <Activity className="w-4 h-4 text-muted-foreground" />
-                    Active Projects
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {projectMetrics.activeProjects}
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Currently running
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex gap-2 items-center text-sm font-medium">
-                    <Users className="w-4 h-4 text-muted-foreground" />
-                    Completed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {projectMetrics.completedProjects}
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Completed projects
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex gap-2 items-center text-sm font-medium">
-                    <Users className="w-4 h-4 text-muted-foreground" />
-                    Planned
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {projectMetrics.plannedProjects}
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Planned projects
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex gap-2 items-center text-sm font-medium">
-                    <Users className="w-4 h-4 text-muted-foreground" />
-                    Total Participants
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {projectMetrics.totalParticipants}
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Total participants
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex gap-2 items-center text-sm font-medium">
-                    <Activity className="w-4 h-4 text-muted-foreground" />
-                    Avg. Progress
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {projectMetrics.averageProgress}%
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Average progress
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Project List */}
-            <Card>
-              <CardHeader className="border-b">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle>Active Projects Overview</CardTitle>
-                    <CardDescription>
-                      Current and upcoming community extension projects
-                    </CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      <Filter className="mr-2 w-4 h-4" />
-                      Filter
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Download className="mr-2 w-4 h-4" />
-                      Export
-                    </Button>
-                  </div>
-                </div>
+            <Card className="lg:col-span-3">
+              <CardHeader>
+                <CardTitle>Program Distribution</CardTitle>
+                <CardDescription>By category</CardDescription>
               </CardHeader>
-              <CardContent className="p-0">
-                <div>
-                  {projectsList.map((project, index) => (
-                    <div
-                      key={project.id}
-                      className={cn(
-                        "p-4 hover:bg-accent/50 cursor-pointer transition-colors",
-                        index !== projectsList.length - 1 && "border-b"
-                      )}
+              <CardContent>
+                <ResponsiveContainer width="100%" height={400}>
+                  <PieChart>
+                    <Pie
+                      data={programDistribution}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      paddingAngle={5}
+                      dataKey="value"
                     >
-                      {/* Header with Title, Status, and Menu */}
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex-1">
-                          <div className="flex justify-between items-center mb-1">
-                            <div className="flex gap-2 items-center">
-                              <h4 className="font-medium">{project.name}</h4>
-                              <Badge
-                                variant="secondary"
-                                className={cn("capitalize", {
-                                  "bg-green-100 text-green-700":
-                                    project.status === "completed",
-                                  "bg-blue-100 text-blue-700":
-                                    project.status === "ongoing",
-                                  "bg-orange-100 text-orange-700":
-                                    project.status === "planned",
-                                })}
-                              >
-                                {project.status}
-                              </Badge>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="w-8 h-8"
+                      {programDistribution.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Stakeholder Participation Trends</CardTitle>
+              <CardDescription>Weekly participation breakdown</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart data={participationData}>
+                  <XAxis dataKey="name" stroke="#888888" fontSize={12} />
+                  <YAxis stroke="#888888" fontSize={12} />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="students"
+                    stroke="#0088FE"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="faculty"
+                    stroke="#00C49F"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="community"
+                    stroke="#FFBB28"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Projects Tab */}
+        <TabsContent value="projects" className="space-y-6">
+          {/* Project Metrics Overview */}
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+            <Card className="transition-shadow hover:shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex gap-2 items-center text-sm font-medium">
+                  <Wallet className="w-4 h-4 text-muted-foreground" />
+                  Total Budget
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {projectMetrics.totalBudget}
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Allocated for all projects
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="transition-shadow hover:shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex gap-2 items-center text-sm font-medium">
+                  <Activity className="w-4 h-4 text-muted-foreground" />
+                  Active Projects
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {projectMetrics.activeProjects}
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Currently running
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="transition-shadow hover:shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex gap-2 items-center text-sm font-medium">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  Completed
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {projectMetrics.completedProjects}
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Completed projects
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="transition-shadow hover:shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex gap-2 items-center text-sm font-medium">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  Planned
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {projectMetrics.plannedProjects}
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Planned projects
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="transition-shadow hover:shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex gap-2 items-center text-sm font-medium">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  Total Participants
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {projectMetrics.totalParticipants}
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Total participants
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="transition-shadow hover:shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex gap-2 items-center text-sm font-medium">
+                  <Activity className="w-4 h-4 text-muted-foreground" />
+                  Avg. Progress
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {projectMetrics.averageProgress}%
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Average progress
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Project List */}
+          <Card>
+            <CardHeader className="border-b">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Active Projects Overview</CardTitle>
+                  <CardDescription>
+                    Current and upcoming community extension projects
+                  </CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Filter className="mr-2 w-4 h-4" />
+                    Filter
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Download className="mr-2 w-4 h-4" />
+                    Export
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div>
+                {projectsList.map((project, index) => (
+                  <div
+                    key={project.id}
+                    className={cn(
+                      "p-4 hover:bg-accent/50 cursor-pointer transition-colors",
+                      index !== projectsList.length - 1 && "border-b"
+                    )}
+                  >
+                    {/* Header with Title, Status, and Menu */}
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center mb-1">
+                          <div className="flex gap-2 items-center">
+                            <h4 className="font-medium">{project.name}</h4>
+                            <Badge
+                              variant="secondary"
+                              className={cn("capitalize", {
+                                "bg-green-100 text-green-700":
+                                  project.status === "completed",
+                                "bg-blue-100 text-blue-700":
+                                  project.status === "ongoing",
+                                "bg-orange-100 text-orange-700":
+                                  project.status === "planned",
+                              })}
                             >
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
+                              {project.status}
+                            </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground line-clamp-1">
-                            {project.description}
-                          </p>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="w-8 h-8"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground line-clamp-1">
+                          {project.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Main Content Grid */}
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                      {/* Project Details */}
+                      <div className="grid grid-cols-2 col-span-1 gap-y-2 gap-x-8 text-sm md:col-span-3">
+                        <div className="flex gap-2 items-center">
+                          <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <span className="truncate">{project.location}</span>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                          <User className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <span className="truncate">
+                            {project.coordinator}
+                          </span>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                          <Wallet className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <span>{project.budget}</span>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                          <Users className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <span>{project.participants} participants</span>
                         </div>
                       </div>
 
-                      {/* Main Content Grid */}
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                        {/* Project Details */}
-                        <div className="grid grid-cols-2 col-span-1 gap-y-2 gap-x-8 text-sm md:col-span-3">
-                          <div className="flex gap-2 items-center">
-                            <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
-                            <span className="truncate">{project.location}</span>
-                          </div>
-                          <div className="flex gap-2 items-center">
-                            <User className="w-4 h-4 text-muted-foreground shrink-0" />
-                            <span className="truncate">
-                              {project.coordinator}
+                      {/* Progress Section */}
+                      <div className="flex col-span-1 items-center">
+                        <div className="w-full space-y-1.5">
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="font-medium">
+                              {project.progress}%
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              Due{" "}
+                              {new Date(project.endDate).toLocaleDateString()}
                             </span>
                           </div>
-                          <div className="flex gap-2 items-center">
-                            <Wallet className="w-4 h-4 text-muted-foreground shrink-0" />
-                            <span>{project.budget}</span>
-                          </div>
-                          <div className="flex gap-2 items-center">
-                            <Users className="w-4 h-4 text-muted-foreground shrink-0" />
-                            <span>{project.participants} participants</span>
+                          <div className="overflow-hidden h-2 rounded-full bg-secondary">
+                            <div
+                              className={cn(
+                                "h-full transition-all duration-300",
+                                project.status === "completed"
+                                  ? "bg-green-500"
+                                  : "bg-primary"
+                              )}
+                              style={{ width: `${project.progress}%` }}
+                            />
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                        {/* Progress Section */}
-                        <div className="flex col-span-1 items-center">
-                          <div className="w-full space-y-1.5">
-                            <div className="flex justify-between items-center text-sm">
-                              <span className="font-medium">
-                                {project.progress}%
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                Due{" "}
-                                {new Date(project.endDate).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <div className="overflow-hidden h-2 rounded-full bg-secondary">
-                              <div
-                                className={cn(
-                                  "h-full transition-all duration-300",
-                                  project.status === "completed"
-                                    ? "bg-green-500"
-                                    : "bg-primary"
-                                )}
-                                style={{ width: `${project.progress}%` }}
-                              />
-                            </div>
-                          </div>
-                        </div>
+        {/* Engagement Tab */}
+        <TabsContent value="engagement" className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {engagementMetrics.slice(-1)[0].students && (
+              <Card>
+                <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
+                  <CardTitle className="text-sm font-medium">
+                    Student Volunteers
+                  </CardTitle>
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {engagementMetrics.slice(-1)[0].students}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Active this month
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+            {/* Similar cards for faculty, partners, and hours */}
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Monthly Engagement Trends</CardTitle>
+              <CardDescription>
+                Participation across different stakeholder groups
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart data={engagementMetrics}>
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="students"
+                    stroke="#0088FE"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="faculty"
+                    stroke="#00C49F"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="partners"
+                    stroke="#FFBB28"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Impact Tab */}
+        <TabsContent value="impact" className="space-y-6">
+          {impactIndicators.map((category) => (
+            <Card key={category.category}>
+              <CardHeader>
+                <CardTitle>{category.category} Impact</CardTitle>
+                <CardDescription>
+                  Key performance indicators and outcomes
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {category.metrics.map((metric) => (
+                    <div
+                      key={metric.name}
+                      className="p-4 space-y-2 rounded-lg border"
+                    >
+                      <div className="text-sm text-muted-foreground">
+                        {metric.name}
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <div className="text-2xl font-bold">{metric.value}</div>
+                        <span className="text-sm text-green-600">
+                          {metric.increase}
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          {/* Engagement Tab */}
-          <TabsContent value="engagement" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {engagementMetrics.slice(-1)[0].students && (
-                <Card>
-                  <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-                    <CardTitle className="text-sm font-medium">
-                      Student Volunteers
-                    </CardTitle>
-                    <Users className="w-4 h-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {engagementMetrics.slice(-1)[0].students}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Active this month
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-              {/* Similar cards for faculty, partners, and hours */}
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Monthly Engagement Trends</CardTitle>
-                <CardDescription>
-                  Participation across different stakeholder groups
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={engagementMetrics}>
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="students"
-                      stroke="#0088FE"
-                      strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="faculty"
-                      stroke="#00C49F"
-                      strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="partners"
-                      stroke="#FFBB28"
-                      strokeWidth={2}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Impact Tab */}
-          <TabsContent value="impact" className="space-y-6">
-            {impactIndicators.map((category) => (
-              <Card key={category.category}>
-                <CardHeader>
-                  <CardTitle>{category.category} Impact</CardTitle>
-                  <CardDescription>
-                    Key performance indicators and outcomes
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-3">
-                    {category.metrics.map((metric) => (
-                      <div
-                        key={metric.name}
-                        className="p-4 space-y-2 rounded-lg border"
-                      >
-                        <div className="text-sm text-muted-foreground">
-                          {metric.name}
-                        </div>
-                        <div className="flex gap-2 items-center">
-                          <div className="text-2xl font-bold">
-                            {metric.value}
-                          </div>
-                          <span className="text-sm text-green-600">
-                            {metric.increase}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </TabsContent>
-        </Tabs>
-      </div>
-    </AdminLayout>
+          ))}
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

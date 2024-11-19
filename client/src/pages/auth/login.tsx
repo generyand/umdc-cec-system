@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import axios from "axios";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +22,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons/icons";
+import { useAuth } from "@/hooks/use-auth";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -32,8 +32,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { login, isLoading, error, user } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,33 +42,15 @@ export default function LoginPage() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/login`,
-        {
-          email: values.email,
-          password: values.password,
-        }
-      );
-
-      const { token } = response.data;
-      localStorage.setItem("token", token);
-      navigate("/admin/dashboard");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage =
-          error.response?.data?.message || "Invalid credentials";
-        setError(errorMessage);
-      } else {
-        setError("An unexpected error occurred");
-      }
-    } finally {
-      setIsLoading(false);
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/admin/");
     }
+  }, [user, navigate]);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    await login(values.email, values.password);
   }
 
   return (

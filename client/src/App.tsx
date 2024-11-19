@@ -5,7 +5,10 @@ import MainLayout from "@/components/layouts/main-layout";
 import RegisterPage from "@/pages/auth/register";
 import AuthLayout from "@/components/layouts/auth-layout";
 import LoginPage from "@/pages/auth/login";
-import DashboardPage from "@/pages/admin/dashboard";
+import HomePage from "@/pages/admin/home";
+import AdminLayout from "./components/layouts/admin-layout";
+import DashboardPage from "./pages/admin/dashboard";
+import ProjectsPage from "./pages/admin/projects";
 
 const App = () => {
   return (
@@ -22,7 +25,18 @@ const App = () => {
         </Route>
 
         {/* Protected routes */}
-        <Route path="/admin/dashboard" element={<DashboardPage />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="/admin/dashboard" element={<DashboardPage />} />
+          <Route path="/admin/projects" element={<ProjectsPage />} />
+        </Route>
+
+        {/* <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="projects" element={<Projects />} />
+        <Route path="settings" element={<Settings />} />
+      </Route> */}
 
         {/* Catch all route - redirect to login */}
         <Route path="*" element={<Navigate to="/auth/login" replace />} />

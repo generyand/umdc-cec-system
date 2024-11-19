@@ -1,38 +1,28 @@
-import { Sidebar } from "../admin/sidebar";
-// import { Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
-// import { useSidebarStore } from "@/store/use-sidebar-store";
-// import { Button } from "@/components/ui/button";
-// import { useMediaQuery } from "@/hooks/use-media-query";
+import { Outlet, Navigate } from "react-router-dom";
+import { Sidebar } from "@/components/admin/sidebar";
+import { useAuth } from "@/hooks/use-auth";
+import { AdminLayoutSkeleton } from "@/components/skeletons/admin-layout-skeleton";
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  // const { isOpen, toggle } = useSidebarStore();
-  // const isMobile = useMediaQuery("(max-width: 768px)");
+export default function AdminLayout() {
+  const { user, isLoading } = useAuth();
+  // const isLoading = false;
+  // const user = { role: "admin" };
+
+  if (isLoading) {
+    return <AdminLayoutSkeleton />;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth/login" replace />;
+  }
 
   return (
     <div className="flex overflow-hidden w-full h-screen bg-background">
       <Sidebar />
       <main className="overflow-auto flex-1">
-        {/* <div className="p-4 border-b">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggle}
-            className="hover:bg-accent"
-          >
-            {isMobile ? (
-              <Menu className="w-4 h-4" />
-            ) : isOpen ? (
-              <PanelLeftClose className="w-4 h-4" />
-            ) : (
-              <PanelLeftOpen className="w-4 h-4" />
-            )}
-          </Button>
-        </div> */}
-        <div className="p-6">{children}</div>
+        <div className="p-6">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

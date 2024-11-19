@@ -13,6 +13,7 @@ import {
   HandHeart,
   GraduationCap,
   MessageSquare,
+  Home,
 } from "lucide-react";
 import { NavLink } from "./nav-link";
 import { useSidebarStore } from "@/store/use-sidebar-store";
@@ -37,6 +38,9 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
         <nav className="flex-1 px-2 space-y-2">
           <div className="space-y-1">
+            <NavLink collapsed={!isOpen} href="/admin/" icon={Home}>
+              Home
+            </NavLink>
             <NavLink
               collapsed={!isOpen}
               href="/admin/dashboard"

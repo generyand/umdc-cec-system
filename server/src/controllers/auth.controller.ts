@@ -3,6 +3,7 @@ import { authService } from "../services/auth.service.js";
 import { AuthError, ValidationError } from "../utils/errors.js";
 import jwt from "jsonwebtoken";
 import { prisma } from "../lib/prisma.js";
+import { Request, Response, NextFunction } from "express";
 
 // Define types for request bodies
 // interface RegisterRequest {
@@ -96,7 +97,11 @@ export const login: Handler = async (req, res, next) => {
   }
 };
 
-export const logout: Handler = async (req, res, next) => {
+export const logout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -111,8 +116,10 @@ export const logout: Handler = async (req, res, next) => {
 
     res.clearCookie("refreshToken");
     res.status(200).json({ message: "Logged out successfully" });
+    return;
   } catch (error) {
     next(error);
+    return;
   }
 };
 

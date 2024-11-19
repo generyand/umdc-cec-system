@@ -9,7 +9,7 @@ import HomePage from "@/pages/admin/home";
 import AdminLayout from "./components/layouts/admin-layout";
 import DashboardPage from "./pages/admin/dashboard";
 import ProjectsPage from "./pages/admin/projects";
-
+import SettingsPage from "./pages/admin/settings";
 const App = () => {
   return (
     <MainLayout>
@@ -29,6 +29,7 @@ const App = () => {
           <Route index element={<HomePage />} />
           <Route path="/admin/dashboard" element={<DashboardPage />} />
           <Route path="/admin/projects" element={<ProjectsPage />} />
+          <Route path="/admin/settings" element={<SettingsPage />} />
         </Route>
 
         {/* <Route path="/admin" element={<AdminLayout />}>

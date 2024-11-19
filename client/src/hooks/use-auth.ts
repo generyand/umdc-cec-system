@@ -69,20 +69,14 @@ export const useAuth = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
 
-          await api.post("/api/auth/logout", null, {
-            headers: {
-              Authorization: `Bearer ${get().accessToken}`,
-            },
-          });
+          // Don't send a request body for logout
+          await api.post("/api/auth/logout");
 
-          // Remove authorization header
-          delete api.defaults.headers.common["Authorization"];
+          // Clear user state
+          set({ user: null, isLoading: false });
 
-          set({
-            user: null,
-            accessToken: null,
-            isLoading: false,
-          });
+          // Optionally navigate to login
+          window.location.href = "/auth/login";
         } catch (error) {
           set({
             error: axios.isAxiosError(error)
@@ -90,6 +84,8 @@ export const useAuth = create<AuthState>()(
               : "An error occurred",
             isLoading: false,
           });
+          console.error("Failed to logout", error);
+          throw error;
         }
       },
 

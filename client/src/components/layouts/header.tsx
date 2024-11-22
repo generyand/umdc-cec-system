@@ -52,13 +52,12 @@ export function Header() {
           to="/admin"
           className="flex gap-3 items-center transition-opacity hover:opacity-90"
         >
-          <div className="relative">
+          <div>
             <img
               src={umdcLogo}
               alt="UMDC Logo"
               className="w-10 h-10 rounded-full shadow-sm"
             />
-            <div className="absolute -right-1 -bottom-1 w-4 h-4 rounded-full border-2 bg-primary border-background" />
           </div>
           <div className="hidden flex-col md:flex">
             <span className="text-base font-semibold">UM Digos College</span>

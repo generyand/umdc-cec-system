@@ -26,7 +26,7 @@ export function NavLink({
       className={cn(
         "group flex items-center transition-all duration-200",
         "rounded-md text-sm select-none",
-        isChild ? "py-1.5 pl-9 pr-3 -ml-3" : "py-2.5 px-3",
+        isChild ? "py-1.5 pl-9 pr-3" : "py-2.5 px-3",
         collapsed ? "justify-center w-10 mx-auto" : "justify-start w-full",
         !collapsed && "gap-3",
         "hover:bg-accent/50",

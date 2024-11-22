@@ -139,7 +139,7 @@ export function Sidebar({ className }: SidebarProps) {
           >
             <NavLink
               collapsed={!isOpen}
-              href="/admin/departments/dae"
+              href="/admin/academic-departments/dae"
               icon={GraduationCap}
               isChild
             >
@@ -147,7 +147,7 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
             <NavLink
               collapsed={!isOpen}
-              href="/admin/departments/dase"
+              href="/admin/academic-departments/dase"
               icon={GraduationCap}
               isChild
             >
@@ -155,7 +155,7 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
             <NavLink
               collapsed={!isOpen}
-              href="/admin/departments/dba"
+              href="/admin/academic-departments/dba"
               icon={GraduationCap}
               isChild
             >
@@ -163,7 +163,7 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
             <NavLink
               collapsed={!isOpen}
-              href="/admin/departments/dcje"
+              href="/admin/academic-departments/dcje"
               icon={GraduationCap}
               isChild
             >
@@ -171,7 +171,7 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
             <NavLink
               collapsed={!isOpen}
-              href="/admin/departments/dte"
+              href="/admin/academic-departments/dte"
               icon={GraduationCap}
               isChild
             >
@@ -179,7 +179,7 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
             <NavLink
               collapsed={!isOpen}
-              href="/admin/departments/dtp"
+              href="/admin/academic-departments/dtp"
               icon={GraduationCap}
               isChild
             >
@@ -187,7 +187,7 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
             <NavLink
               collapsed={!isOpen}
-              href="/admin/departments/shs"
+              href="/admin/academic-departments/shs"
               icon={GraduationCap}
               isChild
             >
@@ -206,7 +206,7 @@ export function Sidebar({ className }: SidebarProps) {
           >
             <NavLink
               collapsed={!isOpen}
-              href="/admin/communities"
+              href="/admin/community-engagement/partner-communities"
               icon={Users}
               isChild
             >
@@ -214,7 +214,7 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
             <NavLink
               collapsed={!isOpen}
-              href="/admin/partnerships"
+              href="/admin/community-engagement/partnerships-and-linkages"
               icon={Building2}
               isChild
             >

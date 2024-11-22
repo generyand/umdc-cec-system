@@ -8,9 +8,17 @@ import LoginPage from "@/pages/auth/login";
 import HomePage from "@/pages/admin/home";
 import AdminLayout from "./components/layouts/admin-layout";
 import DashboardPage from "./pages/admin/dashboard";
-import ProjectsPage from "./pages/admin/projects";
 import SettingsPage from "./pages/admin/settings";
 import AdminProfile from "./pages/admin/profile";
+import DBAPage from "./pages/admin/academic-departments/dba";
+import DCJEPage from "./pages/admin/academic-departments/dcje";
+import DTEPage from "./pages/admin/academic-departments/dte";
+import DTPPage from "./pages/admin/academic-departments/dtp";
+import SHSPage from "./pages/admin/academic-departments/shs";
+import DAEPage from "./pages/admin/academic-departments/dae";
+import DASEPage from "./pages/admin/academic-departments/dase";
+import PartnershipsAndLinkagesPage from "./pages/admin/community-engagement/partnerships-and-linkages";
+import PartnerCommunitiesPage from "./pages/admin/community-engagement/partner-communities";
 
 const App = () => {
   return (
@@ -30,17 +38,30 @@ const App = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/admin/profile" element={<AdminProfile />} />
-          <Route path="/admin/dashboard" element={<DashboardPage />} />
-          <Route path="/admin/projects" element={<ProjectsPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
+          <Route path="/admin/dashboard" element={<DashboardPage />} />
+          <Route path="/admin/academic-departments/dae" element={<DAEPage />} />
+          <Route
+            path="/admin/academic-departments/dase"
+            element={<DASEPage />}
+          />
+          <Route path="/admin/academic-departments/dba" element={<DBAPage />} />
+          <Route
+            path="/admin/academic-departments/dcje"
+            element={<DCJEPage />}
+          />
+          <Route path="/admin/academic-departments/dte" element={<DTEPage />} />
+          <Route path="/admin/academic-departments/dtp" element={<DTPPage />} />
+          <Route path="/admin/academic-departments/shs" element={<SHSPage />} />
+          <Route
+            path="/admin/community-engagement/partner-communities"
+            element={<PartnerCommunitiesPage />}
+          />
+          <Route
+            path="/admin/community-engagement/partnerships-and-linkages"
+            element={<PartnershipsAndLinkagesPage />}
+          />
         </Route>
-
-        {/* <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="projects" element={<Projects />} />
-        <Route path="settings" element={<Settings />} />
-      </Route> */}
 
         {/* Catch all route - redirect to login */}
         <Route path="*" element={<Navigate to="/auth/login" replace />} />

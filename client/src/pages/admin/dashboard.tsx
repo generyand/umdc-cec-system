@@ -174,7 +174,7 @@ const impactIndicators = [
 
 export default function DashboardPage() {
   return (
-    <div className="p-8 h-full">
+    <div className="h-full">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">

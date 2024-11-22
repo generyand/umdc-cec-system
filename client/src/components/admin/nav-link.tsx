@@ -1,11 +1,6 @@
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface NavLinkProps {
   href: string;
@@ -13,7 +8,6 @@ interface NavLinkProps {
   children: React.ReactNode;
   collapsed?: boolean;
   isChild?: boolean;
-  description?: string;
 }
 
 export function NavLink({
@@ -22,12 +16,11 @@ export function NavLink({
   children,
   collapsed,
   isChild = false,
-  description,
 }: NavLinkProps) {
   const { pathname } = useLocation();
   const isActive = pathname === href;
 
-  const link = (
+  return (
     <Link
       to={href}
       className={cn(
@@ -72,25 +65,4 @@ export function NavLink({
       )}
     </Link>
   );
-
-  if (collapsed && description) {
-    return (
-      <Tooltip delayDuration={0}>
-        <TooltipTrigger asChild>{link}</TooltipTrigger>
-        <TooltipContent side="right" className="flex gap-2 items-center">
-          <Icon className="w-4 h-4" />
-          <div className="flex flex-col">
-            <span className="font-medium">{children}</span>
-            {description && (
-              <span className="text-xs text-muted-foreground">
-                {description}
-              </span>
-            )}
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    );
-  }
-
-  return link;
 }

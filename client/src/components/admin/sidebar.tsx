@@ -110,205 +110,175 @@ export function Sidebar({ className }: SidebarProps) {
     <div
       className={cn(
         "border-r backdrop-blur bg-background/95 supports-[backdrop-filter]:bg-background/60",
-        isOpen ? "w-[240px]" : "w-[70px]",
+        isOpen ? "w-[260px]" : "w-[70px]",
         "transition-all duration-300 max-md:hidden",
         className
       )}
     >
       <div className="flex flex-col h-screen">
         <nav className="overflow-y-auto flex-1 p-2 space-y-2">
-          <div className="pb-2 space-y-1">
+          <NavLink collapsed={!isOpen} href="/admin" icon={Home}>
+            Home
+          </NavLink>
+          <NavLink
+            collapsed={!isOpen}
+            href="/admin/dashboard"
+            icon={LayoutDashboard}
+          >
+            Dashboard
+          </NavLink>
+
+          {/* Academic Departments Section */}
+          <CollapsibleSection
+            title="Academic Departments"
+            icon={School}
+            isOpen={isOpen}
+            collapsed={!isOpen}
+            isExpanded={expandedSection === "Academic Departments"}
+            onToggle={() => handleSectionToggle("Academic Departments")}
+          >
             <NavLink
               collapsed={!isOpen}
-              href="/admin"
-              icon={Home}
-              description="Return to home page"
+              href="/admin/departments/dae"
+              icon={GraduationCap}
+              isChild
             >
-              Home
+              DAE
             </NavLink>
             <NavLink
               collapsed={!isOpen}
-              href="/admin/dashboard"
-              icon={LayoutDashboard}
-              description="View analytics and reports"
+              href="/admin/departments/dase"
+              icon={GraduationCap}
+              isChild
             >
-              Dashboard
+              DASE
             </NavLink>
-          </div>
-
-          <div className="space-y-1">
-            {/* Academic Departments Section */}
-            <CollapsibleSection
-              title="Academic Departments"
-              icon={School}
-              isOpen={isOpen}
-              collapsed={!isOpen}
-              isExpanded={expandedSection === "Academic Departments"}
-              onToggle={() => handleSectionToggle("Academic Departments")}
-            >
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/departments/dae"
-                icon={GraduationCap}
-                isChild
-                description="Department of Arts and Education"
-              >
-                DAE
-              </NavLink>
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/departments/dase"
-                icon={GraduationCap}
-                isChild
-                description="Department of Arts and Sciences Education"
-              >
-                DASE
-              </NavLink>
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/departments/dba"
-                icon={GraduationCap}
-                isChild
-                description="Department of Business Administration"
-              >
-                DBA
-              </NavLink>
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/departments/dcje"
-                icon={GraduationCap}
-                isChild
-                description="Department of Criminal Justice Education"
-              >
-                DCJE
-              </NavLink>
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/departments/dte"
-                icon={GraduationCap}
-                isChild
-                description="Department of Teacher Education"
-              >
-                DTE
-              </NavLink>
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/departments/dtp"
-                icon={GraduationCap}
-                isChild
-                description="Department of Technology Programs"
-              >
-                DTP
-              </NavLink>
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/departments/shs"
-                icon={GraduationCap}
-                isChild
-                description="Senior High School"
-              >
-                SHS
-              </NavLink>
-            </CollapsibleSection>
-
-            {/* Community Engagement Section */}
-            <CollapsibleSection
-              title="Community Engagement"
-              icon={Handshake}
-              isOpen={isOpen}
-              collapsed={!isOpen}
-              isExpanded={expandedSection === "Community Engagement"}
-              onToggle={() => handleSectionToggle("Community Engagement")}
-            >
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/communities"
-                icon={Users}
-                isChild
-                description="Manage partner communities"
-              >
-                Partner Communities
-              </NavLink>
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/partnerships"
-                icon={Building2}
-                isChild
-                description="Manage partnerships and linkages"
-              >
-                Partnerships & Linkages
-              </NavLink>
-            </CollapsibleSection>
-
-            {/* Service Programs Section */}
-            <CollapsibleSection
-              title="Service Programs"
-              icon={BookOpen}
-              isOpen={isOpen}
-              collapsed={!isOpen}
-              isExpanded={expandedSection === "Service Programs"}
-              onToggle={() => handleSectionToggle("Service Programs")}
-            >
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/rotc"
-                icon={Users}
-                isChild
-                description="Reserve Officers' Training Corps"
-              >
-                ROTC
-              </NavLink>
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/nstp"
-                icon={Users}
-                isChild
-                description="National Service Training Program"
-              >
-                NSTP
-              </NavLink>
-            </CollapsibleSection>
-          </div>
-
-          <div className="pt-2 space-y-1">
             <NavLink
               collapsed={!isOpen}
-              href="/admin/events"
-              icon={Calendar}
-              description="Manage events and activities"
+              href="/admin/departments/dba"
+              icon={GraduationCap}
+              isChild
             >
-              Events
+              DBA
             </NavLink>
-
-            {/* Analytics & Reports Section */}
-            <CollapsibleSection
-              title="Analytics & Reports"
-              icon={BarChart3}
-              isOpen={isOpen}
+            <NavLink
               collapsed={!isOpen}
-              isExpanded={expandedSection === "Analytics & Reports"}
-              onToggle={() => handleSectionToggle("Analytics & Reports")}
+              href="/admin/departments/dcje"
+              icon={GraduationCap}
+              isChild
             >
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/reports"
-                icon={FileText}
-                isChild
-                description="View and generate reports"
-              >
-                Reports
-              </NavLink>
-              <NavLink
-                collapsed={!isOpen}
-                href="/admin/impact"
-                icon={TrendingUp}
-                isChild
-                description="View impact metrics and statistics"
-              >
-                Impact Metrics
-              </NavLink>
-            </CollapsibleSection>
-          </div>
+              DCJE
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/departments/dte"
+              icon={GraduationCap}
+              isChild
+            >
+              DTE
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/departments/dtp"
+              icon={GraduationCap}
+              isChild
+            >
+              DTP
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/departments/shs"
+              icon={GraduationCap}
+              isChild
+            >
+              SHS
+            </NavLink>
+          </CollapsibleSection>
+
+          {/* Community Engagement Section */}
+          <CollapsibleSection
+            title="Community Engagement"
+            icon={Handshake}
+            isOpen={isOpen}
+            collapsed={!isOpen}
+            isExpanded={expandedSection === "Community Engagement"}
+            onToggle={() => handleSectionToggle("Community Engagement")}
+          >
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/communities"
+              icon={Users}
+              isChild
+            >
+              Partner Communities
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/partnerships"
+              icon={Building2}
+              isChild
+            >
+              Partnerships & Linkages
+            </NavLink>
+          </CollapsibleSection>
+
+          {/* Service Programs Section */}
+          <CollapsibleSection
+            title="Service Programs"
+            icon={BookOpen}
+            isOpen={isOpen}
+            collapsed={!isOpen}
+            isExpanded={expandedSection === "Service Programs"}
+            onToggle={() => handleSectionToggle("Service Programs")}
+          >
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/rotc"
+              icon={Users}
+              isChild
+            >
+              ROTC
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/nstp"
+              icon={Users}
+              isChild
+            >
+              NSTP
+            </NavLink>
+          </CollapsibleSection>
+
+          <NavLink collapsed={!isOpen} href="/admin/events" icon={Calendar}>
+            Events
+          </NavLink>
+
+          {/* Analytics & Reports Section */}
+          <CollapsibleSection
+            title="Analytics & Reports"
+            icon={BarChart3}
+            isOpen={isOpen}
+            collapsed={!isOpen}
+            isExpanded={expandedSection === "Analytics & Reports"}
+            onToggle={() => handleSectionToggle("Analytics & Reports")}
+          >
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/reports"
+              icon={FileText}
+              isChild
+            >
+              Reports
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/impact"
+              icon={TrendingUp}
+              isChild
+            >
+              Impact Metrics
+            </NavLink>
+          </CollapsibleSection>
         </nav>
       </div>
     </div>

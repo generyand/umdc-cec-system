@@ -117,7 +117,7 @@ export function Sidebar({ className }: SidebarProps) {
     >
       <div className="flex flex-col h-screen">
         <nav className="overflow-y-auto flex-1 p-2 space-y-2">
-          <NavLink collapsed={!isOpen} href="/admin" icon={Home}>
+          <NavLink collapsed={!isOpen} href="/admin/" icon={Home}>
             Home
           </NavLink>
           <NavLink

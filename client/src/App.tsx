@@ -19,6 +19,7 @@ import DAEPage from "./pages/admin/academic-departments/dae";
 import DASEPage from "./pages/admin/academic-departments/dase";
 import PartnershipsAndLinkagesPage from "./pages/admin/community-engagement/partnerships-and-linkages";
 import PartnerCommunitiesPage from "./pages/admin/community-engagement/partner-communities";
+import EventsPage from "./pages/admin/events";
 
 const App = () => {
   return (
@@ -61,6 +62,7 @@ const App = () => {
             path="/admin/community-engagement/partnerships-and-linkages"
             element={<PartnershipsAndLinkagesPage />}
           />
+          <Route path="/admin/events" element={<EventsPage />} />
         </Route>
 
         {/* Catch all route - redirect to login */}

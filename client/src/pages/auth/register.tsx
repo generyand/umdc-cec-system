@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons/icons";
 import { useAuth } from "@/hooks/use-auth";
+import { useEffect } from "react";
 
 const formSchema = z
   .object({

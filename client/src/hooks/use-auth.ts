@@ -120,13 +120,13 @@ export const useAuth = create<AuthState>()(
           });
 
           // Update axios default authorization header
-          api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+          // api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
 
-          set({
-            user: data.user,
-            token: data.token,
-            isLoading: false,
-          });
+          // set({
+          //   user: data.user,
+          //   token: data.token,
+          //   isLoading: false,
+          // });
         } catch (error) {
           set({
             error: axios.isAxiosError(error)

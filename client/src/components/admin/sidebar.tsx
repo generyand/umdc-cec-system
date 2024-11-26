@@ -109,15 +109,16 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <div
       className={cn(
-        "border-r backdrop-blur bg-background/95 supports-[backdrop-filter]:bg-background/60",
+        "border-r backdrop-blur",
         isOpen ? "w-[260px]" : "w-[70px]",
         "transition-all duration-300 max-md:hidden",
+        "shadow-sm",
         className
       )}
     >
       <div className="flex flex-col h-screen">
         <nav className="overflow-y-auto flex-1 p-2 space-y-2">
-          <NavLink collapsed={!isOpen} href="/admin/" icon={Home}>
+          <NavLink collapsed={!isOpen} href="/admin" icon={Home}>
             Home
           </NavLink>
           <NavLink
@@ -193,6 +194,22 @@ export function Sidebar({ className }: SidebarProps) {
             >
               SHS
             </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/academic-departments/alumni"
+              icon={GraduationCap}
+              isChild
+            >
+              Alumni
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/academic-departments/ntp"
+              icon={GraduationCap}
+              isChild
+            >
+              NTP
+            </NavLink>
           </CollapsibleSection>
 
           {/* Community Engagement Section */}
@@ -233,7 +250,7 @@ export function Sidebar({ className }: SidebarProps) {
           >
             <NavLink
               collapsed={!isOpen}
-              href="/admin/rotc"
+              href="/admin/service-programs/rotc"
               icon={Users}
               isChild
             >
@@ -241,7 +258,7 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
             <NavLink
               collapsed={!isOpen}
-              href="/admin/nstp"
+              href="/admin/service-programs/nstp"
               icon={Users}
               isChild
             >
@@ -264,7 +281,7 @@ export function Sidebar({ className }: SidebarProps) {
           >
             <NavLink
               collapsed={!isOpen}
-              href="/admin/reports"
+              href="/admin/analytics-and-reports/reports"
               icon={FileText}
               isChild
             >
@@ -272,7 +289,7 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
             <NavLink
               collapsed={!isOpen}
-              href="/admin/impact"
+              href="/admin/analytics-and-reports/impact-metrics"
               icon={TrendingUp}
               isChild
             >

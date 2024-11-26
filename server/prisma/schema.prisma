@@ -28,3 +28,8 @@ model User {
   @@index([email])
   @@map("users")
 }
+
+model UserDetails {
+  uc_ud_main_id                String    @id @default(cuid())
+  
+}

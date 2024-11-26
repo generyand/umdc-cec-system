@@ -1,5 +1,5 @@
 import express from "express";
-import helmet from "helmet";
+// import helmet from "helmet";
 import cors from "cors";
 import { initializeConfig } from "./config/app.config.js";
 import {
@@ -19,7 +19,7 @@ async function createServer() {
   const app = express();
 
   // Basic middleware
-  app.use(helmet());
+  // app.use(helmet());
   app.use(cors());
   app.use(express.json());
 

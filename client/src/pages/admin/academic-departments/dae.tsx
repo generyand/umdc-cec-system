@@ -10,7 +10,14 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, MapPinIcon, UsersIcon, ArrowUpRight } from "lucide-react";
+import {
+  UsersIcon,
+  ArchiveIcon,
+  FlagIcon,
+  ClipboardListIcon,
+  ArrowUpRight
+} from "lucide-react";
+import { StatCard } from "@/components/admin/academic-departments/stat-card";
 
 // Mock data
 const academicPrograms = {
@@ -91,282 +98,258 @@ const bannerProgramStats = {
 };
 
 export default function DAEPage() {
+  const stats = [
+    {
+      icon: UsersIcon,
+      iconColor: "text-primary",
+      iconBgColor: "bg-primary/10",
+      title: "Active Academic Programs",
+      subtitle: "Currently running",
+      value: academicPrograms.active.length,
+      unit: academicPrograms.active.length === 1 ? "program" : "programs"
+    },
+    {
+      icon: ArchiveIcon,
+      iconColor: "text-orange-500",
+      iconBgColor: "bg-orange-100 dark:bg-orange-500/10",
+      title: "Inactive Programs",
+      subtitle: "Historical records",
+      value: academicPrograms.inactive.length,
+      unit: academicPrograms.inactive.length === 1 ? "program" : "programs"
+    },
+    {
+      icon: FlagIcon,
+      iconColor: "text-blue-500",
+      iconBgColor: "bg-blue-100 dark:bg-blue-500/10",
+      title: "Banner Programs",
+      subtitle: "Featured initiatives",
+      value: bannerPrograms.length,
+      unit: bannerPrograms.length === 1 ? "program" : "programs"
+    },
+    {
+      icon: ClipboardListIcon,
+      iconColor: "text-green-500",
+      iconBgColor: "bg-green-100 dark:bg-green-500/10",
+      title: "Total Projects",
+      subtitle: "Implemented activities",
+      value: implementedProjects.length,
+      unit: implementedProjects.length === 1 ? "project" : "projects"
+    }
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto space-y-8 p-6">
-      {/* Header Section */}
-      <div className="flex justify-between items-center">
+    <div className="max-w-7xl mx-auto space-y-6 p-6">
+      {/* Header Section - Enhanced */}
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between bg-card p-6 rounded-lg border">
         <div>
           <h1 className="text-3xl font-bold text-foreground">
             Department of Accounting Education
           </h1>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-2 text-muted-foreground max-w-2xl">
             Empowering communities through financial education and literacy programs
           </p>
         </div>
-        <Button className="flex items-center gap-2">
-          Create New Program <ArrowUpRight className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="outline">Download Report</Button>
+          <Button className="flex items-center gap-2">
+            Create New Program <ArrowUpRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6 border bg-card hover:bg-accent/10 transition-colors">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary/10 rounded-lg">
-              <UsersIcon className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Active Academic Programs</p>
-              <p className="text-2xl font-bold text-foreground">{academicPrograms.active.length}</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-6 border bg-card hover:bg-accent/10 transition-colors">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary/10 rounded-lg">
-              <CalendarIcon className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Banner Programs</p>
-              <p className="text-2xl font-bold text-foreground">{bannerPrograms.length}</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-6 border bg-card hover:bg-accent/10 transition-colors">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary/10 rounded-lg">
-              <MapPinIcon className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Projects Implemented</p>
-              <p className="text-2xl font-bold text-foreground">{implementedProjects.length}</p>
-            </div>
-          </div>
-        </Card>
+      {/* Quick Stats - Reorganized */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {stats.map((stat, index) => (
+          <StatCard
+            key={index}
+            {...stat}
+          />
+        ))}
       </div>
 
-      {/* Academic Programs Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6 border bg-card">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-foreground">Active Academic Programs</h2>
-            <Button variant="outline" size="sm">View Details</Button>
-          </div>
-          <div className="space-y-4">
-            {academicPrograms.active.map((program, index) => (
-              <div key={index} className="p-4 rounded-lg hover:bg-accent/10 transition-colors">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-foreground">{program.code}</h3>
-                    <p className="text-sm text-muted-foreground">{program.name}</p>
-                  </div>
-                  <Badge variant="secondary" className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
-                    Active
-                  </Badge>
-                </div>
-                <div className="mt-2 space-y-1">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <UsersIcon className="h-4 w-4 mr-2" />
-                    {program.students} enrolled students
-                  </div>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <CalendarIcon className="h-4 w-4 mr-2" />
-                    Since {program.yearStarted}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="p-6 border bg-card">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-foreground">Inactive Programs</h2>
-            <Button variant="outline" size="sm">View History</Button>
-          </div>
-          <div className="space-y-4">
-            {academicPrograms.inactive.map((program, index) => (
-              <div key={index} className="p-4 rounded-lg hover:bg-accent/10 transition-colors">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-foreground">{program.code}</h3>
-                    <p className="text-sm text-muted-foreground">{program.name}</p>
-                  </div>
-                  <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-500/20 text-gray-700 dark:text-gray-400">
-                    Inactive
-                  </Badge>
-                </div>
-                <div className="mt-2 space-y-1">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <CalendarIcon className="h-4 w-4 mr-2" />
-                    Ended {program.yearEnded}
-                  </div>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <UsersIcon className="h-4 w-4 mr-2" />
-                    Last batch: {program.lastGraduates} graduates
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* Add this section after the Academic Programs section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6 border bg-card">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-foreground">Banner Programs Overview</h2>
-            <Button variant="outline" size="sm">View All</Button>
-          </div>
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-lg bg-primary/5">
-                <p className="text-sm text-muted-foreground">Total Programs</p>
-                <p className="text-2xl font-bold text-foreground">{bannerProgramStats.totalPrograms}</p>
-              </div>
-              <div className="p-4 rounded-lg bg-primary/5">
-                <p className="text-sm text-muted-foreground">Implementation Rate</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {Math.round((bannerProgramStats.implementedProjects.completed / bannerProgramStats.implementedProjects.target) * 100)}%
-                </p>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Academic Programs Column */}
+        <div className="lg:col-span-1 space-y-6">
+          <Card className="border bg-card">
+            <div className="p-6 border-b">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-foreground">Academic Programs</h2>
+                <Button variant="outline" size="sm">View All</Button>
               </div>
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Projects Target</span>
-                <span className="font-medium text-foreground">{bannerProgramStats.implementedProjects.target}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Completed</span>
-                <span className="font-medium text-foreground">{bannerProgramStats.implementedProjects.completed}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Ongoing</span>
-                <span className="font-medium text-foreground">{bannerProgramStats.implementedProjects.ongoing}</span>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6 border bg-card">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-foreground">Beneficiaries Progress</h2>
-            <Button variant="outline" size="sm">Details</Button>
-          </div>
-          <div className="space-y-6">
-            <div className="space-y-4">
+            <div className="p-6 space-y-6">
               <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-muted-foreground">Target Beneficiaries</span>
-                  <span className="font-medium text-foreground">{bannerProgramStats.implementedProjects.totalBeneficiaries.target}</span>
+                <h3 className="text-sm font-medium text-muted-foreground mb-4">Active Academic Programs</h3>
+                <div className="space-y-3">
+                  {academicPrograms.active.map((program, index) => (
+                    <div key={index} className="flex justify-between items-start p-3 rounded-lg hover:bg-accent/10 transition-colors">
+                      <div>
+                        <h4 className="font-medium text-foreground">{program.code}</h4>
+                        <p className="text-sm text-muted-foreground">{program.name}</p>
+                      </div>
+                      <Badge variant="secondary" className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
+                        Active
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
-                <div className="h-2 bg-primary/10 rounded-full">
-                  <div 
-                    className="h-full bg-primary rounded-full"
-                    style={{ 
-                      width: `${(bannerProgramStats.implementedProjects.totalBeneficiaries.actual / bannerProgramStats.implementedProjects.totalBeneficiaries.target) * 100}%` 
+              </div>
+              <div className="pt-4 border-t">
+                <h3 className="text-sm font-medium text-muted-foreground mb-4">Inactive Programs</h3>
+                <div className="space-y-3">
+                  {academicPrograms.inactive.map((program, index) => (
+                    <div key={index} className="flex justify-between items-start p-3 rounded-lg hover:bg-accent/10 transition-colors">
+                      <div>
+                        <h4 className="font-medium text-foreground">{program.code}</h4>
+                        <p className="text-sm text-muted-foreground">{program.name}</p>
+                      </div>
+                      <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-500/20 text-gray-700 dark:text-gray-400">
+                        Inactive
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Banner Programs and Analytics Column */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Banner Program Card */}
+          <Card className="relative overflow-hidden border-0">
+            {/* Gradient background with subtle overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-indigo-700" />
+            <div className="absolute inset-0 bg-black/5" /> {/* Subtle overlay */}
+
+            <div className="relative p-8">
+              <div className="flex justify-between items-start mb-8">
+                <div className="space-y-1">
+                  <Badge
+                    variant="secondary"
+                    className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm"
+                  >
+                    Banner Program
+                  </Badge>
+                  <p className="text-white/60 text-sm">Active since {bannerPrograms[0].yearStarted}</p>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm"
+                >
+                  View Details
+                </Button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-3">
+                    {bannerPrograms[0].title}
+                  </h2>
+                  <p className="text-white/80 leading-relaxed max-w-3xl">
+                    {bannerPrograms[0].description}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-4">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                    <p className="text-white/60 text-sm mb-1">Target Projects</p>
+                    <p className="text-2xl font-bold text-white">
+                      {bannerProgramStats.implementedProjects.target}
+                    </p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                    <p className="text-white/60 text-sm mb-1">Completed</p>
+                    <p className="text-2xl font-bold text-white">
+                      {bannerProgramStats.implementedProjects.completed}
+                    </p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                    <p className="text-white/60 text-sm mb-1">Target Reach</p>
+                    <p className="text-2xl font-bold text-white">
+                      {bannerProgramStats.implementedProjects.totalBeneficiaries.target.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                    <p className="text-white/60 text-sm mb-1">Current Reach</p>
+                    <div className="flex items-end gap-2">
+                      <p className="text-2xl font-bold text-white">
+                        {bannerProgramStats.implementedProjects.totalBeneficiaries.actual.toLocaleString()}
+                      </p>
+                      <p className="text-white/60 text-sm mb-1">
+                        ({Math.round((bannerProgramStats.implementedProjects.totalBeneficiaries.actual / bannerProgramStats.implementedProjects.totalBeneficiaries.target) * 100)}%)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                <div className="mt-6 space-y-2">
+                  <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-white/90 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${(bannerProgramStats.implementedProjects.totalBeneficiaries.actual / bannerProgramStats.implementedProjects.totalBeneficiaries.target) * 100}%`
+                      }}
+                    />
+                  </div>
+                  <p className="text-sm text-white/60">Overall Progress</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Analytics Chart */}
+          <Card className="p-6 border bg-card">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground">Monthly Analytics</h2>
+                <p className="text-sm text-muted-foreground">Beneficiaries reached per month</p>
+              </div>
+              <Button variant="outline" size="sm">Export</Button>
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analyticsData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis
+                    dataKey="month"
+                    className="text-muted-foreground"
+                  />
+                  <YAxis className="text-muted-foreground" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                    }}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-background border rounded-lg p-2 shadow-lg">
+                            <p className="text-sm text-foreground">
+                              {`${payload[0].value} beneficiaries`}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
                     }}
                   />
-                </div>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Current Reach</span>
-                <span className="font-medium text-foreground">{bannerProgramStats.implementedProjects.totalBeneficiaries.actual}</span>
-              </div>
+                  <Bar
+                    dataKey="beneficiaries"
+                    fill="hsl(var(--primary))"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-            <div className="pt-4 border-t">
-              <div className="text-sm text-muted-foreground mb-2">Progress</div>
-              <p className="text-2xl font-bold text-foreground">
-                {Math.round((bannerProgramStats.implementedProjects.totalBeneficiaries.actual / bannerProgramStats.implementedProjects.totalBeneficiaries.target) * 100)}%
-              </p>
-              <p className="text-sm text-muted-foreground">
-                of target beneficiaries reached
-              </p>
-            </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
-
-      {/* Banner Program - remains mostly the same but with updated data */}
-      {bannerPrograms.map((program, index) => (
-        <Card key={index} className="relative overflow-hidden border-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/50" />
-          <div className="relative p-8 text-primary-foreground space-y-4">
-            <Badge variant="secondary" className="bg-white/20 hover:bg-white/30">
-              Banner Program
-            </Badge>
-            <h2 className="text-2xl font-bold">{program.title}</h2>
-            <p className="text-primary-foreground/80 max-w-2xl">
-              {program.description}
-            </p>
-            <div className="flex gap-4">
-              <div>
-                <p className="text-sm text-primary-foreground/80">Target Beneficiaries</p>
-                <p className="text-xl font-bold">{program.targetBeneficiaries}</p>
-              </div>
-              <div>
-                <p className="text-sm text-primary-foreground/80">Actual Beneficiaries</p>
-                <p className="text-xl font-bold">{program.actualBeneficiaries}</p>
-              </div>
-            </div>
-            <Button variant="secondary" className="mt-4">
-              View Details
-            </Button>
-          </div>
-        </Card>
-      ))}
-
-      {/* Analytics */}
-      <Card className="p-6 border bg-card">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h2 className="text-xl font-semibold text-foreground">Program Analytics</h2>
-            <p className="text-sm text-muted-foreground">Monthly beneficiaries reached</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">This Year</Button>
-            <Button variant="outline" size="sm">Export</Button>
-          </div>
-        </div>
-        <div className="h-[400px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={analyticsData}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis 
-                dataKey="month" 
-                className="text-muted-foreground"
-              />
-              <YAxis className="text-muted-foreground" />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                }}
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    return (
-                      <div className="bg-background border rounded-lg p-2 shadow-lg">
-                        <p className="text-sm text-foreground">
-                          {`${payload[0].value} beneficiaries`}
-                        </p>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
-              <Bar 
-                dataKey="beneficiaries" 
-                fill="hsl(var(--primary))"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
     </div>
   );
 }

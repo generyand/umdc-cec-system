@@ -3,10 +3,10 @@ import { Toaster } from "sonner";
 
 import MainLayout from "@/components/layouts/main-layout";
 import RegisterPage from "@/pages/auth/register";
-import AuthLayout from "@/components/layouts/auth-layout";
+import AuthLayout from "@/components/layouts/auth/auth-layout";
 import LoginPage from "@/pages/auth/login";
 import HomePage from "@/pages/admin/home";
-import AdminLayout from "./components/layouts/admin-layout";
+import AdminLayout from "./components/layouts/admin/admin-layout";
 import DashboardPage from "./pages/admin/dashboard";
 import SettingsPage from "./pages/admin/settings";
 import AdminProfile from "./pages/admin/profile";

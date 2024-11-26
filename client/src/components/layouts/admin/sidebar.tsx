@@ -14,7 +14,7 @@ import {
   FileText,
   TrendingUp,
 } from "lucide-react";
-import { NavLink } from "./nav-link";
+import { NavLink } from "@/components/admin/nav-link";
 import { useSidebarStore } from "@/store/use-sidebar-store";
 import { useState } from "react";
 

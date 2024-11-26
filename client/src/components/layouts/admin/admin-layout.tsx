@@ -1,6 +1,6 @@
 import { Outlet, Navigate } from "react-router-dom";
-import { Sidebar } from "@/components/admin/sidebar";
-import { Header } from "@/components/layouts/header";
+import { Sidebar } from "@/components/layouts/admin/sidebar";
+import { Header } from "@/components/layouts/admin/header";
 import { useAuth } from "@/hooks/use-auth";
 import { AdminLayoutSkeleton } from "@/components/skeletons/admin-layout-skeleton";
 

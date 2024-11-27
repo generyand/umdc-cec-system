@@ -26,6 +26,7 @@ import ReportsPage from "./pages/admin/analytics-and-reports/reports";
 import ImpactMetricsPage from "./pages/admin/analytics-and-reports/impact-metrics";
 import AlumniPage from "./pages/admin/academic-departments/alumni";
 import NTPPage from "./pages/admin/academic-departments/ntp";
+import BarangayPage from "./pages/admin/community-engagement/partner-communities/barangay-details";
 
 const App = () => {
   return (
@@ -65,6 +66,10 @@ const App = () => {
             element={<PartnerCommunitiesPage />}
           />
           <Route
+            path="/admin/community-engagement/partner-communities/:slug"
+            element={<BarangayPage />}
+          />
+          <Route
             path="/admin/community-engagement/partnerships-and-linkages"
             element={<PartnershipsAndLinkagesPage />}
           />
@@ -84,6 +89,7 @@ const App = () => {
             element={<AlumniPage />}
           />
           <Route path="/admin/academic-departments/ntp" element={<NTPPage />} />
+          
         </Route>
 
         {/* Catch all route - redirect to login */}

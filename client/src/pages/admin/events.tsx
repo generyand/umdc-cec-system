@@ -180,7 +180,7 @@ export default function EventsPage() {
           {/* Calendar Component */}
           <div className="p-6">
             <div className="h-[calc(100vh-240px)]">
-              {/* <Calendar
+              <Calendar
                 localizer={localizer}
                 events={events}
                 startAccessor="start"
@@ -216,7 +216,7 @@ export default function EventsPage() {
                   className:
                     "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150",
                 })}
-              /> */}
+              />
             </div>
           </div>
         </div>

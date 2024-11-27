@@ -131,7 +131,7 @@ export function Sidebar({ className }: SidebarProps) {
 
           {/* Academic Departments Section */}
           <CollapsibleSection
-            title="Academic Departments"
+            title="Departments"
             icon={School}
             isOpen={isOpen}
             collapsed={!isOpen}

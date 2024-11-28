@@ -22,10 +22,10 @@ export default function AdminLayout() {
       <Header />
       <div className="flex overflow-hidden flex-1">
         <Sidebar className="z-40" />
-        <main className="overflow-auto flex-1">
-          <div className="p-6">
-            <Outlet />
-          </div>
+        <main className="overflow-auto flex-1 p-8">
+          {/* <div className="p-6"> */}
+          <Outlet />
+          {/* </div> */}
         </main>
       </div>
     </div>

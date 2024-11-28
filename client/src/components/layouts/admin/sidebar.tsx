@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import {
   Home,
   LayoutDashboard,
-  GraduationCap,
   Building2,
   Users,
   Calendar,
@@ -129,88 +128,13 @@ export function Sidebar({ className }: SidebarProps) {
             Dashboard
           </NavLink>
 
-          {/* Academic Departments Section */}
-          <CollapsibleSection
-            title="Departments"
-            icon={School}
-            isOpen={isOpen}
+          <NavLink
             collapsed={!isOpen}
-            isExpanded={expandedSection === "Academic Departments"}
-            onToggle={() => handleSectionToggle("Academic Departments")}
+            href="/admin/academic-departments"
+            icon={School}
           >
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/academic-departments/dae"
-              icon={GraduationCap}
-              isChild
-            >
-              DAE
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/academic-departments/dase"
-              icon={GraduationCap}
-              isChild
-            >
-              DASE
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/academic-departments/dba"
-              icon={GraduationCap}
-              isChild
-            >
-              DBA
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/academic-departments/dcje"
-              icon={GraduationCap}
-              isChild
-            >
-              DCJE
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/academic-departments/dte"
-              icon={GraduationCap}
-              isChild
-            >
-              DTE
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/academic-departments/dtp"
-              icon={GraduationCap}
-              isChild
-            >
-              DTP
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/academic-departments/shs"
-              icon={GraduationCap}
-              isChild
-            >
-              SHS
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/academic-departments/alumni"
-              icon={GraduationCap}
-              isChild
-            >
-              Alumni
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/academic-departments/ntp"
-              icon={GraduationCap}
-              isChild
-            >
-              NTP
-            </NavLink>
-          </CollapsibleSection>
+            Academic Departments
+          </NavLink>
 
           {/* Community Engagement Section */}
           <CollapsibleSection

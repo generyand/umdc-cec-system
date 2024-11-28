@@ -1,14 +1,13 @@
-import { MapPin, ChevronRight } from "lucide-react";
+import { MapPin, ChevronRight, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import DefaultBarangayImage from "@/assets/images/partner-communities/default-barangay.webp";
 
 interface PartnerCommunityCardProps {
   name: string;
   slug: string;
   beneficiaries?: number;
-  targetBeneficiaries?: number;
   location?: string;
   imageUrl?: string;
   description?: string;
@@ -19,14 +18,11 @@ function PartnerCommunityCard({
   name,
   slug,
   beneficiaries = 0,
-  targetBeneficiaries = 0,
   location = "",
-  imageUrl = "/images/default-barangay.jpg",
+  imageUrl = DefaultBarangayImage,
   // description = "",
   activePrograms = 0,
 }: PartnerCommunityCardProps) {
-  const progressPercentage = (beneficiaries / targetBeneficiaries) * 100;
-
   return (
     <Card className="overflow-hidden transition-all group hover:shadow-md">
       <div className="overflow-hidden relative h-48">
@@ -53,23 +49,19 @@ function PartnerCommunityCard({
           </p>
         </div>
 
-        <div className="space-y-1">
-          <div className="flex justify-between text-sm">
-            <span>Beneficiaries</span>
-            <span className="text-primary">
-              {beneficiaries}/{targetBeneficiaries}
-            </span>
+        <div className="flex justify-between items-center">
+          <div className="flex gap-2 items-center text-sm text-muted-foreground">
+            <Users className="w-4 h-4" />
+            <span>{beneficiaries.toLocaleString()} Beneficiaries</span>
           </div>
-          <Progress value={progressPercentage} className="h-1.5" />
+          <Link
+            to={`/admin/community-engagement/partner-communities/${slug}`}
+            className="inline-flex items-center text-sm text-primary hover:underline"
+          >
+            View Details
+            <ChevronRight className="ml-1 w-4 h-4" />
+          </Link>
         </div>
-
-        <Link
-          to={`/admin/community-engagement/partner-communities/${slug}`}
-          className="inline-flex items-center text-sm text-primary hover:underline"
-        >
-          View Community Details
-          <ChevronRight className="ml-1 w-4 h-4" />
-        </Link>
       </CardContent>
     </Card>
   );
@@ -95,9 +87,9 @@ export default function PartnerCommunitiesPage() {
           name="Barangay San Miguel"
           slug="san-miguel"
           beneficiaries={150}
-          targetBeneficiaries={200}
           location="San Miguel, Digos City"
-          imageUrl="https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=1200&auto=format&fit=crop"
+          // imageUrl="https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=1200&auto=format&fit=crop"
+          imageUrl={DefaultBarangayImage}
           description="A vibrant community known for its agricultural heritage"
           activePrograms={3}
         />
@@ -105,9 +97,9 @@ export default function PartnerCommunitiesPage() {
           name="Barangay Dawis"
           slug="dawis"
           beneficiaries={200}
-          targetBeneficiaries={250}
           location="Dawis, Digos City"
-          imageUrl="https://images.unsplash.com/photo-1526958097901-5e6d742d3371?q=80&w=1200&auto=format&fit=crop"
+          // imageUrl="https://images.unsplash.com/photo-1526958097901-5e6d742d3371?q=80&w=1200&auto=format&fit=crop"
+          imageUrl={DefaultBarangayImage}
           description="A coastal community focusing on sustainable fishing practices"
           activePrograms={4}
         />
@@ -115,9 +107,9 @@ export default function PartnerCommunitiesPage() {
           name="Barangay Ruparan"
           slug="ruparan"
           beneficiaries={175}
-          targetBeneficiaries={200}
           location="Ruparan, Digos City"
-          imageUrl="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?q=80&w=1200&auto=format&fit=crop"
+          // imageUrl="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?q=80&w=1200&auto=format&fit=crop"
+          imageUrl={DefaultBarangayImage}
           description="An emerging hub for local entrepreneurship"
           activePrograms={3}
         />

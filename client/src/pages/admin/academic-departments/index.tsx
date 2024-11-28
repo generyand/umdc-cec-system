@@ -9,7 +9,7 @@ import {
   DTELogo,
   DTPLogo,
   SHSLogo,
-} from "../../../assets/images/department-logos";
+} from "@/assets/images/department-logos";
 
 interface DepartmentCardProps {
   name: string;

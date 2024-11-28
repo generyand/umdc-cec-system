@@ -21,15 +21,7 @@ export const departmentsData: Record<string, DepartmentData> = {
           yearStarted: 2005,
         },
       ],
-      inactive: [
-        // {
-        //   code: "BSBAMajAcc",
-        //   name: "BSBA Major in Accounting",
-        //   yearStarted: 1990,
-        //   yearEnded: 2010,
-        //   lastGraduates: 89,
-        // },
-      ],
+      inactive: [],
     },
     bannerPrograms: [
       {

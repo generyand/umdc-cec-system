@@ -16,14 +16,17 @@ import {
   FlagIcon,
   ClipboardListIcon,
   ArrowUpRight,
+  ArrowLeft,
 } from "lucide-react";
 import { StatCard } from "@/components/admin/academic-departments/stat-card";
 import { useParams } from "react-router-dom";
 import { useMemo } from "react";
 import { getDepartmentData } from "./mock-data-depts";
+import { useNavigate } from "react-router-dom";
 
 export default function DepartmentPage() {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const departmentData = useMemo(() => getDepartmentData(slug || ""), [slug]);
 
   if (!departmentData) {
@@ -80,6 +83,16 @@ export default function DepartmentPage() {
 
   return (
     <div className="mx-auto space-y-8 w-full">
+      {/* Back Button */}
+      <Button
+        variant="ghost"
+        className="flex gap-2 items-center hover:bg-accent/50"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Back to Departments</span>
+      </Button>
+
       {/* Header Section */}
       <div className="flex flex-col gap-6 p-6 rounded-lg border md:flex-row md:items-center md:justify-between bg-card">
         <div>

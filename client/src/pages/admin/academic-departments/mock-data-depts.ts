@@ -22,13 +22,13 @@ export const departmentsData: Record<string, DepartmentData> = {
         },
       ],
       inactive: [
-        {
-          code: "BSBAMajAcc",
-          name: "BSBA Major in Accounting",
-          yearStarted: 1990,
-          yearEnded: 2010,
-          lastGraduates: 89,
-        },
+        // {
+        //   code: "BSBAMajAcc",
+        //   name: "BSBA Major in Accounting",
+        //   yearStarted: 1990,
+        //   yearEnded: 2010,
+        //   lastGraduates: 89,
+        // },
       ],
     },
     bannerPrograms: [
@@ -75,32 +75,38 @@ export const departmentsData: Record<string, DepartmentData> = {
     slug: "dase",
     name: "Department of Arts & Sciences Education",
     description:
-      "Advancing STEM education through innovative teaching and community engagement",
+      "Advancing social sciences and humanities education through innovative teaching and community engagement",
     academicPrograms: {
       active: [
         {
-          code: "BSED-Science",
-          name: "Bachelor of Secondary Education Major in Science",
+          code: "BSP",
+          name: "Bachelor of Science in Psychology",
           students: 380,
           yearStarted: 1998,
         },
         {
-          code: "BSED-Math",
-          name: "Bachelor of Secondary Education Major in Mathematics",
+          code: "BSSW",
+          name: "Bachelor of Science in Social Work",
           students: 420,
           yearStarted: 1998,
         },
         {
-          code: "BS Biology",
-          name: "Bachelor of Science in Biology",
+          code: "ABCOM",
+          name: "Bachelor of Arts in Communication",
           students: 290,
           yearStarted: 2010,
+        },
+        {
+          code: "ABPOLSCI",
+          name: "Bachelor of Arts in Political Science",
+          students: 310,
+          yearStarted: 2012,
         },
       ],
       inactive: [
         {
-          code: "BS Chemistry",
-          name: "Bachelor of Science in Chemistry",
+          code: "ABENG",
+          name: "Bachelor of Arts in English",
           yearStarted: 2005,
           yearEnded: 2015,
           lastGraduates: 45,
@@ -109,22 +115,47 @@ export const departmentsData: Record<string, DepartmentData> = {
     },
     bannerPrograms: [
       {
-        title: "Science and Mathematics Outreach Program",
+        title: "Community Mental Health Awareness Program",
         description:
-          "An innovative community outreach initiative focused on promoting STEM education through interactive workshops and mobile laboratories.",
+          "A comprehensive initiative focused on promoting mental health awareness and psychological well-being through counseling services, workshops, and community-based interventions.",
         status: "Active",
         yearStarted: 2022,
         targetBeneficiaries: 3000,
         actualBeneficiaries: 1850,
       },
+      {
+        title: "Social Development and Advocacy Campaign",
+        description:
+          "An integrated program combining social work interventions, communication campaigns, and policy advocacy to address community needs and social issues.",
+        status: "Active",
+        yearStarted: 2023,
+        targetBeneficiaries: 2500,
+        actualBeneficiaries: 1650,
+      },
     ],
     implementedProjects: [
       {
-        title: "Mobile Science Laboratory",
+        title: "Mental Health First Aid Training",
         date: "March 20, 2024",
         targetBeneficiaries: 300,
         actualBeneficiaries: 275,
-        location: "Various High Schools",
+        location: "Various Communities",
+        status: "Completed",
+      },
+      {
+        title: "Youth Leadership and Civic Engagement Workshop",
+        date: "February 15, 2024",
+        targetBeneficiaries: 250,
+        actualBeneficiaries: 230,
+        location: "Main Campus",
+        status: "Completed",
+      },
+      {
+        title: "Community Communications Development",
+        date: "January 25, 2024",
+        targetBeneficiaries: 200,
+        actualBeneficiaries: 185,
+        location: "Partner Barangays",
         status: "Completed",
       },
     ],
@@ -155,28 +186,22 @@ export const departmentsData: Record<string, DepartmentData> = {
     academicPrograms: {
       active: [
         {
-          code: "BSBA-MM",
-          name: "BS Business Administration - Marketing Management",
+          code: "BSBA",
+          name: "Bachelor of Science in Business Administration",
           students: 520,
           yearStarted: 1992,
         },
         {
-          code: "BSBA-HRM",
-          name: "BS Business Administration - Human Resource Management",
+          code: "BSTM",
+          name: "Bachelor of Science in Tourism Management",
           students: 480,
           yearStarted: 1995,
-        },
-        {
-          code: "BSBA-FM",
-          name: "BS Business Administration - Financial Management",
-          students: 380,
-          yearStarted: 2000,
         },
       ],
       inactive: [
         {
-          code: "BSBA-OM",
-          name: "BS Business Administration - Operations Management",
+          code: "BSHRM",
+          name: "Bachelor of Science in Hotel and Restaurant Management",
           yearStarted: 1990,
           yearEnded: 2018,
           lastGraduates: 76,
@@ -236,12 +261,6 @@ export const departmentsData: Record<string, DepartmentData> = {
           students: 850,
           yearStarted: 1988,
         },
-        {
-          code: "BSFS",
-          name: "Bachelor of Science in Forensic Science",
-          students: 240,
-          yearStarted: 2015,
-        },
       ],
       inactive: [],
     },
@@ -293,25 +312,39 @@ export const departmentsData: Record<string, DepartmentData> = {
     academicPrograms: {
       active: [
         {
-          code: "BEED",
-          name: "Bachelor of Elementary Education",
+          code: "BSED",
+          name: "Bachelor of Secondary Education",
           students: 420,
           yearStarted: 1985,
         },
         {
-          code: "BSED-English",
-          name: "Bachelor of Secondary Education - English",
+          code: "BEED",
+          name: "Bachelor of Elementary Education",
           students: 380,
           yearStarted: 1985,
         },
         {
-          code: "BSED-Filipino",
-          name: "Bachelor of Secondary Education - Filipino",
+          code: "BPED",
+          name: "Bachelor of Physical Education",
           students: 310,
-          yearStarted: 1985,
+          yearStarted: 1990,
+        },
+        {
+          code: "BTVTED",
+          name: "Bachelor of Technical-Vocational Teacher Education",
+          students: 280,
+          yearStarted: 2005,
         },
       ],
-      inactive: [],
+      inactive: [
+        {
+          code: "BSNED",
+          name: "Bachelor of Special Needs Education",
+          yearStarted: 2000,
+          yearEnded: 2015,
+          lastGraduates: 50,
+        },
+      ],
     },
     bannerPrograms: [
       {
@@ -362,13 +395,13 @@ export const departmentsData: Record<string, DepartmentData> = {
       active: [
         {
           code: "BSIT",
-          name: "Bachelor of Science in Industrial Technology",
+          name: "Bachelor of Science in Information Technology",
           students: 340,
           yearStarted: 2000,
         },
         {
-          code: "BTVTED",
-          name: "Bachelor of Technical-Vocational Teacher Education",
+          code: "BSCPE",
+          name: "Bachelor of Science in Computer Engineering",
           students: 280,
           yearStarted: 2005,
         },

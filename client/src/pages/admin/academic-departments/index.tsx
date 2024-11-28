@@ -87,7 +87,7 @@ export default function DepartmentsPage() {
       students: 1090,
       programs: 3,
       description:
-        "Advancing STEM education through innovative teaching and community engagement",
+        "Advancing social sciences and humanities education through innovative teaching and community engagement",
       icon: DASELogo,
     },
     {

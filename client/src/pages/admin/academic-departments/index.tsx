@@ -1,5 +1,6 @@
 import { Users, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
+import { departmentsData } from "./mock-data-depts";
 
 import {
   DAELogo,
@@ -71,89 +72,17 @@ function DepartmentCard({
 }
 
 export default function DepartmentsPage() {
-  const departments = [
-    {
-      name: "Department of Accounting Education",
-      slug: "dae",
-      students: 770,
-      programs: 2,
-      description:
-        "Empowering communities through financial education and literacy programs",
-      icon: DAELogo,
-    },
-    {
-      name: "Department of Arts & Sciences Education",
-      slug: "dase",
-      students: 1090,
-      programs: 3,
-      description:
-        "Advancing social sciences and humanities education through innovative teaching and community engagement",
-      icon: DASELogo,
-    },
-    {
-      name: "Department of Business Administration",
-      slug: "dba",
-      students: 850,
-      programs: 4,
-      description:
-        "Developing future business leaders through practical education and industry partnerships",
-      icon: DBALogo,
-    },
-    {
-      name: "Department of Criminal Justice Education",
-      slug: "dcje",
-      students: 680,
-      programs: 2,
-      description:
-        "Training future law enforcement professionals with emphasis on ethics and community service",
-      icon: DCJELogo,
-    },
-    {
-      name: "Department of Teacher Education",
-      slug: "dte",
-      students: 920,
-      programs: 5,
-      description:
-        "Shaping educators who will inspire the next generation of learners",
-      icon: DTELogo,
-    },
-    {
-      name: "Department of Technical Programs",
-      slug: "dtp",
-      students: 560,
-      programs: 6,
-      description:
-        "Providing hands-on technical education aligned with industry needs",
-      icon: DTPLogo,
-    },
-    {
-      name: "Senior High School Department",
-      slug: "shs",
-      students: 1200,
-      programs: 4,
-      description:
-        "Preparing students for higher education and career development",
-      icon: SHSLogo,
-    },
-    {
-      name: "Alumni Department",
-      slug: "alumni",
-      students: 0,
-      programs: 3,
-      description:
-        "Maintaining connections and fostering engagement with our graduates",
-      icon: <Users className="w-full h-full" />,
-    },
-    {
-      name: "Non-Teaching Personnel",
-      slug: "ntp",
-      students: 0,
-      programs: 1,
-      description:
-        "Supporting academic excellence through administrative and operational services",
-      icon: <Users className="w-full h-full" />,
-    },
-  ];
+  const departments = Object.values(departmentsData).map((dept) => ({
+    name: dept.name,
+    slug: dept.slug,
+    students: dept.academicPrograms.active.reduce(
+      (total, program) => total + (program.students || 0),
+      0
+    ),
+    programs: dept.academicPrograms.active.length,
+    description: dept.description,
+    icon: getIconBySlug(dept.slug),
+  }));
 
   return (
     <div className="space-y-6">
@@ -171,4 +100,21 @@ export default function DepartmentsPage() {
       </div>
     </div>
   );
+}
+
+// Helper function to map slugs to their respective icons
+function getIconBySlug(slug: string): React.ReactNode {
+  const iconMap: Record<string, React.ReactNode> = {
+    dae: DAELogo,
+    dase: DASELogo,
+    dba: DBALogo,
+    dcje: DCJELogo,
+    dte: DTELogo,
+    dtp: DTPLogo,
+    shs: SHSLogo,
+    alumni: <Users className="w-full h-full" />,
+    ntp: <Users className="w-full h-full" />,
+  };
+
+  return iconMap[slug] || <Users className="w-full h-full" />;
 }

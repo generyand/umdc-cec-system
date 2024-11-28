@@ -5,7 +5,6 @@ import {
   Calendar,
   Phone,
   Mail,
-  MapPin,
   Users2,
   History,
   Activity,
@@ -13,366 +12,13 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-
-// Add interfaces for the new data structure
-// interface BarangayOfficial {
-//   name: string;
-//   position: string;
-//   contact: string;
-//   email?: string;
-// }
-
-// interface GalleryImage {
-//   url: string;
-//   caption: string;
-//   date: string;
-//   category: "community" | "program";
-// }
-
-// Expanded community data structure
-const communities = {
-  "san-miguel": {
-    name: "Barangay San Miguel",
-    description:
-      "Served as the adopted community for the academic year 2021-2022. The CEC provided educational resources, community outreach programs, and student volunteer opportunities in the barangay.",
-    location: "San Miguel, Digos City",
-    history: `Established in 1945, Barangay San Miguel has been a vital part of Digos City's growth. 
-      The community has strong agricultural roots and has developed into a thriving residential area. 
-      Over the years, it has become a model for community development programs and civic engagement.`,
-    coordinates: "6.7494° N, 125.3567° E",
-    officials: [
-      {
-        name: "Juan Dela Cruz",
-        position: "Barangay Captain",
-        contact: "09123456789",
-        email: "juan.delacruz@digoscity.gov.ph",
-      },
-      {
-        name: "Maria Santos",
-        position: "Barangay Secretary",
-        contact: "09187654321",
-        email: "maria.santos@digoscity.gov.ph",
-      },
-      {
-        name: "Pedro Reyes",
-        position: "Kagawad - Education",
-        contact: "09234567890",
-        email: "pedro.reyes@digoscity.gov.ph",
-      },
-    ],
-    contactInfo: {
-      office: "(082) 553-2847",
-      email: "sanmiguel@digoscity.gov.ph",
-      address: "San Miguel Hall, National Highway, Digos City",
-    },
-    stats: {
-      totalBeneficiaries: 150,
-      activePrograms: 3,
-      completedPrograms: 5,
-      studentVolunteers: 45,
-      totalOutcomes: 15,
-      volunteerHours: 450,
-    },
-    currentPrograms: [
-      {
-        name: "Educational Support Initiative",
-        description:
-          "Providing educational resources and support to community members",
-        status: "ongoing",
-        beneficiaries: 50,
-        startDate: "2024-01",
-        outcomes: [
-          "Distributed learning materials to 50 students",
-          "Established community learning hub",
-          "Weekly tutoring sessions",
-        ],
-      },
-      {
-        name: "Community Health Program",
-        description: "Regular health check-ups and medical assistance",
-        status: "ongoing",
-        beneficiaries: 75,
-        startDate: "2024-02",
-        outcomes: [
-          "Monthly health screenings",
-          "Health education workshops",
-          "Medicine distribution program",
-        ],
-      },
-      {
-        name: "Skills Training Workshop",
-        description: "Vocational training for community members",
-        status: "ongoing",
-        beneficiaries: 25,
-        startDate: "2024-03",
-        outcomes: [
-          "Basic computer literacy training",
-          "Entrepreneurship workshops",
-          "Handicraft skills development",
-        ],
-      },
-    ],
-    completedPrograms: [
-      {
-        name: "Literacy Campaign",
-        description: "Adult literacy program for community members",
-        status: "completed",
-        beneficiaries: 30,
-        startDate: "2023-06",
-        endDate: "2023-12",
-        outcomes: [
-          "30 adults completed basic literacy training",
-          "Established community reading club",
-          "Distributed reading materials",
-        ],
-      },
-      {
-        name: "Environmental Awareness",
-        description: "Community clean-up and environmental education",
-        status: "completed",
-        beneficiaries: 100,
-        startDate: "2023-08",
-        endDate: "2023-11",
-        outcomes: [
-          "Conducted 5 community clean-up drives",
-          "Established waste segregation system",
-          "Planted 200 trees",
-        ],
-      },
-    ],
-    gallery: [
-      {
-        url: "/images/san-miguel/community-cleanup-2024.jpg",
-        caption: "Community Cleanup Drive 2024",
-        date: "2024-02-15",
-        category: "program",
-      },
-      {
-        url: "/images/san-miguel/literacy-program.jpg",
-        caption: "Adult Literacy Program Graduation",
-        date: "2023-12-20",
-        category: "program",
-      },
-      {
-        url: "/images/san-miguel/health-mission.jpg",
-        caption: "Community Health Mission",
-        date: "2024-01-10",
-        category: "program",
-      },
-    ],
-  },
-  dawis: {
-    name: "Barangay Dawis",
-    description:
-      "The adopted community for the academic year 2022-2023. The CEC built upon the existing partnership, expanding its programs and services to meet the community's needs.",
-    location: "Dawis, Digos City",
-    history: `Barangay Dawis, established in 1952, has evolved from a small farming community into a vibrant neighborhood. 
-      The barangay is known for its strong community ties and active participation in local development initiatives.`,
-    coordinates: "6.7523° N, 125.3542° E",
-    officials: [
-      {
-        name: "Roberto Luna",
-        position: "Barangay Captain",
-        contact: "09198765432",
-        email: "roberto.luna@digoscity.gov.ph",
-      },
-      {
-        name: "Ana Reyes",
-        position: "Barangay Secretary",
-        contact: "09187654323",
-        email: "ana.reyes@digoscity.gov.ph",
-      },
-    ],
-    contactInfo: {
-      office: "(082) 553-2848",
-      email: "dawis@digoscity.gov.ph",
-      address: "Dawis Barangay Hall, Roxas Avenue, Digos City",
-    },
-    stats: {
-      totalBeneficiaries: 200,
-      activePrograms: 4,
-      completedPrograms: 3,
-      studentVolunteers: 55,
-      totalOutcomes: 12,
-      volunteerHours: 520,
-    },
-    currentPrograms: [
-      {
-        name: "Youth Development Program",
-        description: "Comprehensive youth development initiatives",
-        status: "ongoing",
-        beneficiaries: 60,
-        startDate: "2024-01",
-        outcomes: [
-          "Sports training programs",
-          "Leadership workshops",
-          "Academic tutorials",
-        ],
-      },
-      // ... add more current programs
-    ],
-    completedPrograms: [
-      {
-        name: "Community Garden Project",
-        description: "Urban gardening initiative",
-        status: "completed",
-        beneficiaries: 45,
-        startDate: "2023-05",
-        endDate: "2023-11",
-        outcomes: [
-          "Established 15 community gardens",
-          "Conducted gardening workshops",
-          "Created sustainable food source",
-        ],
-      },
-      // ... add more completed programs
-    ],
-    gallery: [
-      {
-        url: "/images/dawis/youth-program.jpg",
-        caption: "Youth Leadership Workshop",
-        date: "2024-01-20",
-        category: "program",
-      },
-      // ... add more gallery items
-    ],
-  },
-  ruparan: {
-    name: "Barangay Ruparan",
-    description:
-      "The CEC expanded its reach to this new community in the 2022-2023 academic year. The center implemented new initiatives to engage residents and build positive relationships.",
-    location: "Ruparan, Digos City",
-    history: `Barangay Ruparan, one of the newer barangays in Digos City, was established in 1975. 
-      The community has shown remarkable progress in urban development while maintaining its agricultural heritage.`,
-    coordinates: "6.7512° N, 125.3589° E",
-    officials: [
-      {
-        name: "Juan Dela Cruz",
-        position: "Barangay Captain",
-        contact: "09123456789",
-        email: "juan.delacruz@digoscity.gov.ph",
-      },
-      {
-        name: "Maria Santos",
-        position: "Barangay Secretary",
-        contact: "09187654321",
-        email: "maria.santos@digoscity.gov.ph",
-      },
-      {
-        name: "Pedro Reyes",
-        position: "Kagawad - Education",
-        contact: "09234567890",
-        email: "pedro.reyes@digoscity.gov.ph",
-      },
-    ],
-    contactInfo: {
-      office: "(082) 553-2847",
-      email: "ruparan@digoscity.gov.ph",
-      address: "Ruparan Barangay Hall, National Highway, Digos City",
-    },
-    stats: {
-      totalBeneficiaries: 175,
-      activePrograms: 3,
-      completedPrograms: 4,
-      studentVolunteers: 35,
-      totalOutcomes: 14,
-      volunteerHours: 380,
-    },
-    currentPrograms: [
-      {
-        name: "Educational Support Initiative",
-        description:
-          "Providing educational resources and support to community members",
-        status: "ongoing",
-        beneficiaries: 50,
-        startDate: "2024-01",
-        outcomes: [
-          "Distributed learning materials to 50 students",
-          "Established community learning hub",
-          "Weekly tutoring sessions",
-        ],
-      },
-      {
-        name: "Community Health Program",
-        description: "Regular health check-ups and medical assistance",
-        status: "ongoing",
-        beneficiaries: 75,
-        startDate: "2024-02",
-        outcomes: [
-          "Monthly health screenings",
-          "Health education workshops",
-          "Medicine distribution program",
-        ],
-      },
-      {
-        name: "Skills Training Workshop",
-        description: "Vocational training for community members",
-        status: "ongoing",
-        beneficiaries: 25,
-        startDate: "2024-03",
-        outcomes: [
-          "Basic computer literacy training",
-          "Entrepreneurship workshops",
-          "Handicraft skills development",
-        ],
-      },
-    ],
-    completedPrograms: [
-      {
-        name: "Literacy Campaign",
-        description: "Adult literacy program for community members",
-        status: "completed",
-        beneficiaries: 30,
-        startDate: "2023-06",
-        endDate: "2023-12",
-        outcomes: [
-          "30 adults completed basic literacy training",
-          "Established community reading club",
-          "Distributed reading materials",
-        ],
-      },
-      {
-        name: "Environmental Awareness",
-        description: "Community clean-up and environmental education",
-        status: "completed",
-        beneficiaries: 100,
-        startDate: "2023-08",
-        endDate: "2023-11",
-        outcomes: [
-          "Conducted 5 community clean-up drives",
-          "Established waste segregation system",
-          "Planted 200 trees",
-        ],
-      },
-    ],
-    gallery: [
-      {
-        url: "/images/ruparan/community-cleanup-2024.jpg",
-        caption: "Community Cleanup Drive 2024",
-        date: "2024-02-15",
-        category: "program",
-      },
-      {
-        url: "/images/ruparan/literacy-program.jpg",
-        caption: "Adult Literacy Program Graduation",
-        date: "2023-12-20",
-        category: "program",
-      },
-      {
-        url: "/images/ruparan/health-mission.jpg",
-        caption: "Community Health Mission",
-        date: "2024-01-10",
-        category: "program",
-      },
-    ],
-  },
-};
+import { partnerCommunities } from "./mock-data-partnercomms";
 
 export default function BarangayPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  const community = communities[slug as keyof typeof communities];
+  const community = partnerCommunities[slug as keyof typeof partnerCommunities];
 
   if (!community)
     return <div>{slug ? "Community not found" : "Loading..."}</div>;
@@ -475,24 +121,120 @@ export default function BarangayPage() {
           <Card className="p-6">
             <div className="flex gap-2 items-center mb-4">
               <History className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">History</h2>
+              <h2 className="text-xl font-semibold">Overview</h2>
             </div>
-            <p className="leading-relaxed text-gray-700">{community.history}</p>
+            <p className="text-gray-700 whitespace-pre-line">
+              {community.description}
+            </p>
           </Card>
 
           <Card className="p-6">
             <div className="flex gap-2 items-center mb-4">
-              <MapPin className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">Location Details</h2>
+              <Users2 className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-semibold">Demographics</h2>
             </div>
-            <div className="space-y-2">
-              <p className="text-gray-700">
-                Address: {community.contactInfo.address}
-              </p>
-              <p className="text-gray-700">
-                Coordinates: {community.coordinates}
-              </p>
+            <div className="space-y-4">
+              <div>
+                <h3 className="mb-2 font-medium">Population</h3>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="p-4 rounded-lg border">
+                    <p className="text-sm text-muted-foreground">
+                      2020 Population
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {community.demographics.population.total2020.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {community.demographics.population.percentOfCity}% of
+                      Digos City
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-lg border">
+                    <p className="text-sm text-muted-foreground">
+                      Growth Rate (2015-2020)
+                    </p>
+                    <p className="text-2xl font-bold">
+                      +{community.demographics.population.growthRate}%
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-lg border">
+                    <p className="text-sm text-muted-foreground">
+                      Households (2015)
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {community.demographics.households.count2015.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      ~{community.demographics.households.averageSize} members
+                      per household
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-2 font-medium">Location & Geography</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="p-4 rounded-lg border">
+                    <p className="text-sm text-muted-foreground">Coordinates</p>
+                    <p className="font-medium">
+                      {community.summary.coordinates.dms}
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-lg border">
+                    <p className="text-sm text-muted-foreground">Elevation</p>
+                    <p className="font-medium">
+                      {community.summary.elevation.meters}m (
+                      {community.summary.elevation.feet}ft)
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-2 font-medium">Administrative Information</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Region:</span>{" "}
+                      {community.summary.region}
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Province:</span>{" "}
+                      {community.summary.province}
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">City:</span>{" "}
+                      {community.summary.city}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">
+                        Postal Code:
+                      </span>{" "}
+                      {community.summary.postalCode}
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">
+                        Island Group:
+                      </span>{" "}
+                      {community.summary.islandGroup}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex gap-2 items-center mb-4">
+              <History className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-semibold">Historical Growth</h2>
+            </div>
+            <p className="text-gray-700">
+              {community.demographics.historicalGrowth.description}
+            </p>
           </Card>
         </TabsContent>
 

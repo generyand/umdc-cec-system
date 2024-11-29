@@ -8,7 +8,7 @@
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
-    "clean": "rimraf dist",
+    "clean": "rm -rf dist",
     "build:clean": "npm run clean && npm run build"
   },
   "keywords": [],

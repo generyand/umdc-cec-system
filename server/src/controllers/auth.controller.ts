@@ -92,7 +92,7 @@ export const logout = async (
     console.log("Clearing cookies");
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "strict",
     });
 

@@ -80,6 +80,12 @@ export const useAuth = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
 
+          // Call logout endpoint last
+          await api.post("/api/auth/logout");
+
+          // Clear auth header
+          delete api.defaults.headers.common["Authorization"];
+
           // Clear state first to prevent interceptor issues
           set({
             user: null,
@@ -87,12 +93,6 @@ export const useAuth = create<AuthState>()(
             isLoading: false,
             error: null,
           });
-
-          // Clear auth header
-          delete api.defaults.headers.common["Authorization"];
-
-          // Call logout endpoint last
-          await api.post("/api/auth/logout");
 
           return true;
         } catch (error) {
@@ -126,11 +126,11 @@ export const useAuth = create<AuthState>()(
 
           console.log("User data:", data.user);
 
-          // set({
-          //   user: data.user,
-          //   token: data.token,
-          //   isLoading: false,
-          // });
+          set({
+            user: data.user,
+            // token: data.token,
+            isLoading: false,
+          });
         } catch (error) {
           set({
             error: axios.isAxiosError(error)

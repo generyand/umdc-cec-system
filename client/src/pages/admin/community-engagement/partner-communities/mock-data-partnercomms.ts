@@ -239,7 +239,7 @@ export const partnerCommunities: Record<string, Community> = {
       },
     ],
   },
-  dawis: {},
+  // dawis: {},
 };
 
 export const getCommunityData = (slug: string): Community | undefined => {

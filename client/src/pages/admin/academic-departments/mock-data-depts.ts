@@ -1,4 +1,4 @@
-import { DepartmentData } from "@/types/department";
+import { DepartmentData } from "@/types/department.types";
 
 export const departmentsData: Record<string, DepartmentData> = {
   dae: {

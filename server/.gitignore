@@ -48,3 +48,6 @@ coverage/
 # Misc
 .DS_Store
 Thumbs.db
+
+# Certificates
+src/certs/ca.pem

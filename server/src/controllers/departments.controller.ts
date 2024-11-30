@@ -20,6 +20,15 @@ export const getAllDepartments: RequestHandler = async (req, res) => {
             contactNumber: true,
           },
         },
+        academicPrograms: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            totalStudents: true,
+            status: true,
+          },
+        },
       },
     });
     console.log(`✅ Successfully fetched ${departments.length} departments`);
@@ -57,6 +66,15 @@ export const getDepartmentById: RequestHandler = async (
             role: true,
             status: true,
             contactNumber: true,
+          },
+        },
+        academicPrograms: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            totalStudents: true,
+            status: true,
           },
         },
       },

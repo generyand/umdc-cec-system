@@ -1,7 +1,6 @@
 import { Users, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
-import { departmentsData } from "./mock-data-depts";
-
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import {
   DAELogo,
   DASELogo,
@@ -11,14 +10,32 @@ import {
   DTPLogo,
   SHSLogo,
 } from "@/assets/images/department-logos";
+import { departmentsApi } from "@/services/api/departments.services";
 
+// Types
 interface DepartmentCardProps {
+  id: string;
   name: string;
   slug: string;
   students?: number;
   programs?: number;
   description: string;
   icon?: React.ReactNode;
+}
+
+interface Program {
+  id: string;
+  name: string;
+  totalStudents: number;
+  status: string;
+}
+
+interface Department {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  programs: Program[];
 }
 
 function DepartmentCard({
@@ -72,17 +89,70 @@ function DepartmentCard({
 }
 
 export default function DepartmentsPage() {
-  const departments = Object.values(departmentsData).map((dept) => ({
-    name: dept.name,
-    slug: dept.slug,
-    students: dept.academicPrograms.active.reduce(
-      (total, program) => total + (program.students || 0),
-      0
-    ),
-    programs: dept.academicPrograms.active.length,
-    description: dept.description,
-    icon: getIconBySlug(dept.slug),
-  }));
+  const { data, isLoading, error }: UseQueryResult<Department[], Error> =
+    useQuery({
+      queryKey: ["departments"],
+      queryFn: async () => {
+        try {
+          const { data } = await departmentsApi.getAll();
+
+          // console.log("Raw API Result:", data);
+          // console.log("Result type:", typeof data);
+          // console.log("Is Array?", Array.isArray(data));
+
+          return data;
+        } catch (err) {
+          console.error("Query Error:", err);
+          throw err;
+        }
+      },
+    });
+
+  // console.log("Component State:", {
+  //   data,
+  //   isLoading,
+  //   error,
+  //   hasData: !!data,
+  //   isArray: Array.isArray(data),
+  // });
+
+  if (isLoading) {
+    return <div>Loading departments...</div>;
+  }
+
+  if (error) {
+    return (
+      <div>
+        Error loading departments:{" "}
+        {error instanceof Error ? error.message : "Unknown error"}
+      </div>
+    );
+  }
+
+  // Ensure data is an array
+  const departments = Array.isArray(data) ? data : [];
+  // console.log("Departments before formatting:", departments);
+
+  const formattedDepartments: DepartmentCardProps[] = departments.map(
+    (dept) => {
+      // console.log("Processing department:", dept); // Log each department being processed
+      return {
+        id: dept.id,
+        name: dept.name,
+        slug: dept.slug,
+        students: dept.programs
+          ?.filter((program) => program.status === "ACTIVE")
+          .reduce((total, program) => total + (program.totalStudents || 0), 0),
+        programs:
+          dept.programs?.filter((program) => program.status === "ACTIVE")
+            .length || 0,
+        description: dept.description,
+        icon: getIconBySlug(dept.slug),
+      };
+    }
+  );
+
+  // console.log("Formatted departments:", formattedDepartments);
 
   return (
     <div className="space-y-6">
@@ -94,9 +164,13 @@ export default function DepartmentsPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {departments.map((department) => (
-          <DepartmentCard key={department.slug} {...department} />
-        ))}
+        {formattedDepartments.length > 0 ? (
+          formattedDepartments.map((department) => (
+            <DepartmentCard key={department.id} {...department} />
+          ))
+        ) : (
+          <div>No departments available</div>
+        )}
       </div>
     </div>
   );

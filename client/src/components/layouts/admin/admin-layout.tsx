@@ -15,8 +15,6 @@ export default function AdminLayout() {
     return <Navigate to="/auth/login" replace />;
   }
 
-  console.log(user);
-
   return (
     <div className="flex relative flex-col w-full h-screen">
       <Header />

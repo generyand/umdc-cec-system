@@ -7,6 +7,32 @@ export interface AcademicProgram {
   lastGraduates?: number;
 }
 
+export interface AcademicProgram {
+  id: string;
+  name: string;
+  totalStudents: number;
+  status: string;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  slug: string; // This will be used as slug
+  description: string;
+  academicPrograms: AcademicProgram[];
+  // data: DepartmentData;
+}
+
+// Interface for the formatted department data used in the UI
+export interface FormattedDepartment {
+  name: string;
+  slug: string;
+  students: number;
+  programs: number;
+  description: string;
+  icon: React.ReactNode;
+}
+
 export interface BannerProgram {
   title: string;
   description: string;

@@ -1,0 +1,66 @@
+/* Base toast styles */
+.sonner-toast {
+  --normal-bg: hsl(var(--background));
+  --normal-border: hsl(var(--border));
+  --normal-text: hsl(var(--foreground));
+
+  --success-bg: hsl(var(--success));
+  --success-text: hsl(var(--success-foreground));
+
+  --error-bg: hsl(var(--destructive));
+  --error-text: hsl(var(--destructive-foreground));
+
+  --warning-bg: hsl(var(--warning));
+  --warning-text: hsl(var(--warning-foreground));
+
+  border: 1px solid var(--normal-border);
+  background: var(--normal-bg) !important;
+  color: var(--normal-text) !important;
+}
+
+/* Success toast */
+.sonner-toast[data-type="success"] {
+  background: var(--success-bg) !important;
+  color: var(--success-text) !important;
+}
+
+/* Error toast */
+.sonner-toast[data-type="error"] {
+  background: var(--error-bg) !important;
+  color: var(--error-text) !important;
+}
+
+/* Warning toast */
+.sonner-toast[data-type="warning"] {
+  background: var(--warning-bg) !important;
+  color: var(--warning-text) !important;
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] .sonner-toast {
+  --normal-bg: hsl(var(--background));
+  --normal-border: hsl(var(--border));
+  --normal-text: hsl(var(--foreground));
+}
+
+/* Loading spinner color */
+.sonner-loading-wrapper {
+  --spinner-color: hsl(var(--foreground));
+}
+
+/* Toast action button */
+.sonner-toast button {
+  background: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* Close button */
+.sonner-toast-close-button {
+  background: transparent !important;
+  color: currentColor !important;
+  opacity: 0.7;
+}
+
+.sonner-toast-close-button:hover {
+  opacity: 1;
+}

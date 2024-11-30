@@ -169,7 +169,7 @@ export const useAuth = create<AuthState>()(
           set({ isLoading: true, error: null });
 
           const { data: updatedUser } = await api.patch(
-            "/api/auth/profile", // should be /api/users/profile
+            `/api/users/${get().user?.id}/profile`,
             data,
             {
               headers: {

@@ -10,10 +10,16 @@ export const registerSchema = z.object({
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
         "Password must contain at least one uppercase letter, one lowercase letter, and one number"
       ),
-    name: z
+    firstName: z
       .string()
-      .min(2, "Name must be at least 2 characters")
-      .max(50, "Name cannot exceed 50 characters"),
+      .min(2, "First name must be at least 2 characters")
+      .max(50, "First name cannot exceed 50 characters"),
+    lastName: z
+      .string()
+      .min(2, "Last name must be at least 2 characters")
+      .max(50, "Last name cannot exceed 50 characters"),
+    department: z.string().min(1, "Department is required"),
+    contactNumber: z.string().optional(),
   }),
 });
 

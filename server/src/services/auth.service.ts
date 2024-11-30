@@ -5,12 +5,6 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-interface RegisterInput {
-  email: string;
-  password: string;
-  name: string;
-}
-
 interface LoginInput {
   email: string;
   password: string;
@@ -19,6 +13,15 @@ interface LoginInput {
 interface UpdatePasswordInput {
   userId: string;
   newPassword: string;
+}
+
+interface RegisterParams {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  department: string;
+  contactNumber?: string;
 }
 
 export const authService = {
@@ -34,19 +37,32 @@ export const authService = {
   },
 
   // Existing methods
-  async register({ email, password, name }: RegisterInput) {
+  async register({
+    email,
+    password,
+    firstName,
+    lastName,
+    department,
+    contactNumber,
+  }: RegisterParams) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.create({
       data: {
         email,
-        name,
+        firstName,
+        lastName,
+        department,
+        contactNumber,
         hashedPassword,
       },
       select: {
         id: true,
         email: true,
-        name: true,
+        firstName: true,
+        lastName: true,
+        department: true,
+        contactNumber: true,
         createdAt: true,
       },
     });
@@ -89,7 +105,10 @@ export const authService = {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        department: user.department,
+        contactNumber: user.contactNumber,
         role: user.role,
       },
       accessToken,

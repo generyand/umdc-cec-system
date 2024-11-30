@@ -8,7 +8,8 @@ import { Request, Response, NextFunction } from "express";
 // Update controller types
 export const register: Handler = async (req, res, next) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, firstName, lastName, department, contactNumber } =
+      req.body;
 
     // Check if email exists first
     const existingUser = await prisma.user.findUnique({
@@ -30,7 +31,10 @@ export const register: Handler = async (req, res, next) => {
     const { user, accessToken, refreshToken } = await authService.register({
       email,
       password,
-      name,
+      firstName,
+      lastName,
+      department,
+      contactNumber,
     });
 
     res.cookie("refreshToken", refreshToken, {
@@ -44,9 +48,6 @@ export const register: Handler = async (req, res, next) => {
       user,
       token: accessToken,
     });
-
-    console.log("User registered successfully");
-    return;
   } catch (error) {
     next(error);
     return;

@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import umdcLogo from "@/assets/images/umdc-logo.png";
+import cecLogo from "@/assets/images/cec-logo.png";
 
 function AuthLayout() {
   return (
@@ -39,11 +40,18 @@ function AuthLayout() {
         <div className="flex relative z-20 flex-col h-full">
           {/* Header */}
           <div className="flex gap-3 items-center mb-16">
-            <img
-              src={umdcLogo}
-              alt="UMDC Logo"
-              className="w-14 h-14 rounded-full shadow-lg"
-            />
+            <div className="flex gap-2 items-center">
+              <img
+                src={umdcLogo}
+                alt="UMDC Logo"
+                className="w-14 h-14 rounded-full shadow-lg"
+              />
+              <img
+                src={cecLogo}
+                alt="CEC Logo"
+                className="w-14 h-14 rounded-full shadow-lg"
+              />
+            </div>
             <div className="flex flex-col">
               <span className="text-2xl font-bold text-white">
                 UM Digos College

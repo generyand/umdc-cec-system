@@ -36,17 +36,35 @@ model User {
 }
 
 model Department {
-  id              Int      @id @default(autoincrement())
-  name            String   @unique
-  abbreviation    String   @unique
+  id              Int               @id @default(autoincrement())
+  name            String            @unique
+  abbreviation    String            @unique
   description     String?
   logoUrl         String?
-  totalStudents   Int      @default(0)
-  status          String   @default("ACTIVE")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  totalStudents   Int               @default(0)
+  status          String            @default("ACTIVE")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   
   users           User[]
+  academicPrograms AcademicProgram[]
 
   @@map("departments")
+}
+
+model AcademicProgram {
+  id            Int         @id @default(autoincrement())
+  name          String      @unique
+  abbreviation  String      @unique
+  description   String?
+  totalStudents Int         @default(0)
+  status        String      @default("ACTIVE")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  department    Department  @relation(fields: [departmentId], references: [id])
+  departmentId  Int
+
+  @@index([departmentId])
+  @@map("academic_programs")
 }

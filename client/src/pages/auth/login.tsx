@@ -1,4 +1,4 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -8,7 +8,7 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
+  // CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -109,14 +109,14 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            <div className="flex justify-end">
+            {/* <div className="flex justify-end">
               <Link
                 to="/auth/forgot-password"
                 className="text-sm font-medium text-primary hover:underline underline-offset-4"
               >
                 Forgot password?
               </Link>
-            </div>
+            </div> */}
             <Button
               type="submit"
               className="w-full bg-primary dark:text-white"
@@ -135,7 +135,7 @@ export default function LoginPage() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-4">
+      {/* <CardFooter className="flex flex-col space-y-4">
         <div className="text-sm text-center text-muted-foreground">
           Don't have an account?{" "}
           <Link
@@ -145,7 +145,7 @@ export default function LoginPage() {
             Create account
           </Link>
         </div>
-      </CardFooter>
+      </CardFooter> */}
     </Card>
   );
 }

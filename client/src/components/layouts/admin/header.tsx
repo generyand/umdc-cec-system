@@ -22,6 +22,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
 import { User, LogOut, Settings } from "lucide-react";
 import umdcLogo from "@/assets/images/umdc-logo.png";
+import cecLogo from "@/assets/images/cec-logo.png";
 
 const DEFAULT_AVATAR =
   "https://api.dicebear.com/7.x/avataaars/svg?seed=default";
@@ -54,10 +55,15 @@ export function Header() {
           to="/admin"
           className="flex gap-3 items-center transition-opacity hover:opacity-90"
         >
-          <div>
+          <div className="flex gap-2 items-center">
             <img
               src={umdcLogo}
               alt="UMDC Logo"
+              className="w-10 h-10 rounded-full shadow-sm"
+            />
+            <img
+              src={cecLogo}
+              alt="CEC Logo"
               className="w-10 h-10 rounded-full shadow-sm"
             />
           </div>

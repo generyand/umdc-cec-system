@@ -19,9 +19,9 @@ export const registerSchema = z.object({
       .min(2, "Last name must be at least 2 characters")
       .max(50, "Last name cannot exceed 50 characters"),
     departmentId: z
-      .string()
-      .cuid("Invalid department ID")
-      .min(1, "Department is required"),
+      .number()
+      .int("Department ID must be an integer")
+      .positive("Invalid department ID"),
     contactNumber: z.string().optional(),
   }),
 });

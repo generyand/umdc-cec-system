@@ -53,7 +53,7 @@ export const authService = {
         email: true,
         firstName: true,
         lastName: true,
-        department: true,
+        departmentId: true,
         contactNumber: true,
         createdAt: true,
       },

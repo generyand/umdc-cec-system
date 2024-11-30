@@ -1,6 +1,6 @@
 import { Users, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   DAELogo,
   DASELogo,
@@ -11,6 +11,8 @@ import {
   SHSLogo,
 } from "@/assets/images/department-logos";
 import { departmentsApi } from "@/services/api/departments.services";
+import { toast } from "sonner";
+import { generateSlug } from "@/utils/string";
 
 // Types
 interface DepartmentCardProps {
@@ -21,21 +23,6 @@ interface DepartmentCardProps {
   programs?: number;
   description: string;
   icon?: React.ReactNode;
-}
-
-interface Program {
-  id: string;
-  name: string;
-  totalStudents: number;
-  status: string;
-}
-
-interface Department {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  programs: Program[];
 }
 
 function DepartmentCard({
@@ -89,67 +76,56 @@ function DepartmentCard({
 }
 
 export default function DepartmentsPage() {
-  const { data, isLoading, error }: UseQueryResult<Department[], Error> =
-    useQuery({
-      queryKey: ["departments"],
-      queryFn: async () => {
-        try {
-          const { data } = await departmentsApi.getAll();
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["departments"],
+    queryFn: async () => {
+      const response = await departmentsApi.getAll();
 
-          // console.log("Raw API Result:", data);
-          // console.log("Result type:", typeof data);
-          // console.log("Is Array?", Array.isArray(data));
+      if (response.success) {
+        toast.success(response.message, {
+          description: `Found ${response.data.length} departments`,
+        });
+      } else {
+        toast.error(response.message, {
+          description:
+            "Please try again or contact support if the problem persists",
+        });
+      }
 
-          return data;
-        } catch (err) {
-          console.error("Query Error:", err);
-          throw err;
-        }
-      },
-    });
-
-  // console.log("Component State:", {
-  //   data,
-  //   isLoading,
-  //   error,
-  //   hasData: !!data,
-  //   isArray: Array.isArray(data),
-  // });
+      return response.data;
+    },
+  });
 
   if (isLoading) {
     return <div>Loading departments...</div>;
   }
 
   if (error) {
-    return (
-      <div>
-        Error loading departments:{" "}
-        {error instanceof Error ? error.message : "Unknown error"}
-      </div>
-    );
+    toast.error("Failed to load departments", {
+      description:
+        error instanceof Error ? error.message : "Unknown error occurred",
+    });
+    return <div>Error loading departments</div>;
   }
 
   // Ensure data is an array
   const departments = Array.isArray(data) ? data : [];
-  // console.log("Departments before formatting:", departments);
+  console.log("Departments before formatting:", departments);
 
   const formattedDepartments: DepartmentCardProps[] = departments.map(
-    (dept) => {
-      // console.log("Processing department:", dept); // Log each department being processed
-      return {
-        id: dept.id,
-        name: dept.name,
-        slug: dept.slug,
-        students: dept.programs
-          ?.filter((program) => program.status === "ACTIVE")
-          .reduce((total, program) => total + (program.totalStudents || 0), 0),
-        programs:
-          dept.programs?.filter((program) => program.status === "ACTIVE")
-            .length || 0,
-        description: dept.description,
-        icon: getIconBySlug(dept.slug),
-      };
-    }
+    (dept) => ({
+      id: dept.id,
+      name: dept.name,
+      slug: generateSlug(dept.name),
+      students: dept.academicPrograms
+        .filter((program) => program.status === "ACTIVE")
+        .reduce((total, program) => total + (program.totalStudents || 0), 0),
+      programs: dept.academicPrograms.filter(
+        (program) => program.status === "ACTIVE"
+      ).length,
+      description: dept.description,
+      icon: getIconBySlug(generateSlug(dept.name)),
+    })
   );
 
   // console.log("Formatted departments:", formattedDepartments);

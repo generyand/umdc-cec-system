@@ -9,17 +9,6 @@ export const getAllDepartments: RequestHandler = async (req, res) => {
     console.log("📃 Fetching all departments...");
     const departments = await prisma.department.findMany({
       include: {
-        users: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            role: true,
-            status: true,
-            contactNumber: true,
-          },
-        },
         academicPrograms: {
           select: {
             id: true,
@@ -35,6 +24,7 @@ export const getAllDepartments: RequestHandler = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      message: "Departments fetched successfully",
       data: departments,
     });
   } catch (error) {
@@ -88,6 +78,7 @@ export const getDepartmentById: RequestHandler = async (
     console.log(`✅ Successfully fetched department: ${department.name}`);
     res.status(200).json({
       success: true,
+      message: "Department fetched successfully",
       data: department,
     });
   } catch (error) {
@@ -138,6 +129,7 @@ export const createDepartment: RequestHandler = async (
     console.log("✅ Successfully created department:", department.name);
     res.status(201).json({
       success: true,
+      message: "Department created successfully",
       data: department,
     });
   } catch (error) {
@@ -249,6 +241,7 @@ export const updateDepartment: RequestHandler = async (
     console.log("✅ Successfully updated department:", updatedDepartment.name);
     res.status(200).json({
       success: true,
+      message: "Department updated successfully",
       data: updatedDepartment,
     });
   } catch (error) {
@@ -331,6 +324,7 @@ export const deleteDepartment: RequestHandler = async (
     res.status(200).json({
       success: true,
       message: "Department deleted successfully",
+      data: null,
     });
   } catch (error) {
     console.error("❌ Error deleting department:", error);

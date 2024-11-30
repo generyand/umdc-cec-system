@@ -1,17 +1,39 @@
 import api from "@/lib/api";
 import { Department } from "@/types/department.types";
 
-export const departmentsApi = {
-  getAll: async (): Promise<Department[]> => {
-    try {
-      const response = await api.get<Department[]>("/api/departments");
-      //   console.log("API Response:", data); // Debug log
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
 
-      console.log("API Response:", response);
-      return response.data;
+interface ServiceResponse<T> {
+  data: T;
+  success: boolean;
+  message: string;
+}
+
+export const departmentsApi = {
+  getAll: async (): Promise<ServiceResponse<Department[]>> => {
+    try {
+      const response = await api.get<ApiResponse<Department[]>>(
+        "api/departments"
+      );
+
+      return {
+        data: response.data.data,
+        success: response.data.success,
+        message: response.data.message,
+      };
     } catch (error) {
-      console.error("Error fetching departments:", error);
-      throw error;
+      return {
+        data: [],
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch departments",
+      };
     }
   },
 };

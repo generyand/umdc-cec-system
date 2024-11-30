@@ -19,7 +19,6 @@ model User {
   firstName         String
   lastName          String
   role              String    @default("FOCAL_PERSON")
-  department        String
   contactNumber     String?
   status            String    @default("ACTIVE")
   hashedPassword    String
@@ -28,11 +27,25 @@ model User {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
+  department        Department @relation(fields: [departmentId], references: [id])
+  departmentId      Int
+
   @@index([email])
+  @@index([departmentId])
   @@map("users")
 }
 
-model UserDetails {
-  uc_ud_main_id                String    @id @default(cuid())
+model Department {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  abbreviation    String   @unique
+  description     String?
+  totalStudents   Int      @default(0)
+  status          String   @default("ACTIVE")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   
+  users           User[]
+
+  @@map("departments")
 }

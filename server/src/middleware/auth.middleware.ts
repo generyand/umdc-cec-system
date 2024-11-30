@@ -61,3 +61,16 @@ export const authenticateToken = async (
     });
   }
 };
+
+export const isAuthenticated = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (!req.user) {
+    res.status(401).json({
+      status: "error",
+      message: "Unauthorized",
+    });
+  }
+};

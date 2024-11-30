@@ -8,8 +8,14 @@ import { Request, Response, NextFunction } from "express";
 // Update controller types
 export const register: Handler = async (req, res, next) => {
   try {
-    const { email, password, firstName, lastName, department, contactNumber } =
-      req.body;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      departmentId,
+      contactNumber,
+    } = req.body;
 
     // Check if email exists first
     const existingUser = await prisma.user.findUnique({
@@ -33,7 +39,7 @@ export const register: Handler = async (req, res, next) => {
       password,
       firstName,
       lastName,
-      department,
+      departmentId,
       contactNumber,
     });
 

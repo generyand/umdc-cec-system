@@ -20,7 +20,7 @@ interface RegisterParams {
   password: string;
   firstName: string;
   lastName: string;
-  department: string;
+  departmentId: number;
   contactNumber?: string;
 }
 
@@ -34,7 +34,7 @@ export const authService = {
     password,
     firstName,
     lastName,
-    department,
+    departmentId,
     contactNumber,
   }: RegisterParams) {
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -44,7 +44,7 @@ export const authService = {
         email,
         firstName,
         lastName,
-        department,
+        departmentId,
         contactNumber,
         hashedPassword,
       },
@@ -87,7 +87,7 @@ export const authService = {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        department: user.department,
+        departmentId: user.departmentId,
         contactNumber: user.contactNumber,
         role: user.role,
       },

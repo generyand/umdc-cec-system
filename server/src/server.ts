@@ -9,6 +9,7 @@ import {
 import { errorHandler } from "./middleware/error.middleware.js";
 import authRoutes from "./routes/auth/auth.route.js";
 import usersRoutes from "./routes/users/users.route.js";
+import departmentsRoutes from "./routes/departments/departments.route.js";
 // import { Server } from "http";
 
 async function createServer() {
@@ -36,6 +37,7 @@ async function createServer() {
 
   app.use("/api/auth", authRoutes);
   app.use("/api/users", usersRoutes);
+  app.use("/api/departments", departmentsRoutes);
 
   // Error handling middleware (should be last)
   app.use(errorHandler);

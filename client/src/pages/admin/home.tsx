@@ -103,7 +103,7 @@ export default function HomePage() {
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          Welcome back, {user?.name}
+          Welcome back, {user?.firstName}
         </h1>
         <p className="text-muted-foreground">
           Monitor and manage community extension programs at UM Digos College

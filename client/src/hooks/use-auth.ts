@@ -1,37 +1,30 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import axios from "axios";
-
-// Create axios instance with default config
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: "admin" | "focal-person";
-}
+import {
+  User,
+  ProfileUpdateData,
+  PasswordUpdateData,
+} from "@/types/user.types";
+import api from "@/lib/api";
 
 interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
   error: string | null;
+  setToken: (token: string) => void;
 
   login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<boolean | undefined>;
+  logout: () => Promise<boolean>;
   register: (email: string, password: string, name: string) => Promise<void>;
   resetPassword: (
     email: string,
     token: string,
     newPassword: string
   ) => Promise<void>;
-  updateProfile: (data: Partial<User>) => Promise<void>;
+  updateProfile: (data: ProfileUpdateData) => Promise<void>;
+  updatePassword: (data: PasswordUpdateData) => Promise<void>;
 }
 
 export const useAuth = create<AuthState>()(
@@ -41,6 +34,11 @@ export const useAuth = create<AuthState>()(
       token: null,
       isLoading: false,
       error: null,
+
+      setToken: (token: string) => {
+        set({ token });
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      },
 
       login: async (email: string, password: string) => {
         try {
@@ -166,12 +164,12 @@ export const useAuth = create<AuthState>()(
         }
       },
 
-      updateProfile: async (data: Partial<User>) => {
+      updateProfile: async (data: ProfileUpdateData) => {
         try {
           set({ isLoading: true, error: null });
 
           const { data: updatedUser } = await api.patch(
-            "/api/auth/profile",
+            "/api/auth/profile", // should be /api/users/profile
             data,
             {
               headers: {
@@ -188,6 +186,23 @@ export const useAuth = create<AuthState>()(
           set({
             error: axios.isAxiosError(error)
               ? error.response?.data?.message || "Failed to update profile"
+              : "An error occurred",
+            isLoading: false,
+          });
+        }
+      },
+
+      updatePassword: async (data: PasswordUpdateData) => {
+        try {
+          set({ isLoading: true, error: null });
+
+          await api.post("/api/auth/update-password", data);
+
+          set({ isLoading: false });
+        } catch (error) {
+          set({
+            error: axios.isAxiosError(error)
+              ? error.response?.data?.message || "Failed to update password"
               : "An error occurred",
             isLoading: false,
           });
@@ -218,38 +233,14 @@ api.interceptors.request.use(
   }
 );
 
-// Add refresh token functionality to response interceptor
+// Simplified response interceptor - just handle errors
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url?.includes("/logout") &&
-      !originalRequest.url?.includes("/refresh-token")
-    ) {
-      originalRequest._retry = true;
-
-      try {
-        // Try to refresh the token
-        const { data } = await api.post("/api/auth/refresh-token");
-        const { token } = data;
-
-        // Update auth store with new token
-        useAuth.setState({ token });
-
-        // Retry original request with new token
-        originalRequest.headers.Authorization = `Bearer ${token}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        // If refresh fails, logout
-        await useAuth.getState().logout();
-        return Promise.reject(refreshError);
-      }
+  (error) => {
+    // If unauthorized, logout user
+    if (error.response?.status === 401) {
+      useAuth.getState().logout();
     }
-
     return Promise.reject(error);
   }
 );

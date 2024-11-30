@@ -10,7 +10,6 @@ import {
   register,
   logout,
   resetPassword,
-  refreshToken,
 } from "../../controllers/auth.controller.js";
 import { authenticateToken } from "../../middleware/auth.middleware.js";
 // import { rateLimit } from "express-rate-limit";
@@ -29,7 +28,6 @@ const router = Router();
 router.post("/register", validateRequest(registerSchema), register);
 router.post("/login", validateRequest(loginSchema), login);
 router.post("/logout", authenticateToken, logout);
-router.post("/refresh-token", refreshToken);
 router.post(
   "/reset-password",
   validateRequest(resetPasswordSchema),

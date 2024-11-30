@@ -25,18 +25,10 @@ interface RegisterParams {
 }
 
 export const authService = {
-  // Token generation methods
   generateAccessToken(userId: string): string {
-    return jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: "15m" });
+    return jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: "24h" });
   },
 
-  generateRefreshToken(userId: string): string {
-    return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET!, {
-      expiresIn: "7d",
-    });
-  },
-
-  // Existing methods
   async register({
     email,
     password,
@@ -68,14 +60,8 @@ export const authService = {
     });
 
     const accessToken = this.generateAccessToken(user.id);
-    const refreshToken = this.generateRefreshToken(user.id);
 
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { refreshToken },
-    });
-
-    return { user, accessToken, refreshToken };
+    return { user, accessToken };
   },
 
   async login({ email, password }: LoginInput) {
@@ -94,12 +80,6 @@ export const authService = {
     }
 
     const accessToken = this.generateAccessToken(user.id);
-    const refreshToken = this.generateRefreshToken(user.id);
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { refreshToken },
-    });
 
     return {
       user: {
@@ -112,7 +92,6 @@ export const authService = {
         role: user.role,
       },
       accessToken,
-      refreshToken,
     };
   },
 

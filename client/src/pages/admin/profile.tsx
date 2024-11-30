@@ -22,14 +22,21 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
-import { User, Mail, KeyRound } from "lucide-react";
+import { User as LucideUser, Mail, KeyRound, Phone } from "lucide-react";
+// import { User, ProfileUpdateData } from "@/types/user.types";
 
 const profileFormSchema = z.object({
-  name: z
+  firstName: z
     .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(30, "Name must not be longer than 30 characters"),
+    .min(2, "First name must be at least 2 characters")
+    .max(30, "First name must not be longer than 30 characters"),
+  lastName: z
+    .string()
+    .min(2, "Last name must be at least 2 characters")
+    .max(30, "Last name must not be longer than 30 characters"),
   email: z.string().email("Invalid email address"),
+  department: z.string().min(1, "Department is required"),
+  contactNumber: z.string().optional(),
 });
 
 const passwordFormSchema = z
@@ -66,8 +73,11 @@ export default function AdminProfile() {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      name: user?.name || "",
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
       email: user?.email || "",
+      department: user?.department || "",
+      contactNumber: user?.contactNumber || "",
     },
   });
 
@@ -88,8 +98,11 @@ export default function AdminProfile() {
   useEffect(() => {
     if (user) {
       form.reset({
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
+        department: user.department,
+        contactNumber: user.contactNumber || "",
       });
     }
   }, [user, form]);
@@ -98,8 +111,11 @@ export default function AdminProfile() {
     setIsLoading(true);
     try {
       await updateProfile({
-        name: data.name,
+        firstName: data.firstName,
+        lastName: data.lastName,
         email: data.email,
+        department: data.department,
+        contactNumber: data.contactNumber,
       });
       toast.success("Profile updated", {
         description: "Your profile has been successfully updated.",
@@ -163,15 +179,16 @@ export default function AdminProfile() {
               <div className="relative group">
                 <Avatar className="w-16 h-16 border-2 border-background">
                   <AvatarFallback className="text-lg bg-primary/10">
-                    {user.name?.slice(0, 2).toUpperCase()}
+                    {user.firstName?.charAt(0)}
+                    {user.lastName?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute -right-1 -bottom-1 p-1 rounded-full border shadow-sm transition-colors bg-background group-hover:border-primary/50">
-                  <User className="w-3.5 h-3.5 text-muted-foreground" />
+                  <LucideUser className="w-3.5 h-3.5 text-muted-foreground" />
                 </div>
               </div>
               <div className="space-y-1">
-                <CardTitle>{user.name}</CardTitle>
+                <CardTitle>{`${user.firstName} ${user.lastName}`}</CardTitle>
                 <CardDescription className="space-x-2">
                   <span>{user.email}</span>
                   <span>•</span>
@@ -191,16 +208,79 @@ export default function AdminProfile() {
               >
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>First Name</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <LucideUser className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                           <Input
                             className="pl-9 bg-background"
-                            placeholder="Your name"
+                            placeholder="Your first name"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <LucideUser className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            className="pl-9 bg-background"
+                            placeholder="Your last name"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="department"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Department</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <LucideUser className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            className="pl-9 bg-background"
+                            placeholder="Your department"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="contactNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact Number</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            className="pl-9 bg-background"
+                            placeholder="Your contact number"
                             {...field}
                           />
                         </div>

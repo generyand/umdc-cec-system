@@ -16,7 +16,6 @@ datasource db {
 model User {
   id                String    @id @default(cuid())
   email             String    @unique
-  // employeeId        String    @unique
   firstName         String
   lastName          String
   role              String    @default("FOCAL_PERSON")
@@ -24,7 +23,6 @@ model User {
   contactNumber     String?
   status            String    @default("ACTIVE")
   hashedPassword    String
-  refreshToken      String?
   resetPasswordToken String?
   resetTokenExpiry  DateTime?
   createdAt         DateTime  @default(now())

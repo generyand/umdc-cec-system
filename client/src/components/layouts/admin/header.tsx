@@ -29,6 +29,8 @@ const DEFAULT_AVATAR =
 export function Header() {
   const { user, logout } = useAuth();
 
+  const name = `${user?.firstName} ${user?.lastName}`;
+
   const handleLogout = async () => {
     await logout();
   };
@@ -73,19 +75,16 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <div className="flex gap-3 items-center">
                 <div className="hidden text-sm text-right md:block">
-                  <span className="block font-medium">{user?.name}</span>
+                  <span className="block font-medium">{name}</span>
                   <span className="block text-xs capitalize text-muted-foreground">
                     {formatRole(user?.role || "Unknown")}
                   </span>
                 </div>
                 <button className="p-1.5 rounded-full hover:bg-accent/50 transition-colors">
                   <Avatar className="w-8 h-8 border-2 shadow-sm border-background">
-                    <AvatarImage
-                      src={DEFAULT_AVATAR}
-                      alt={user?.name || "User"}
-                    />
+                    <AvatarImage src={DEFAULT_AVATAR} alt={name || "User"} />
                     <AvatarFallback className="bg-primary/10">
-                      {user?.name?.slice(0, 2).toUpperCase()}
+                      {name?.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </button>

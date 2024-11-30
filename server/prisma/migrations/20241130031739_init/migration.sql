@@ -9,7 +9,6 @@ CREATE TABLE "users" (
     "contactNumber" TEXT,
     "status" TEXT NOT NULL DEFAULT 'ACTIVE',
     "hashedPassword" TEXT NOT NULL,
-    "refreshToken" TEXT,
     "resetPasswordToken" TEXT,
     "resetTokenExpiry" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

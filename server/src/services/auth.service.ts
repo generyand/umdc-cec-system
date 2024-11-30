@@ -67,6 +67,15 @@ export const authService = {
   async login({ email, password }: LoginInput) {
     const user = await prisma.user.findUnique({
       where: { email },
+      include: {
+        department: {
+          select: {
+            id: true,
+            name: true,
+            abbreviation: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -88,6 +97,7 @@ export const authService = {
         firstName: user.firstName,
         lastName: user.lastName,
         departmentId: user.departmentId,
+        department: user.department,
         contactNumber: user.contactNumber,
         role: user.role,
       },

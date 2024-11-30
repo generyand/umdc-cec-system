@@ -1,13 +1,17 @@
 export interface User {
-  id: string;
-  email: string;
+  id: number;
   firstName: string;
   lastName: string;
+  email: string;
+  departmentId: number;
+  department?: {
+    id: number;
+    name: string;
+    abbreviation: string;
+  };
+  contactNumber?: string;
+  role: string;
   //   fullName: string;
-  role: "ADMIN" | "FOCAL_PERSON";
-  department: string;
-  contactNumber?: string | null;
-  status: "ACTIVE" | "INACTIVE";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -16,7 +20,7 @@ export interface ProfileUpdateData {
   firstName: string;
   lastName: string;
   email: string;
-  department: string;
+  departmentId: number;
   contactNumber?: string;
 }
 

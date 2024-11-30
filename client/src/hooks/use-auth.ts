@@ -57,6 +57,8 @@ export const useAuth = create<AuthState>()(
             token: data.token,
             isLoading: false,
           });
+
+          console.log("User data:", data.user);
         } catch (error) {
           set({
             error: axios.isAxiosError(error)

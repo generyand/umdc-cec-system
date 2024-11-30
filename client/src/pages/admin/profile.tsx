@@ -25,6 +25,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { User as LucideUser, Mail, KeyRound, Phone } from "lucide-react";
 // import { User, ProfileUpdateData } from "@/types/user.types";
 
+// type Department = {
+//   id: number;
+//   name: string;
+//   abbreviation: string;
+// };
+
 const profileFormSchema = z.object({
   firstName: z
     .string()
@@ -35,7 +41,7 @@ const profileFormSchema = z.object({
     .min(2, "Last name must be at least 2 characters")
     .max(30, "Last name must not be longer than 30 characters"),
   email: z.string().email("Invalid email address"),
-  department: z.string().min(1, "Department is required"),
+  departmentId: z.number().min(1, "Department is required"),
   contactNumber: z.string().optional(),
 });
 
@@ -76,7 +82,7 @@ export default function AdminProfile() {
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       email: user?.email || "",
-      department: user?.department || "",
+      departmentId: user?.departmentId || 0,
       contactNumber: user?.contactNumber || "",
     },
   });
@@ -101,7 +107,7 @@ export default function AdminProfile() {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        department: user.department,
+        departmentId: user.departmentId,
         contactNumber: user.contactNumber || "",
       });
     }
@@ -114,7 +120,7 @@ export default function AdminProfile() {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
-        department: data.department,
+        departmentId: data.departmentId,
         contactNumber: data.contactNumber,
       });
       toast.success("Profile updated", {
@@ -130,7 +136,10 @@ export default function AdminProfile() {
     }
   }
 
-  async function onPasswordSubmit(values: z.infer<typeof passwordFormSchema>) {
+  async function onPasswordSubmit(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    values: z.infer<typeof passwordFormSchema>
+  ) {
     setIsLoading(true);
     try {
       // Implement password update logic
@@ -250,8 +259,9 @@ export default function AdminProfile() {
 
                 <FormField
                   control={form.control}
-                  name="department"
-                  render={({ field }) => (
+                  name="departmentId"
+                  render={() => (
+                    // ignore field
                     <FormItem>
                       <FormLabel>Department</FormLabel>
                       <FormControl>
@@ -259,8 +269,8 @@ export default function AdminProfile() {
                           <LucideUser className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                           <Input
                             className="pl-9 bg-background"
-                            placeholder="Your department"
-                            {...field}
+                            value={user?.department?.name || ""}
+                            disabled
                           />
                         </div>
                       </FormControl>

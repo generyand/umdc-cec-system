@@ -81,9 +81,13 @@ export default function DepartmentsPage() {
     queryFn: async () => {
       const response = await departmentsApi.getAll();
 
+      alert(response.data);
+
       if (response.success) {
         toast.success(response.message, {
-          description: `Found ${response.data.length} departments`,
+          description: `Found ${response.data.length} ${
+            response.data.length === 1 ? "department" : "departments"
+          }`,
         });
       } else {
         toast.error(response.message, {
@@ -110,7 +114,7 @@ export default function DepartmentsPage() {
 
   // Ensure data is an array
   const departments = Array.isArray(data) ? data : [];
-  console.log("Departments before formatting:", departments);
+  // console.log("Departments before formatting:", departments);
 
   const formattedDepartments: DepartmentCardProps[] = departments.map(
     (dept) => ({

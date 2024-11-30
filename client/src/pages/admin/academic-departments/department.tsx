@@ -21,7 +21,7 @@ import {
 import { StatCard } from "@/components/admin/academic-departments/stat-card";
 import { useParams } from "react-router-dom";
 import { useMemo } from "react";
-import { getDepartmentData } from "./mock-data-depts";
+// import { getDepartmentData } from "./mock-data-depts";
 import { useNavigate } from "react-router-dom";
 
 export default function DepartmentPage() {

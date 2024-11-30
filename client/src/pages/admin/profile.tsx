@@ -79,12 +79,13 @@ export default function AdminProfile() {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      firstName: user?.firstName || "",
-      lastName: user?.lastName || "",
-      email: user?.email || "",
-      departmentId: user?.departmentId || 0,
-      contactNumber: user?.contactNumber || "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      departmentId: 0,
+      contactNumber: "",
     },
+    mode: "onChange",
   });
 
   const passwordForm = useForm<z.infer<typeof passwordFormSchema>>({
@@ -94,22 +95,16 @@ export default function AdminProfile() {
       newPassword: "",
       confirmPassword: "",
     },
+    mode: "onChange",
   });
-
-  const isProfileFormDirty = form.formState.isDirty;
-  const isPasswordFormDirty = passwordForm.formState.isDirty;
-  const isProfileFormValid = form.formState.isValid;
-  const isPasswordFormValid = passwordForm.formState.isValid;
 
   useEffect(() => {
     if (user) {
-      form.reset({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        departmentId: user.departmentId,
-        contactNumber: user.contactNumber || "",
-      });
+      form.setValue("firstName", user.firstName);
+      form.setValue("lastName", user.lastName);
+      form.setValue("email", user.email);
+      form.setValue("departmentId", user.departmentId);
+      form.setValue("contactNumber", user.contactNumber || "");
     }
   }, [user, form]);
 
@@ -123,6 +118,13 @@ export default function AdminProfile() {
         departmentId: data.departmentId,
         contactNumber: data.contactNumber,
       });
+
+      form.setValue("firstName", data.firstName);
+      form.setValue("lastName", data.lastName);
+      form.setValue("email", data.email);
+      form.setValue("departmentId", data.departmentId);
+      form.setValue("contactNumber", data.contactNumber || "");
+
       toast.success("Profile updated", {
         description: "Your profile has been successfully updated.",
       });
@@ -130,7 +132,7 @@ export default function AdminProfile() {
       toast.error("Error", {
         description: "Failed to update profile. Please try again.",
       });
-      console.log(error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -142,9 +144,13 @@ export default function AdminProfile() {
   ) {
     setIsLoading(true);
     try {
-      // Implement password update logic
+      // Implement password update logic here
+
+      passwordForm.setValue("currentPassword", "");
+      passwordForm.setValue("newPassword", "");
+      passwordForm.setValue("confirmPassword", "");
+
       toast.success("Password updated successfully");
-      passwordForm.reset();
     } catch (error) {
       toast.error("Failed to update password");
       console.error(error);
@@ -152,6 +158,14 @@ export default function AdminProfile() {
       setIsLoading(false);
     }
   }
+
+  // Form state for profile form
+  const isProfileFormDirty = form.formState.isDirty;
+  const isProfileFormValid = form.formState.isValid;
+
+  // Form state for password form
+  const isPasswordFormDirty = passwordForm.formState.isDirty;
+  const isPasswordFormValid = passwordForm.formState.isValid;
 
   if (!user) {
     return (

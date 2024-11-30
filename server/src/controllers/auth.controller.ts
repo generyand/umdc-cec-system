@@ -1,6 +1,6 @@
 import { Handler } from "express";
 import { authService } from "../services/auth.service.js";
-import { AuthError, ValidationError } from "../utils/errors.js";
+import { ValidationError } from "../utils/errors.js";
 // import jwt from "jsonwebtoken";
 import { prisma } from "../lib/prisma.js";
 import { Request, Response, NextFunction } from "express";

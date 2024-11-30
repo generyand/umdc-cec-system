@@ -40,6 +40,7 @@ model Department {
   name            String   @unique
   abbreviation    String   @unique
   description     String?
+  logoUrl         String?
   totalStudents   Int      @default(0)
   status          String   @default("ACTIVE")
   createdAt       DateTime @default(now())

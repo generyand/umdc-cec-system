@@ -166,13 +166,15 @@ function DepartmentCard({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
     >
-      <div className="flex gap-4 items-start">
+      <div className="flex relative gap-4 items-start">
         <Link
           to={`/admin/academic-departments/${slug}`}
-          className="flex flex-1 gap-4 items-start p-6"
+          className="flex flex-1 gap-4 items-start p-4"
         >
-          <div className="p-3 rounded-lg transition-colors bg-primary/10 group-hover:bg-primary/20 outline outline-1 outline-primary/20">
-            <div className="w-8 h-8">{getLogoByAbbreviation(abbreviation)}</div>
+          <div className="p-2 rounded-lg transition-colors bg-primary/10 group-hover:bg-primary/20 outline outline-1 outline-primary/20">
+            <div className="w-10 aspect-square">
+              {getLogoByAbbreviation(abbreviation)}
+            </div>
           </div>
           <div className="flex-1">
             <h2 className="mb-2 text-xl font-semibold transition-colors group-hover:text-primary">
@@ -195,38 +197,40 @@ function DepartmentCard({
         </Link>
 
         {/* Menu Button */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="p-0 w-8 h-8 text-muted-foreground"
-            >
-              <span className="sr-only">Open menu</span>
-              <MoreVertical className="w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DepartmentFormModal
-              mode="edit"
-              department={{ id, name, abbreviation, description }}
-              onSuccess={onDepartmentDeleted}
-              trigger={
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  <Pencil className="mr-2 w-4 h-4" />
-                  Edit
-                </DropdownMenuItem>
-              }
-            />
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => setShowDeleteDialog(true)}
-              className="cursor-pointer text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 w-4 h-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="absolute top-0 right-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="p-0 w-8 h-8 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+              >
+                <span className="sr-only">Open menu</span>
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DepartmentFormModal
+                mode="edit"
+                department={{ id, name, abbreviation, description }}
+                onSuccess={onDepartmentDeleted}
+                trigger={
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Pencil className="mr-2 w-4 h-4" />
+                    Edit
+                  </DropdownMenuItem>
+                }
+              />
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => setShowDeleteDialog(true)}
+                className="cursor-pointer text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 w-4 h-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

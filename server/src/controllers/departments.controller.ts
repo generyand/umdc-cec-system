@@ -18,14 +18,43 @@ export const getAllDepartments: RequestHandler = async (req, res) => {
             status: true,
           },
         },
+        _count: {
+          select: {
+            academicPrograms: true,
+          },
+        },
+      },
+      where: {
+        status: "ACTIVE", // Only fetch active departments
       },
     });
-    console.log(`✅ Successfully fetched ${departments.length} departments`);
+
+    // Transform the data to include calculated fields
+    const transformedDepartments = departments.map((department) => ({
+      id: department.id,
+      name: department.name,
+      abbreviation: department.abbreviation,
+      description: department.description,
+      logoUrl: department.logoUrl,
+      status: department.status,
+      createdAt: department.createdAt,
+      updatedAt: department.updatedAt,
+      totalStudents: department.academicPrograms.reduce(
+        (sum, program) => sum + (program.totalStudents || 0),
+        0
+      ),
+      totalPrograms: department._count.academicPrograms,
+      academicPrograms: department.academicPrograms,
+    }));
+
+    console.log(
+      `✅ Successfully fetched ${transformedDepartments.length} departments`
+    );
 
     res.status(200).json({
       success: true,
       message: "Departments fetched successfully",
-      data: departments,
+      data: transformedDepartments,
     });
   } catch (error) {
     console.error("❌ Error fetching departments:", error);
@@ -95,7 +124,7 @@ export const createDepartment: RequestHandler = async (
 ) => {
   try {
     console.log("📝 Creating new department with data:", req.body);
-    const { name, abbreviation, description, totalStudents, status } = req.body;
+    const { name, abbreviation, description, status } = req.body;
 
     // Check existing
     console.log("🔍 Checking for existing department...");
@@ -121,7 +150,6 @@ export const createDepartment: RequestHandler = async (
         name,
         abbreviation,
         description,
-        totalStudents: totalStudents || 0,
         status: status || "ACTIVE",
       },
     });

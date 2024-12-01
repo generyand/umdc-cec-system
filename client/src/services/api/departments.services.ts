@@ -19,6 +19,8 @@ export const departmentsApi = {
     const response = await api.get<ServiceResponse<Department[]>>(
       "/api/departments"
     );
+
+    // console.log(response.data);
     return response.data;
   },
 

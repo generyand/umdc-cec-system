@@ -23,7 +23,6 @@ import ImpactMetricsPage from "./pages/admin/analytics-and-reports/impact-metric
 import BarangayPage from "./pages/admin/community-engagement/partner-communities/barangay-details";
 import AcademicDepartmentsPage from "./pages/admin/academic-departments";
 import DepartmentPage from "./pages/admin/academic-departments/department";
-import AddDepartmentPage from "./pages/admin/academic-departments/add-department";
 import NotFound from "./pages/not-found";
 const App = () => {
   return (
@@ -77,10 +76,6 @@ const App = () => {
             <Route
               path="/admin/academic-departments/:slug"
               element={<DepartmentPage />}
-            />
-            <Route
-              path="/admin/academic-departments/add-department"
-              element={<AddDepartmentPage />}
             />
           </Route>
 

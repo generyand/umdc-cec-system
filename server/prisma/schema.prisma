@@ -41,7 +41,6 @@ model Department {
   abbreviation    String            @unique
   description     String?
   logoUrl         String?
-  totalStudents   Int               @default(0)
   status          String            @default("ACTIVE")
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt

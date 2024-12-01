@@ -155,7 +155,7 @@ export function AddDepartmentModal({
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="numberOfStudents"
               render={({ field }) => (
@@ -173,7 +173,7 @@ export function AddDepartmentModal({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <div className="flex gap-3 justify-end pt-4">
               <Button

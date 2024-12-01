@@ -1,17 +1,18 @@
-import { Users, BookOpen } from "lucide-react";
+import { Users, BookOpen, Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-// import {
-//   DAELogo,
-//   DASELogo,
-//   DBALogo,
-//   DCJELogo,
-//   DTELogo,
-//   DTPLogo,
-//   SHSLogo,
-// } from "@/assets/images/department-logos";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { departmentsApi } from "@/services/api/departments.services";
 import { AddDepartmentModal } from "@/components/admin/academic-departments/add-department-modal";
+import { Department } from "@/types/department.types";
 
 // Types
 interface DepartmentCardProps {
@@ -19,7 +20,7 @@ interface DepartmentCardProps {
   name: string;
   slug: string;
   students?: number;
-  programs?: number;
+  academicPrograms?: Department["academicPrograms"];
   description: string;
   icon?: React.ReactNode;
 }
@@ -28,17 +29,17 @@ function DepartmentCard({
   name,
   slug,
   students = 0,
-  programs = 0,
+  academicPrograms = [],
   description,
   icon,
 }: DepartmentCardProps) {
   return (
     <Link
       to={`/admin/academic-departments/${slug}`}
-      className="block p-6 rounded-lg border transition-shadow bg-card hover:shadow-md"
+      className="block p-6 rounded-lg border transition-all duration-200 group bg-card hover:shadow-lg hover:border-primary/20"
     >
       <div className="flex gap-4 items-start">
-        <div className="p-3 rounded-lg bg-primary/10">
+        <div className="p-3 rounded-lg transition-colors bg-primary/10 group-hover:bg-primary/20">
           {icon && (
             <div className="w-8 h-8">
               {typeof icon === "string" ? (
@@ -54,7 +55,9 @@ function DepartmentCard({
           )}
         </div>
         <div className="flex-1">
-          <h2 className="mb-2 text-xl font-semibold">{name}</h2>
+          <h2 className="mb-2 text-xl font-semibold transition-colors group-hover:text-primary">
+            {name}
+          </h2>
           <p className="mb-4 text-sm text-muted-foreground line-clamp-2">
             {description}
           </p>
@@ -65,7 +68,7 @@ function DepartmentCard({
             </div>
             <div className="flex gap-2 items-center">
               <BookOpen className="w-4 h-4" />
-              <span>{programs} Academic Programs</span>
+              <span>{academicPrograms?.length} Academic Programs</span>
             </div>
           </div>
         </div>
@@ -80,23 +83,90 @@ export default function DepartmentsPage() {
     queryFn: departmentsApi.getAll,
   });
 
+  if (!departments) return [];
+
+  const formattedDepartments = departments.data.map((department) => ({
+    ...department,
+    students: department.academicPrograms.reduce(
+      (acc, program) => acc + program.totalStudents,
+      0
+    ),
+  }));
+
+  console.log(formattedDepartments);
+
   return (
-    <div className="space-y-6">
-      <div className="flex gap-4 justify-between items-center">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold tracking-tight">
-            Academic Departments
-          </h2>
-          <p className="text-muted-foreground">
-            Manage your institution's academic departments
-          </p>
+    <div className="space-y-8">
+      <div className="flex flex-col gap-6">
+        <div className="flex justify-between items-center">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold tracking-tight">
+              Academic Departments
+            </h2>
+            <p className="text-muted-foreground">
+              Manage your institution's academic departments
+            </p>
+          </div>
+          <AddDepartmentModal onDepartmentCreated={() => refetch()} />
         </div>
-        <AddDepartmentModal onDepartmentCreated={() => refetch()} />
+
+        <div className="flex gap-4 items-center">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 w-4 h-4 -translate-y-1/2 text-muted-foreground" />
+            <Input placeholder="Search departments..." className="pl-9" />
+          </div>
+          <Select defaultValue="all">
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Departments</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="icon">
+            <Filter className="w-4 h-4" />
+          </Button>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="p-4 rounded-lg border bg-card">
+            <p className="text-sm font-medium text-muted-foreground">
+              Total Departments
+            </p>
+            <p className="text-2xl font-bold">
+              {departments?.data?.length || 0}
+            </p>
+          </div>
+          <div className="p-4 rounded-lg border bg-card">
+            <p className="text-sm font-medium text-muted-foreground">
+              Total Students
+            </p>
+            <p className="text-2xl font-bold">
+              {formattedDepartments?.reduce(
+                (acc, dept) => acc + (dept.students || 0),
+                0
+              )}
+            </p>
+          </div>
+          <div className="p-4 rounded-lg border bg-card">
+            <p className="text-sm font-medium text-muted-foreground">
+              Total Programs
+            </p>
+            <p className="text-2xl font-bold">
+              {formattedDepartments?.reduce(
+                (acc, dept) => acc + (dept.academicPrograms.length || 0),
+                0
+              )}
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {departments?.data?.length ? (
-          departments.data.map((department) => (
+        {formattedDepartments?.length ? (
+          formattedDepartments.map((department) => (
             <DepartmentCard key={department.id} {...department} />
           ))
         ) : (

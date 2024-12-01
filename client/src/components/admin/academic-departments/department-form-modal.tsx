@@ -106,6 +106,7 @@ export function DepartmentFormModal({
       } else {
         toast.error(response.message ?? `Failed to ${mode} department`);
       }
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Submit error:", error);
       toast.error("An unexpected error occurred", {
@@ -211,10 +212,7 @@ export function DepartmentFormModal({
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting || !form.formState.isValid}
-              >
+              <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting
                   ? mode === "create"
                     ? "Creating..."

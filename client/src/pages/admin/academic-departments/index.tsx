@@ -57,6 +57,7 @@ import {
 } from "@/assets/images/department-logos";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Types
 interface DepartmentCardProps {
@@ -271,8 +272,41 @@ function formatDepartments(departments: Department[]) {
   }));
 }
 
+// Add this new component for loading state
+function DepartmentCardSkeleton() {
+  return (
+    <div className="block rounded-lg border bg-card">
+      <div className="flex gap-4 items-start p-6">
+        <Skeleton className="w-14 h-14" />
+        <div className="flex-1 space-y-4">
+          <Skeleton className="w-3/4 h-6" />
+          <Skeleton className="w-full h-16" />
+          <div className="space-y-2">
+            <Skeleton className="w-1/3 h-4" />
+            <Skeleton className="w-1/3 h-4" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Add this new component for loading stats
+function StatsCardSkeleton() {
+  return (
+    <div className="p-4 rounded-lg border bg-card">
+      <Skeleton className="mb-2 w-1/2 h-4" />
+      <Skeleton className="w-1/3 h-8" />
+    </div>
+  );
+}
+
 export default function DepartmentsPage() {
-  const { data: departmentsData, refetch } = useQuery({
+  const {
+    data: departmentsData,
+    refetch,
+    isLoading,
+  } = useQuery({
     queryKey: ["departments"],
     queryFn: departmentsApi.getAll,
   });
@@ -280,6 +314,82 @@ export default function DepartmentsPage() {
   const formattedDepartments = departmentsData?.data
     ? formatDepartments(departmentsData.data)
     : [];
+
+  // Render loading state
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <>
+          {/* Stats Loading */}
+          <div className="grid gap-4 md:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <StatsCardSkeleton key={i} />
+            ))}
+          </div>
+
+          {/* Cards Loading */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <DepartmentCardSkeleton key={i} />
+            ))}
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <>
+        {/* Stats Cards */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="p-4 rounded-lg border bg-card">
+            <p className="text-sm font-medium text-muted-foreground">
+              Total Departments
+            </p>
+            <p className="text-2xl font-bold">
+              {departmentsData?.data?.length || 0}
+            </p>
+          </div>
+          <div className="p-4 rounded-lg border bg-card">
+            <p className="text-sm font-medium text-muted-foreground">
+              Total Students
+            </p>
+            <p className="text-2xl font-bold">
+              {formattedDepartments?.reduce(
+                (acc, dept) => acc + (dept.totalStudents || 0),
+                0
+              )}
+            </p>
+          </div>
+          <div className="p-4 rounded-lg border bg-card">
+            <p className="text-sm font-medium text-muted-foreground">
+              Total Programs
+            </p>
+            <p className="text-2xl font-bold">
+              {formattedDepartments?.reduce(
+                (acc, dept) => acc + (dept.totalPrograms || 0),
+                0
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Department Cards Grid */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {formattedDepartments.length ? (
+            formattedDepartments.map((department) => (
+              <DepartmentCard
+                key={department.id}
+                {...department}
+                onDepartmentDeleted={() => refetch()}
+              />
+            ))
+          ) : (
+            <EmptyState />
+          )}
+        </div>
+      </>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -331,54 +441,7 @@ export default function DepartmentsPage() {
           />
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-sm font-medium text-muted-foreground">
-              Total Departments
-            </p>
-            <p className="text-2xl font-bold">
-              {departmentsData?.data?.length || 0}
-            </p>
-          </div>
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-sm font-medium text-muted-foreground">
-              Total Students
-            </p>
-            <p className="text-2xl font-bold">
-              {formattedDepartments?.reduce(
-                (acc, dept) => acc + (dept.totalStudents || 0),
-                0
-              )}
-            </p>
-          </div>
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-sm font-medium text-muted-foreground">
-              Total Programs
-            </p>
-            <p className="text-2xl font-bold">
-              {formattedDepartments?.reduce(
-                (acc, dept) => acc + (dept.totalPrograms || 0),
-                0
-              )}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Department Cards Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {formattedDepartments.length ? (
-          formattedDepartments.map((department) => (
-            <DepartmentCard
-              key={department.id}
-              {...department}
-              onDepartmentDeleted={() => refetch()}
-            />
-          ))
-        ) : (
-          <EmptyState />
-        )}
+        {renderContent()}
       </div>
     </div>
   );

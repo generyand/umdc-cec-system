@@ -45,13 +45,16 @@ import {
 import { departmentsApi } from "@/services/api/departments.services";
 import { DepartmentFormModal } from "@/components/admin/academic-departments/department-form-modal";
 import { AcademicProgram, Department } from "@/types/department.types";
-import daeLogoUrl from "@/assets/images/department-logos/DAE.png";
-import shsLogoUrl from "@/assets/images/department-logos/SHS.png";
-import dtpLogoUrl from "@/assets/images/department-logos/DTP.png";
-import dteLogoUrl from "@/assets/images/department-logos/DTE.png";
-import dcjeLogoUrl from "@/assets/images/department-logos/DCJE.png";
-import dbaLogoUrl from "@/assets/images/department-logos/DBA.png";
-import daseLogoUrl from "@/assets/images/department-logos/DASE.png";
+
+import {
+  DASELogo,
+  DAELogo,
+  DCJELogo,
+  DBALogo,
+  DTPLogo,
+  DTELogo,
+  SHSLogo,
+} from "@/assets/images/department-logos";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -73,13 +76,13 @@ interface DepartmentCardProps {
 
 // Map logos to department abbreviations using imported URLs
 const departmentLogos: Record<string, string> = {
-  DAE: daeLogoUrl,
-  SHS: shsLogoUrl,
-  DTP: dtpLogoUrl,
-  DTE: dteLogoUrl,
-  DCJE: dcjeLogoUrl,
-  DBA: dbaLogoUrl,
-  DASE: daseLogoUrl,
+  DAE: DAELogo,
+  SHS: SHSLogo,
+  DTP: DTPLogo,
+  DTE: DTELogo,
+  DCJE: DCJELogo,
+  DBA: DBALogo,
+  DASE: DASELogo,
 };
 
 // Map fallback icons to department types

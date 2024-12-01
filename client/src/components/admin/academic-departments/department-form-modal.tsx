@@ -128,7 +128,7 @@ export function DepartmentFormModal({
     >
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button>
+          <Button className="">
             <Plus className="mr-2 w-4 h-4" />
             Add Department
           </Button>

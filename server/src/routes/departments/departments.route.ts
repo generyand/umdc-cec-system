@@ -10,7 +10,7 @@ import { validateRequest } from "../../middleware/validateRequest.js";
 import {
   createDepartmentSchema,
   updateDepartmentSchema,
-} from "schemas/department.schema.js";
+} from "../../schemas/department.schema.js";
 
 const router = Router();
 

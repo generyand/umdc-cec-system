@@ -1,7 +1,7 @@
 export interface AcademicProgram {
-  id: string;
+  id: number;
   name: string;
-  description: string;
+  description: string | null;
   totalStudents: number;
   status: string;
 }
@@ -9,17 +9,17 @@ export interface AcademicProgram {
 export interface Department {
   id: string;
   name: string;
-  slug: string;
-  description: string;
+  abbreviation: string;
+  description: string | null;
+  slug?: string;
+  status: string;
+  totalStudents: number;
+  totalPrograms: number;
   academicPrograms: AcademicProgram[];
 }
 
-export interface FormattedDepartment {
-  id: string;
-  name: string;
-  slug: string; // Generated from department name
-  students: number;
-  programs: number;
-  description: string;
-  icon: React.ReactNode;
+export interface ServiceResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
 }

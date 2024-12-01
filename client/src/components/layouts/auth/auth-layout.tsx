@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import umdcLogo from "@/assets/images/umdc-logo.png";
-import cecLogo from "@/assets/images/cec-logo.png";
+import cecLogo from "@/assets/images/cec-logo.webp";
 
 function AuthLayout() {
   return (

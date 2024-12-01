@@ -39,28 +39,35 @@ const departmentSchema = z.object({
     .string()
     .min(10, "Description must be at least 10 characters")
     .max(500, "Description must not exceed 500 characters"),
-  numberOfStudents: z
-    .number()
-    .min(0, "Number of students cannot be negative")
-    .or(z.string().regex(/^\d+$/).transform(Number)),
 });
 
-interface AddDepartmentModalProps {
-  onDepartmentCreated?: () => void;
+interface DepartmentFormModalProps {
+  mode: "create" | "edit";
+  department?: {
+    id: string;
+    name: string;
+    abbreviation: string;
+    description: string;
+  };
+  onSuccess?: () => void;
+  trigger?: React.ReactNode;
 }
 
-export function AddDepartmentModal({
-  onDepartmentCreated,
-}: AddDepartmentModalProps) {
+export function DepartmentFormModal({
+  mode = "create",
+  department,
+  onSuccess,
+  trigger,
+}: DepartmentFormModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CreateDepartmentDTO>({
     resolver: zodResolver(departmentSchema),
     defaultValues: {
-      name: "",
-      abbreviation: "",
-      description: "",
+      name: department?.name ?? "",
+      abbreviation: department?.abbreviation ?? "",
+      description: department?.description ?? "",
       numberOfStudents: 0,
     },
   });
@@ -68,17 +75,39 @@ export function AddDepartmentModal({
   async function onSubmit(data: CreateDepartmentDTO) {
     try {
       setIsSubmitting(true);
-      const response = await departmentsApi.create(data);
+
+      const submitData = {
+        name: data.name,
+        abbreviation: data.abbreviation,
+        description: data.description,
+        ...(data.numberOfStudents
+          ? { numberOfStudents: data.numberOfStudents }
+          : {}),
+      };
+
+      console.log("Submitting:", { mode, data: submitData });
+
+      const response =
+        mode === "create"
+          ? await departmentsApi.create(submitData as CreateDepartmentDTO)
+          : await departmentsApi.update(department!.id, submitData);
+
+      console.log("Response:", response);
 
       if (response.success) {
-        toast.success(response.message ?? "Department created successfully");
+        toast.success(
+          mode === "create"
+            ? "Department created successfully"
+            : "Department updated successfully"
+        );
         setIsOpen(false);
         form.reset();
-        onDepartmentCreated?.();
+        onSuccess?.();
       } else {
-        toast.error(response.message ?? "Failed to create department");
+        toast.error(response.message ?? `Failed to ${mode} department`);
       }
     } catch (error) {
+      console.error("Submit error:", error);
       toast.error("An unexpected error occurred", {
         description: error instanceof Error ? error.message : "Unknown error",
       });
@@ -88,19 +117,37 @@ export function AddDepartmentModal({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) {
+          form.reset();
+        }
+      }}
+    >
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 w-4 h-4" />
-          Add Department
-        </Button>
+        {trigger ?? (
+          <Button>
+            <Plus className="mr-2 w-4 h-4" />
+            Add Department
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Department</DialogTitle>
+          <DialogTitle>
+            {mode === "create" ? "Add New Department" : "Edit Department"}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit(onSubmit)(e);
+            }}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="name"
@@ -155,26 +202,6 @@ export function AddDepartmentModal({
               )}
             />
 
-            {/* <FormField
-              control={form.control}
-              name="numberOfStudents"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Number of Students</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min="0"
-                      placeholder="0"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-
             <div className="flex gap-3 justify-end pt-4">
               <Button
                 type="button"
@@ -184,8 +211,17 @@ export function AddDepartmentModal({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create"}
+              <Button
+                type="submit"
+                disabled={isSubmitting || !form.formState.isValid}
+              >
+                {isSubmitting
+                  ? mode === "create"
+                    ? "Creating..."
+                    : "Saving..."
+                  : mode === "create"
+                  ? "Create"
+                  : "Save changes"}
               </Button>
             </div>
           </form>

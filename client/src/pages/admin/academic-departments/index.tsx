@@ -9,6 +9,7 @@ import {
   MoreVertical,
   Pencil,
   Trash2,
+  Plus,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -32,7 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
 import {
   Select,
@@ -42,7 +43,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { departmentsApi } from "@/services/api/departments.services";
-import { AddDepartmentModal } from "@/components/admin/academic-departments/add-department-modal";
+import { DepartmentFormModal } from "@/components/admin/academic-departments/department-form-modal";
 import { AcademicProgram, Department } from "@/types/department.types";
 import daeLogoUrl from "@/assets/images/department-logos/DAE.png";
 import shsLogoUrl from "@/assets/images/department-logos/SHS.png";
@@ -51,6 +52,8 @@ import dteLogoUrl from "@/assets/images/department-logos/DTE.png";
 import dcjeLogoUrl from "@/assets/images/department-logos/DCJE.png";
 import dbaLogoUrl from "@/assets/images/department-logos/DBA.png";
 import daseLogoUrl from "@/assets/images/department-logos/DASE.png";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 // Types
 interface DepartmentCardProps {
@@ -130,35 +133,39 @@ function DepartmentCard({
   onDepartmentDeleted,
 }: DepartmentCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-  const handleEdit = () => {
-    // TODO: Implement edit functionality
-
-    toast.info("Edit functionality coming soon");
-  };
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     try {
-      // TODO: Implement delete functionality
+      setIsDeleting(true);
       const response = await departmentsApi.delete(id);
+
       if (response.success) {
         toast.success(`${name} department deleted successfully`);
         setShowDeleteDialog(false);
-        onDepartmentDeleted?.();
+        onDepartmentDeleted?.(); // Call the refetch callback
       } else {
-        toast.error(response.message);
+        toast.error(response.message || "Failed to delete department");
       }
     } catch (error) {
-      toast.error(`Failed to delete ${name} department: ${error}`);
+      toast.error("Failed to delete department");
+      console.error(error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   return (
-    <div className="block p-6 rounded-lg border transition-all duration-200 group bg-card hover:shadow-lg hover:border-primary/20">
+    <motion.div
+      className="block rounded-lg border group bg-card hover:shadow-lg hover:border-primary/20"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+    >
       <div className="flex gap-4 items-start">
         <Link
           to={`/admin/academic-departments/${slug}`}
-          className="flex flex-1 gap-4 items-start"
+          className="flex flex-1 gap-4 items-start p-6"
         >
           <div className="p-3 rounded-lg transition-colors bg-primary/10 group-hover:bg-primary/20 outline outline-1 outline-primary/20">
             <div className="w-8 h-8">{getLogoByAbbreviation(abbreviation)}</div>
@@ -195,10 +202,17 @@ function DepartmentCard({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
-              <Pencil className="mr-2 w-4 h-4" />
-              Edit
-            </DropdownMenuItem>
+            <DepartmentFormModal
+              mode="edit"
+              department={{ id, name, abbreviation, description }}
+              onSuccess={onDepartmentDeleted}
+              trigger={
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <Pencil className="mr-2 w-4 h-4" />
+                  Edit
+                </DropdownMenuItem>
+              }
+            />
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => setShowDeleteDialog(true)}
@@ -222,18 +236,21 @@ function DepartmentCard({
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={isDeleting}>
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDelete}
                 className="bg-destructive hover:bg-destructive/90"
+                disabled={isDeleting}
               >
-                Delete
+                {isDeleting ? "Deleting..." : "Delete"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -263,6 +280,7 @@ export default function DepartmentsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header Section */}
       <div className="flex flex-col gap-6">
         <div className="flex justify-between items-center">
           <div className="space-y-1">
@@ -273,34 +291,44 @@ export default function DepartmentsPage() {
               Manage your institution's academic departments
             </p>
           </div>
-          <AddDepartmentModal onDepartmentCreated={() => refetch()} />
         </div>
 
-        <div className="flex gap-4 items-center">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 w-4 h-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search departments..."
-              className="pl-9"
-              // value={}
-              // onChange={(e) => setSearch(e.target.value)}
-            />
+        {/* Search and Actions Bar */}
+        <div className="flex gap-4 justify-between items-center">
+          <div className="flex flex-1 gap-4 items-center">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 w-4 h-4 -translate-y-1/2 text-muted-foreground" />
+              <Input placeholder="Search departments..." className="pl-9" />
+            </div>
+            <Select defaultValue="all">
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="icon">
+              <Filter className="w-4 h-4" />
+            </Button>
           </div>
-          <Select defaultValue="all">
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="icon">
-            <Filter className="w-4 h-4" />
-          </Button>
+
+          {/* Move Add Department button here */}
+          <DepartmentFormModal
+            mode="create"
+            onSuccess={() => refetch()}
+            trigger={
+              <Button>
+                <Plus className="mr-2 w-4 h-4" />
+                Add Department
+              </Button>
+            }
+          />
         </div>
 
+        {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-3">
           <div className="p-4 rounded-lg border bg-card">
             <p className="text-sm font-medium text-muted-foreground">
@@ -335,6 +363,7 @@ export default function DepartmentsPage() {
         </div>
       </div>
 
+      {/* Department Cards Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {formattedDepartments.length ? (
           formattedDepartments.map((department) => (
@@ -360,7 +389,7 @@ function EmptyState() {
       <p className="mb-4 text-sm text-muted-foreground">
         Get started by creating your first academic department.
       </p>
-      <AddDepartmentModal />
+      <DepartmentFormModal mode="create" />
     </div>
   );
 }

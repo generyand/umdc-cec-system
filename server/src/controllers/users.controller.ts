@@ -25,7 +25,17 @@ export const updateUserProfile = async (
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: validatedData,
+      data: {
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
+        contactNumber: validatedData.contactNumber,
+        status: validatedData.status,
+        department: {
+          connect: {
+            id: parseInt(validatedData.department || ""), // Assuming department is the ID
+          },
+        },
+      },
       select: {
         id: true,
         email: true,
@@ -39,8 +49,6 @@ export const updateUserProfile = async (
         updatedAt: true,
       },
     });
-
-    console.log("updatedUser", updatedUser);
 
     res.json(updatedUser);
     return;

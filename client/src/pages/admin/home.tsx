@@ -119,7 +119,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="p-6 mx-auto space-y-8 w-full">
+    <div className="mx-auto space-y-8 w-full">
       {/* Welcome Section - Enhanced with better visual hierarchy */}
       <div className="flex flex-col gap-4 justify-between items-start p-6 bg-gradient-to-r to-transparent rounded-lg md:flex-row md:items-center from-primary/10">
         <div className="space-y-2">

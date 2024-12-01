@@ -1,18 +1,17 @@
 import { Users, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import {
-  DAELogo,
-  DASELogo,
-  DBALogo,
-  DCJELogo,
-  DTELogo,
-  DTPLogo,
-  SHSLogo,
-} from "@/assets/images/department-logos";
+// import {
+//   DAELogo,
+//   DASELogo,
+//   DBALogo,
+//   DCJELogo,
+//   DTELogo,
+//   DTPLogo,
+//   SHSLogo,
+// } from "@/assets/images/department-logos";
 import { departmentsApi } from "@/services/api/departments.services";
-import { toast } from "sonner";
-import { generateSlug } from "@/utils/string";
+import { AddDepartmentModal } from "@/components/admin/academic-departments/add-department-modal";
 
 // Types
 interface DepartmentCardProps {
@@ -76,99 +75,64 @@ function DepartmentCard({
 }
 
 export default function DepartmentsPage() {
-  const { data, isLoading, error } = useQuery({
+  const { data: departments, refetch } = useQuery({
     queryKey: ["departments"],
-    queryFn: async () => {
-      const response = await departmentsApi.getAll();
-
-      alert(response.data);
-
-      if (response.success) {
-        toast.success(response.message, {
-          description: `Found ${response.data.length} ${
-            response.data.length === 1 ? "department" : "departments"
-          }`,
-        });
-      } else {
-        toast.error(response.message, {
-          description:
-            "Please try again or contact support if the problem persists",
-        });
-      }
-
-      return response.data;
-    },
+    queryFn: departmentsApi.getAll,
   });
-
-  if (isLoading) {
-    return <div>Loading departments...</div>;
-  }
-
-  if (error) {
-    toast.error("Failed to load departments", {
-      description:
-        error instanceof Error ? error.message : "Unknown error occurred",
-    });
-    return <div>Error loading departments</div>;
-  }
-
-  // Ensure data is an array
-  const departments = Array.isArray(data) ? data : [];
-  // console.log("Departments before formatting:", departments);
-
-  const formattedDepartments: DepartmentCardProps[] = departments.map(
-    (dept) => ({
-      id: dept.id,
-      name: dept.name,
-      slug: generateSlug(dept.name),
-      students: dept.academicPrograms
-        .filter((program) => program.status === "ACTIVE")
-        .reduce((total, program) => total + (program.totalStudents || 0), 0),
-      programs: dept.academicPrograms.filter(
-        (program) => program.status === "ACTIVE"
-      ).length,
-      description: dept.description,
-      icon: getIconBySlug(generateSlug(dept.name)),
-    })
-  );
-
-  // console.log("Formatted departments:", formattedDepartments);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Academic Departments</h1>
-        <p className="text-muted-foreground">
-          Overview of all academic departments and their programs
-        </p>
+      <div className="flex gap-4 justify-between items-center">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold tracking-tight">
+            Academic Departments
+          </h2>
+          <p className="text-muted-foreground">
+            Manage your institution's academic departments
+          </p>
+        </div>
+        <AddDepartmentModal onDepartmentCreated={() => refetch()} />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {formattedDepartments.length > 0 ? (
-          formattedDepartments.map((department) => (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {departments?.data?.length ? (
+          departments.data.map((department) => (
             <DepartmentCard key={department.id} {...department} />
           ))
         ) : (
-          <div>No departments available</div>
+          <EmptyState />
         )}
       </div>
     </div>
   );
 }
 
-// Helper function to map slugs to their respective icons
-function getIconBySlug(slug: string): React.ReactNode {
-  const iconMap: Record<string, React.ReactNode> = {
-    dae: DAELogo,
-    dase: DASELogo,
-    dba: DBALogo,
-    dcje: DCJELogo,
-    dte: DTELogo,
-    dtp: DTPLogo,
-    shs: SHSLogo,
-    alumni: <Users className="w-full h-full" />,
-    ntp: <Users className="w-full h-full" />,
-  };
-
-  return iconMap[slug] || <Users className="w-full h-full" />;
+function EmptyState() {
+  return (
+    <div className="flex flex-col col-span-full justify-center items-center p-8 text-center rounded-lg border bg-muted/10">
+      <Users className="mb-4 w-10 h-10 text-muted-foreground" />
+      <h3 className="mb-1 text-lg font-semibold">No departments found</h3>
+      <p className="mb-4 text-sm text-muted-foreground">
+        Get started by creating your first academic department.
+      </p>
+      <AddDepartmentModal />
+    </div>
+  );
 }
+
+// Helper function to map slugs to their respective icons
+// function getIconBySlug(slug: string): React.ReactNode {
+//   const iconMap: Record<string, React.ReactNode> = {
+//     dae: DAELogo,
+//     dase: DASELogo,
+//     dba: DBALogo,
+//     dcje: DCJELogo,
+//     dte: DTELogo,
+//     dtp: DTPLogo,
+//     shs: SHSLogo,
+//     alumni: <Users className="w-full h-full" />,
+//     ntp: <Users className="w-full h-full" />,
+//   };
+
+//   return iconMap[slug] || <Users className="w-full h-full" />;
+// }

@@ -1,39 +1,59 @@
 import api from "@/lib/api";
-import { Department } from "@/types/department.types";
+import type { Department } from "@/types/department.types";
 
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
+export interface CreateDepartmentDTO {
+  name: string;
+  abbreviation: string;
+  description: string;
+  numberOfStudents: number;
 }
 
-interface ServiceResponse<T> {
+export interface ServiceResponse<T> {
   data: T;
   success: boolean;
-  message: string;
+  message?: string;
 }
 
 export const departmentsApi = {
   getAll: async (): Promise<ServiceResponse<Department[]>> => {
-    try {
-      const response = await api.get<ApiResponse<Department[]>>(
-        "api/departments"
-      );
+    const response = await api.get<ServiceResponse<Department[]>>(
+      "/api/departments"
+    );
+    return response.data;
+  },
 
-      return {
-        data: response.data.data,
-        success: response.data.success,
-        message: response.data.message,
-      };
-    } catch (error) {
-      return {
-        data: [],
-        success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch departments",
-      };
-    }
+  create: async (
+    createDepartmentDTO: CreateDepartmentDTO
+  ): Promise<ServiceResponse<Department>> => {
+    const response = await api.post<ServiceResponse<Department>>(
+      "/api/departments",
+      createDepartmentDTO
+    );
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<ServiceResponse<Department>> => {
+    const response = await api.get<ServiceResponse<Department>>(
+      `/api/departments/${id}`
+    );
+    return response.data;
+  },
+
+  update: async (
+    id: string,
+    data: Partial<CreateDepartmentDTO>
+  ): Promise<ServiceResponse<Department>> => {
+    const response = await api.patch<ServiceResponse<Department>>(
+      `/api/departments/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<ServiceResponse<void>> => {
+    const response = await api.delete<ServiceResponse<void>>(
+      `/api/departments/${id}`
+    );
+    return response.data;
   },
 };

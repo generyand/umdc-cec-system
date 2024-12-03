@@ -26,7 +26,7 @@ interface RegisterParams {
 
 export const authService = {
   generateAccessToken(userId: string): string {
-    return jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: "24h" });
+    return jwt.sign({ userId }, process.env.JWT_SECRET!);
   },
 
   async register({

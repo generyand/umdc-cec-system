@@ -18,9 +18,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const quickActions = [
     {
@@ -146,7 +148,7 @@ export default function HomePage() {
                 action.label === "Create Proposal" ? "default" : "secondary"
               }
               className="transition-all hover:scale-105"
-              onClick={() => console.log(`Navigate to ${action.href}`)}
+              onClick={() => navigate(action.href)}
             >
               <action.icon className="mr-2 w-4 h-4" />
               {action.label}

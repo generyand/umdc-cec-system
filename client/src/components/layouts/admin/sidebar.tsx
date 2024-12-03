@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Building2,
   Users,
-  Calendar,
   BarChart3,
   ChevronDown,
   Handshake,
@@ -12,6 +11,15 @@ import {
   BookOpen,
   FileText,
   TrendingUp,
+  Flag,
+  Settings,
+  UserCog,
+  Building,
+  CheckSquare,
+  History,
+  Bell,
+  FileBox,
+  Wrench,
 } from "lucide-react";
 import { NavLink } from "@/components/admin/nav-link";
 import { useSidebarStore } from "@/store/use-sidebar-store";
@@ -120,6 +128,7 @@ export function Sidebar({ className }: SidebarProps) {
           <NavLink collapsed={!isOpen} href="/admin" icon={Home}>
             Home
           </NavLink>
+
           <NavLink
             collapsed={!isOpen}
             href="/admin/dashboard"
@@ -145,6 +154,14 @@ export function Sidebar({ className }: SidebarProps) {
             isExpanded={expandedSection === "Community Engagement"}
             onToggle={() => handleSectionToggle("Community Engagement")}
           >
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/community-engagement/banner-programs"
+              icon={Flag}
+              isChild
+            >
+              Banner Programs
+            </NavLink>
             <NavLink
               collapsed={!isOpen}
               href="/admin/community-engagement/partner-communities"
@@ -190,10 +207,6 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
           </CollapsibleSection>
 
-          <NavLink collapsed={!isOpen} href="/admin/events" icon={Calendar}>
-            Events
-          </NavLink>
-
           {/* Analytics & Reports Section */}
           <CollapsibleSection
             title="Analytics & Reports"
@@ -218,6 +231,81 @@ export function Sidebar({ className }: SidebarProps) {
               isChild
             >
               Impact Metrics
+            </NavLink>
+          </CollapsibleSection>
+
+          {/* Administration Section */}
+          <CollapsibleSection
+            title="Administration"
+            icon={Settings}
+            isOpen={isOpen}
+            collapsed={!isOpen}
+            isExpanded={expandedSection === "Administration"}
+            onToggle={() => handleSectionToggle("Administration")}
+          >
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/administration/user-management"
+              icon={UserCog}
+              isChild
+            >
+              User Management
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/administration/department-settings"
+              icon={Building}
+              isChild
+            >
+              Department Settings
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/administration/system-settings"
+              icon={Settings}
+              isChild
+            >
+              System Settings
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/administration/approvals"
+              icon={CheckSquare}
+              isChild
+            >
+              Approvals
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/administration/activity-logs"
+              icon={History}
+              isChild
+            >
+              Activity Logs
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/administration/announcements"
+              icon={Bell}
+              isChild
+            >
+              Announcements
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/administration/documents"
+              icon={FileBox}
+              isChild
+            >
+              Documents
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
+              href="/admin/administration/maintenance"
+              icon={Wrench}
+              isChild
+            >
+              Maintenance
             </NavLink>
           </CollapsibleSection>
         </nav>

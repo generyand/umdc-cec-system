@@ -24,6 +24,7 @@ import BarangayPage from "./pages/admin/community-engagement/partner-communities
 import AcademicDepartmentsPage from "./pages/admin/academic-departments";
 import DepartmentPage from "./pages/admin/academic-departments/department";
 import NotFound from "./pages/not-found";
+import NewProposalPage from "./pages/admin/proposals/new";
 const App = () => {
   return (
     <>
@@ -77,6 +78,7 @@ const App = () => {
               path="/admin/academic-departments/:slug"
               element={<DepartmentPage />}
             />
+            <Route path="/admin/proposals/new" element={<NewProposalPage />} />
           </Route>
 
           {/* Catch all route - redirect to login */}

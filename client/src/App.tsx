@@ -25,6 +25,7 @@ import AcademicDepartmentsPage from "./pages/admin/academic-departments";
 import DepartmentPage from "./pages/admin/academic-departments/department";
 import NotFound from "./pages/not-found";
 import NewProposalPage from "./pages/admin/proposals/new";
+import BannerProgramsPage from "./pages/admin/banner-programs";
 const App = () => {
   return (
     <>
@@ -79,6 +80,10 @@ const App = () => {
               element={<DepartmentPage />}
             />
             <Route path="/admin/proposals/new" element={<NewProposalPage />} />
+            <Route
+              path="/admin/community-engagement/banner-programs"
+              element={<BannerProgramsPage />}
+            />
           </Route>
 
           {/* Catch all route - redirect to login */}

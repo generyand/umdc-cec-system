@@ -89,11 +89,14 @@ model ProjectProposal {
   updatedAt         DateTime       @updatedAt
   userId            String
   user              User          @relation(fields: [userId], references: [id])
+  communityId       Int?
+  community         PartnerCommunity? @relation(fields: [communityId], references: [id])
 
   @@index([departmentId])
   @@index([programId])
   @@index([userId])
   @@index([status])
+  @@index([communityId])
   
   @@map("project_proposals")
 }
@@ -113,4 +116,33 @@ model ProjectAttachment {
 
   @@index([proposalId])
   @@map("project_attachments")
+}
+
+model PartnerCommunity {
+  id              Int       @id @default(autoincrement())
+  name            String    
+  communityType   String    // Barangay, NGO, School, etc.
+  address         String    
+  adoptionStart   DateTime
+  adoptionEnd     DateTime? // Optional end date (for ongoing partnerships)
+  status          String    @default("ACTIVE")  // ACTIVE, INACTIVE, COMPLETED
+
+  // Contact Information
+  contactPerson   String
+  contactEmail    String?   // Optional email
+  contactNumber   String
+  
+  // Additional Details
+  description     String?   // Brief description or notes about the partnership
+  
+  // Metadata
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relationships
+  projectProposals ProjectProposal[]
+
+  @@index([status])
+  @@index([communityType])
+  @@map("partner_communities")
 }

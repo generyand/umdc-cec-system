@@ -35,11 +35,11 @@ export default function HomePage() {
       href: "/admin/reports/new",
       icon: FileBarChart,
     },
-    {
-      label: "Schedule Event",
-      href: "/admin/calendar",
-      icon: Calendar,
-    },
+    // {
+    //   label: "Schedule Event",
+    //   href: "/admin/calendar",
+    //   icon: Calendar,
+    // },
     {
       label: "View Guidelines",
       href: "/admin/guidelines",

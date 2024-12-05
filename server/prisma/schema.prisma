@@ -23,6 +23,7 @@ model User {
   updatedAt          DateTime   @updatedAt
   departmentId       Int
   department         Department @relation(fields: [departmentId], references: [id])
+  projectProposals   ProjectProposal[]
 
   @@index([email])
   @@index([departmentId])
@@ -40,6 +41,7 @@ model Department {
   updatedAt        DateTime          @updatedAt
   academicPrograms AcademicProgram[]
   users            User[]
+  projectProposals ProjectProposal[]
 
   @@map("departments")
 }
@@ -55,7 +57,40 @@ model AcademicProgram {
   updatedAt     DateTime   @updatedAt
   departmentId  Int
   department    Department @relation(fields: [departmentId], references: [id])
+  projectProposals ProjectProposal[]
 
   @@index([departmentId])
   @@map("academic_programs")
+}
+
+model ProjectProposal {
+  id                 Int            @id @default(autoincrement())
+  title             String
+  description       String
+  bannerProgram     String
+  targetBeneficiaries String
+  targetArea        String
+  targetDate        DateTime
+  venue             String
+  budget            Decimal        @db.Decimal(10, 2)
+  status            String         @default("PENDING")
+  
+  // Foreign Keys
+  departmentId      Int
+  department        Department     @relation(fields: [departmentId], references: [id])
+  programId         Int?
+  program          AcademicProgram? @relation(fields: [programId], references: [id])
+  
+  // Metadata
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  userId            String
+  user              User          @relation(fields: [userId], references: [id])
+
+  @@index([departmentId])
+  @@index([programId])
+  @@index([userId])
+  @@index([status])
+  
+  @@map("project_proposals")
 }

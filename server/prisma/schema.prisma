@@ -75,6 +75,9 @@ model ProjectProposal {
   budget            Decimal        @db.Decimal(10, 2)
   status            String         @default("PENDING")
   
+  // File attachments
+  attachments       ProjectAttachment[]  // One-to-many relationship with attachments
+  
   // Foreign Keys
   departmentId      Int
   department        Department     @relation(fields: [departmentId], references: [id])
@@ -93,4 +96,21 @@ model ProjectProposal {
   @@index([status])
   
   @@map("project_proposals")
+}
+
+// New model for file attachments
+model ProjectAttachment {
+  id              Int            @id @default(autoincrement())
+  fileName        String         // Original file name
+  fileUrl         String         // URL or path where the file is stored
+  fileSize        Int           // Size in bytes
+  fileType        String         // MIME type (e.g., "application/pdf")
+  uploadedAt      DateTime       @default(now())
+  
+  // Relationship with ProjectProposal
+  proposalId      Int
+  proposal        ProjectProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@index([proposalId])
+  @@map("project_attachments")
 }

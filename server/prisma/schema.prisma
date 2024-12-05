@@ -1,34 +1,28 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id                String    @id @default(cuid())
-  email             String    @unique
-  firstName         String
-  lastName          String
-  role              String    @default("FOCAL_PERSON")
-  contactNumber     String?
-  status            String    @default("ACTIVE")
-  hashedPassword    String
+  id                 String     @id @default(cuid())
+  email              String     @unique
+  firstName          String
+  lastName           String
+  role               String     @default("FOCAL_PERSON")
+  contactNumber      String?
+  status             String     @default("ACTIVE")
+  hashedPassword     String
   resetPasswordToken String?
-  resetTokenExpiry  DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  department        Department @relation(fields: [departmentId], references: [id])
-  departmentId      Int
+  resetTokenExpiry   DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  departmentId       Int
+  department         Department @relation(fields: [departmentId], references: [id])
 
   @@index([email])
   @@index([departmentId])
@@ -36,33 +30,31 @@ model User {
 }
 
 model Department {
-  id              Int               @id @default(autoincrement())
-  name            String            @unique
-  abbreviation    String            @unique
-  description     String?
-  logoUrl         String?
-  status          String            @default("ACTIVE")
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  
-  users           User[]
+  id               Int               @id @default(autoincrement())
+  name             String            @unique
+  abbreviation     String            @unique
+  description      String?
+  logoUrl          String?
+  status           String            @default("ACTIVE")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   academicPrograms AcademicProgram[]
+  users            User[]
 
   @@map("departments")
 }
 
 model AcademicProgram {
-  id            Int         @id @default(autoincrement())
-  name          String      @unique
-  abbreviation  String      @unique
+  id            Int        @id @default(autoincrement())
+  name          String     @unique
+  abbreviation  String     @unique
   description   String?
-  totalStudents Int         @default(0)
-  status        String      @default("ACTIVE")
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  department    Department  @relation(fields: [departmentId], references: [id])
+  totalStudents Int        @default(0)
+  status        String     @default("ACTIVE")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
   departmentId  Int
+  department    Department @relation(fields: [departmentId], references: [id])
 
   @@index([departmentId])
   @@map("academic_programs")

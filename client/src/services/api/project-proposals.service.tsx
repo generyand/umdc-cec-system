@@ -16,7 +16,9 @@ interface CreateProposalData {
 }
 
 export const projectProposalsService = {
-  async createProposal(data: CreateProposalData) {
+  async createProposal(data: CreateProposalData, token: string) {
+    console.log("Authorization header being sent:", `Bearer ${token}`);
+
     const formData = new FormData();
 
     // Append all the form fields
@@ -33,9 +35,12 @@ export const projectProposalsService = {
       }
     });
 
+    console.log("Submitting proposal with token:", token);
+
     const response = await api.post("/api/project-proposals", formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`, // Explicitly set the auth header
+        // Let the browser set the Content-Type header with boundary
       },
     });
 

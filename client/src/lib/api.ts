@@ -31,13 +31,26 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // Only logout on 401 errors that aren't from the auth endpoints
-    if (
-      error.response?.status === 401 &&
-      !error.config.url?.includes("/auth/")
-    ) {
-      await useAuth.getState().logout();
-    }
+    console.log("API Error Interceptor:", {
+      status: error.response?.status,
+      url: error.config?.url,
+      method: error.config?.method,
+      errorMessage: error.response?.data?.message,
+    });
+
+    // Only logout on 401 errors that:
+    // 1. Aren't from auth endpoints
+    // 2. Aren't from proposal endpoints
+    // 3. Aren't from file uploads
+    // if (
+    //   error.response?.status === 401 &&
+    //   !error.config.url?.includes("/auth/") &&
+    //   // !error.config.url?.includes("/project-proposals") &&
+    //   !error.config.headers?.["Content-Type"]?.includes("multipart/form-data")
+    // ) {
+    //   console.log("Triggering logout due to unauthorized access");
+    //   await useAuth.getState().logout();
+    // }
     return Promise.reject(error);
   }
 );

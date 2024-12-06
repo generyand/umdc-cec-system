@@ -1,6 +1,6 @@
 // Backend Routes
 import express from "express";
-import { isAuthenticated } from "../../middleware/auth.middleware.js";
+import { authenticateToken } from "../../middleware/auth.middleware.js";
 import {
   getAllProposals,
   getProposalById,
@@ -18,19 +18,19 @@ import {
 const router = express.Router();
 
 // Get all proposals (with filters)
-router.get("/", isAuthenticated, getAllProposals);
+router.get("/", authenticateToken, getAllProposals);
 
 // Get single proposal
-router.get("/:id", isAuthenticated, getProposalById);
+router.get("/:id", authenticateToken, getProposalById);
 
 // Create new proposal
-router.post("/", isAuthenticated, createProposal);
+router.post("/", authenticateToken, createProposal);
 
 // Update proposal
-router.patch("/:id", isAuthenticated, updateProposal);
+router.patch("/:id", authenticateToken, updateProposal);
 
 // Delete proposal
-router.delete("/:id", isAuthenticated, deleteProposal);
+router.delete("/:id", authenticateToken, deleteProposal);
 
 // Optional: Additional routes based on your needs
 // Get proposals by department

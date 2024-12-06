@@ -49,7 +49,7 @@ import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { projectProposalsService } from "@/services/api/project-proposals.service";
 import { AxiosError } from "axios";
-
+import { useAuth } from "@/hooks/use-auth";
 const departmentPrograms: Record<string, { value: string; label: string }[]> = {
   dae: [
     { value: "bsa", label: "Bachelor of Science in Accountancy (BSA)" },
@@ -208,11 +208,17 @@ export default function NewProposalPage() {
 
       // Convert FileList to File array
       const files = data.attachments ? Array.from(data.attachments) : [];
+      const token = useAuth.getState().token || "";
 
-      await projectProposalsService.createProposal({
-        ...data,
-        files,
-      });
+      console.log("Submitting proposal with token:", token);
+
+      await projectProposalsService.createProposal(
+        {
+          ...data,
+          files,
+        },
+        token
+      );
 
       toast.success("Proposal created successfully", {
         description: "Your proposal has been submitted for review.",

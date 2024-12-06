@@ -1,13 +1,14 @@
-import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { Request, Response, RequestHandler } from "express";
+import { prisma } from "../lib/prisma.js";
+import { ApiError } from "../utils/errors.js";
+import { Prisma } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import supabase from "../config/supbase.config.js";
 
-const prisma = new PrismaClient();
-
 // Get all project proposals
-export const getAllProposals = async (req: Request, res: Response) => {
+export const getAllProposals: RequestHandler = async (req, res) => {
   try {
+    console.log("📃 Fetching all proposals...");
     const proposals = await prisma.projectProposal.findMany({
       include: {
         department: true,
@@ -17,17 +18,28 @@ export const getAllProposals = async (req: Request, res: Response) => {
         attachments: true,
       },
     });
-    res.status(200).json(proposals);
+
+    console.log(`✅ Successfully fetched ${proposals.length} proposals`);
+    res.status(200).json({
+      success: true,
+      message: "Proposals fetched successfully",
+      data: proposals,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching proposals", error });
+    console.error("❌ Error fetching proposals:", error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(500, "Failed to fetch proposals");
   }
 };
 
-// Get single project proposal by ID
-export const getProposalById = async (req: Request, res: Response) => {
+// Get single project proposal
+export const getProposalById: RequestHandler = async (req, res) => {
   try {
+    const { id } = req.params;
+    console.log(`📃 Fetching proposal with ID: ${id}`);
+
     const proposal = await prisma.projectProposal.findUnique({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(id) },
       include: {
         department: true,
         program: true,
@@ -36,40 +48,47 @@ export const getProposalById = async (req: Request, res: Response) => {
         attachments: true,
       },
     });
+
     if (!proposal) {
-      res.status(404).json({ message: "Proposal not found" });
+      console.log(`❌ Proposal with ID ${id} not found`);
+      throw new ApiError(404, "Proposal not found");
     }
-    res.status(200).json(proposal);
-    return;
+
+    console.log(`✅ Successfully fetched proposal: ${proposal.title}`);
+    res.status(200).json({
+      success: true,
+      message: "Proposal fetched successfully",
+      data: proposal,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching proposal", error });
+    console.error("❌ Error fetching proposal:", error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(500, "Failed to fetch proposal");
   }
 };
 
 // Create new project proposal
-export const createProposal = async (req: Request, res: Response) => {
+export const createProposal: RequestHandler = async (req, res) => {
   try {
+    console.log("📝 Creating new proposal...");
     const { files, department, program, ...proposalData } = req.body;
 
-    // 1. Create the proposal first with proper relations
+    console.log("🔍 Processing proposal data:", {
+      department,
+      program,
+      userId: req.user?.id,
+    });
+
+    // Create the proposal
     const newProposal = await prisma.projectProposal.create({
       data: {
         ...proposalData,
         budget: new Decimal(proposalData.budget),
         targetDate: new Date(proposalData.targetDate),
-        department: {
-          connect: { id: parseInt(department) },
-        },
-        program: {
-          connect: { id: parseInt(program) },
-        },
-        // Assuming you have the user ID from the auth middleware
-        user: {
-          connect: { id: req.user?.id },
-        },
-        community: {
-          connect: { id: parseInt(proposalData.partnerCommunity) },
-        },
+        department: { connect: { id: parseInt(department) } },
+        program: { connect: { id: parseInt(program) } },
+        user: { connect: { id: req.user?.id } },
+        community: { connect: { id: parseInt(proposalData.partnerCommunity) } },
       },
       include: {
         department: true,
@@ -79,42 +98,45 @@ export const createProposal = async (req: Request, res: Response) => {
       },
     });
 
-    // 2. Handle file uploads if any files are present
-    if (files && files.length > 0) {
-      const attachmentPromises = files.map(async (file: any) => {
-        // Upload file to Supabase Storage
-        const fileName = `${Date.now()}-${file.name}`;
-        const { data, error } = await supabase.storage
-          .from("project-attachments")
-          .upload(`proposals/${newProposal.id}/${fileName}`, file.buffer, {
-            contentType: file.mimetype,
+    console.log(`✅ Proposal created with ID: ${newProposal.id}`);
+
+    // Handle file uploads if present
+    if (files?.length > 0) {
+      console.log(`📎 Processing ${files.length} attachments...`);
+      const attachments = await Promise.all(
+        files.map(async (file: any) => {
+          const fileName = `${Date.now()}-${file.name}`;
+          const { data, error } = await supabase.storage
+            .from("project-attachments")
+            .upload(`proposals/${newProposal.id}/${fileName}`, file.buffer, {
+              contentType: file.mimetype,
+            });
+
+          if (error) {
+            console.error("❌ File upload error:", error);
+            throw new ApiError(500, "Failed to upload file");
+          }
+
+          const {
+            data: { publicUrl },
+          } = supabase.storage
+            .from("project-attachments")
+            .getPublicUrl(`proposals/${newProposal.id}/${fileName}`);
+
+          return prisma.projectAttachment.create({
+            data: {
+              proposalId: newProposal.id,
+              fileName: file.name,
+              fileUrl: publicUrl,
+              fileSize: file.size,
+              fileType: file.mimetype,
+            },
           });
+        })
+      );
 
-        if (error) throw error;
+      console.log(`✅ Created ${attachments.length} attachment records`);
 
-        // Get public URL for the uploaded file
-        const {
-          data: { publicUrl },
-        } = supabase.storage
-          .from("project-attachments")
-          .getPublicUrl(`proposals/${newProposal.id}/${fileName}`);
-
-        // Create attachment record in database
-        return prisma.projectAttachment.create({
-          data: {
-            proposalId: newProposal.id,
-            fileName: file.name,
-            fileUrl: publicUrl,
-            fileSize: file.size,
-            fileType: file.mimetype,
-          },
-        });
-      });
-
-      // Wait for all attachments to be processed
-      await Promise.all(attachmentPromises);
-
-      // Fetch the complete proposal with attachments
       const proposalWithAttachments = await prisma.projectProposal.findUnique({
         where: { id: newProposal.id },
         include: {
@@ -126,14 +148,39 @@ export const createProposal = async (req: Request, res: Response) => {
         },
       });
 
-      res.status(201).json(proposalWithAttachments);
+      res.status(201).json({
+        success: true,
+        message: "Proposal created successfully with attachments",
+        data: proposalWithAttachments,
+      });
     } else {
-      res.status(201).json(newProposal);
+      res.status(201).json({
+        success: true,
+        message: "Proposal created successfully",
+        data: newProposal,
+      });
     }
   } catch (error) {
-    console.error("Proposal creation error:", error);
+    console.error("❌ Error creating proposal:", error);
+    if (error instanceof ApiError) {
+      res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+      });
+      return;
+    }
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid proposal data",
+      });
+      return;
+    }
+
     res.status(500).json({
-      message: "Error creating proposal",
+      success: false,
+      message: "Failed to create proposal",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

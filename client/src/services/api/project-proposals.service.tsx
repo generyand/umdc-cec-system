@@ -17,33 +17,41 @@ interface CreateProposalData {
 
 export const projectProposalsService = {
   async createProposal(data: CreateProposalData, token: string) {
-    console.log("Authorization header being sent:", `Bearer ${token}`);
+    console.log("Service received data:", data);
+
+    // Create a regular object for non-file data
+    const proposalData = {
+      title: data.title,
+      description: data.description,
+      department: data.department,
+      program: data.program,
+      bannerProgram: data.bannerProgram,
+      partnerCommunity: data.partnerCommunity,
+      targetBeneficiaries: data.targetBeneficiaries,
+      targetArea: data.targetArea,
+      targetDate: data.targetDate,
+      venue: data.venue,
+      budget: data.budget,
+    };
 
     const formData = new FormData();
 
-    // Append all the form fields
-    Object.entries(data).forEach(([key, value]) => {
-      if (key === "files") {
-        // Handle files separately
-        data.files.forEach((file) => {
-          formData.append("files", file);
-        });
-      } else if (key === "targetDate") {
-        formData.append(key, value.toISOString());
-      } else {
-        formData.append(key, value as string);
-      }
-    });
+    // Add the JSON data as a string
+    formData.append("data", JSON.stringify(proposalData));
 
-    console.log("Submitting proposal with token:", token);
+    // Add files separately
+    if (data.files?.length) {
+      data.files.forEach((file) => {
+        formData.append("files", file);
+      });
+    }
 
-    const response = await api.post("/api/project-proposals", formData, {
+    console.log("Sending data:", proposalData);
+
+    return await api.post("/api/project-proposals", formData, {
       headers: {
-        Authorization: `Bearer ${token}`, // Explicitly set the auth header
-        // Let the browser set the Content-Type header with boundary
+        Authorization: `Bearer ${token}`,
       },
     });
-
-    return response.data;
   },
 };

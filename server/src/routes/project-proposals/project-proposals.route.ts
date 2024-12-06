@@ -14,8 +14,10 @@ import {
   //   addProposalAttachments,
   //   removeProposalAttachment,
 } from "../../controllers/project-proposals.controller.js";
+import multer from "multer";
 
 const router = express.Router();
+const upload = multer();
 
 // Get all proposals (with filters)
 router.get("/", authenticateToken, getAllProposals);
@@ -24,7 +26,7 @@ router.get("/", authenticateToken, getAllProposals);
 router.get("/:id", authenticateToken, getProposalById);
 
 // Create new proposal
-router.post("/", authenticateToken, createProposal);
+router.post("/", authenticateToken, upload.array("files"), createProposal);
 
 // Update proposal
 router.patch("/:id", authenticateToken, updateProposal);

@@ -51,14 +51,17 @@ import { projectProposalsService } from "@/services/api/project-proposals.servic
 import { AxiosError } from "axios";
 import { useAuth } from "@/hooks/use-auth";
 const departmentPrograms: Record<string, { value: string; label: string }[]> = {
-  dae: [
-    { value: "bsa", label: "Bachelor of Science in Accountancy (BSA)" },
+  "2": [
+    {
+      value: "bsa",
+      label: "Bachelor of Science in Accountancy (BSA)",
+    },
     {
       value: "bsma",
       label: "Bachelor of Science in Management Accounting (BSMA)",
     },
   ],
-  dase: [
+  "3": [
     {
       value: "ab-polsci",
       label: "Bachelor of Arts in Political Science (AB POLSCI)",
@@ -67,7 +70,7 @@ const departmentPrograms: Record<string, { value: string; label: string }[]> = {
     { value: "bssw", label: "Bachelor of Science in Social Work (BSSW)" },
     { value: "bsp", label: "Bachelor of Science in Psychology (BSP)" },
   ],
-  dba: [
+  "4": [
     {
       value: "bsba",
       label: "Bachelor of Science in Business Administration (BSBA)",
@@ -77,8 +80,8 @@ const departmentPrograms: Record<string, { value: string; label: string }[]> = {
       label: "Bachelor of Science in Tourism Management (BSTM)",
     },
   ],
-  dcje: [{ value: "bsc", label: "Bachelor of Science in Criminology (BSC)" }],
-  dte: [
+  "5": [{ value: "bsc", label: "Bachelor of Science in Criminology (BSC)" }],
+  "6": [
     {
       value: "bsed",
       label: "Bachelor of Science in Secondary Education (BSED)",
@@ -90,7 +93,7 @@ const departmentPrograms: Record<string, { value: string; label: string }[]> = {
       label: "Bachelor of Technical Vocational Teacher Education (BTVTED)",
     },
   ],
-  dtp: [
+  "1": [
     {
       value: "bsit",
       label: "Bachelor of Science in Information Technology (BSIT)",
@@ -100,7 +103,7 @@ const departmentPrograms: Record<string, { value: string; label: string }[]> = {
       label: "Bachelor of Science in Computer Engineering (BSCPE)",
     },
   ],
-  shs: [
+  "7": [
     {
       value: "stem",
       label: "Science, Technology, Engineering & Mathematics (STEM)",
@@ -110,8 +113,8 @@ const departmentPrograms: Record<string, { value: string; label: string }[]> = {
     { value: "gas", label: "General Academic Strand (GAS)" },
     { value: "tvl", label: "Technical Vocational Livelihood (TVL)" },
   ],
-  ntp: [{ value: "ntp", label: "Non-teaching Personnel (NTP)" }],
-  alumni: [{ value: "alumni", label: "Alumni" }],
+  "8": [{ value: "ntp", label: "Non-teaching Personnel (NTP)" }],
+  "9": [{ value: "alumni", label: "Alumni" }],
 };
 
 const proposalFormSchema = z.object({
@@ -197,7 +200,7 @@ export default function NewProposalPage() {
       targetArea: "",
       targetDate: undefined,
       venue: "",
-      budget: "",
+      budget: "0",
       attachments: undefined,
     },
   });
@@ -205,20 +208,28 @@ export default function NewProposalPage() {
   const onSubmit = async (data: ProposalFormValues) => {
     try {
       setIsSubmitting(true);
+      console.log("Form data before submission:", data); // Debug log
 
-      // Convert FileList to File array
+      // Strict budget validation
+      if (!data.budget) {
+        console.error("Budget is missing:", data.budget);
+        toast.error("Budget is required");
+        setIsSubmitting(false);
+        return;
+      }
+
       const files = data.attachments ? Array.from(data.attachments) : [];
       const token = useAuth.getState().token || "";
 
-      console.log("Submitting proposal with token:", token);
+      const formData = {
+        ...data,
+        budget: data.budget.toString(), // Ensure it's a string
+        files,
+      };
 
-      await projectProposalsService.createProposal(
-        {
-          ...data,
-          files,
-        },
-        token
-      );
+      console.log("Data being sent to service:", formData); // Debug log
+
+      await projectProposalsService.createProposal(formData, token);
 
       toast.success("Proposal created successfully", {
         description: "Your proposal has been submitted for review.",
@@ -236,7 +247,7 @@ export default function NewProposalPage() {
           description: "An unexpected error occurred. Please try again.",
         });
       }
-      console.error(error);
+      console.error("Submission error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -359,9 +370,10 @@ export default function NewProposalPage() {
                       <FormLabel className="required">Department</FormLabel>
                       <Select
                         onValueChange={(value) => {
+                          console.log("Selected department:", value); // Debug log
                           field.onChange(value);
                           setSelectedDepartment(value);
-                          form.setValue("program", "");
+                          form.setValue("program", ""); // Reset program when department changes
                         }}
                         defaultValue={field.value}
                       >
@@ -371,31 +383,31 @@ export default function NewProposalPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="dae">
-                            Department of Accounting Education (DAE)
-                          </SelectItem>
-                          <SelectItem value="dase">
-                            Department of Arts & Sciences Education (DASE)
-                          </SelectItem>
-                          <SelectItem value="dba">
-                            Department of Business Administration (DBA)
-                          </SelectItem>
-                          <SelectItem value="dcje">
-                            Department of Criminal Justice Education (DCJE)
-                          </SelectItem>
-                          <SelectItem value="dte">
-                            Department of Teacher Education (DTE)
-                          </SelectItem>
-                          <SelectItem value="dtp">
+                          <SelectItem value="1">
                             Department of Technical Programs (DTP)
                           </SelectItem>
-                          <SelectItem value="shs">
+                          <SelectItem value="2">
+                            Department of Accounting Education (DAE)
+                          </SelectItem>
+                          <SelectItem value="3">
+                            Department of Arts & Sciences Education (DASE)
+                          </SelectItem>
+                          <SelectItem value="4">
+                            Department of Business Administration (DBA)
+                          </SelectItem>
+                          <SelectItem value="5">
+                            Department of Criminal Justice Education (DCJE)
+                          </SelectItem>
+                          <SelectItem value="6">
+                            Department of Teacher Education (DTE)
+                          </SelectItem>
+                          <SelectItem value="7">
                             Senior High School (SHS)
                           </SelectItem>
-                          <SelectItem value="ntp">
+                          <SelectItem value="8">
                             Non-teaching Personnel (NTP)
                           </SelectItem>
-                          <SelectItem value="alumni">Alumni</SelectItem>
+                          <SelectItem value="9">Alumni</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -660,39 +672,35 @@ export default function NewProposalPage() {
                       <FormLabel className="required">
                         Budget Proposal
                       </FormLabel>
-                      <FormDescription>
-                        Enter the estimated budget needed for this activity.
-                      </FormDescription>
                       <FormControl>
                         <div className="relative max-w-[240px]">
                           <Input
-                            type="number"
-                            placeholder="0.00"
-                            min="0"
+                            type="text"
+                            placeholder="0"
                             {...field}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value.replace(/[^0-9]/g, "")
-                              )
-                            }
+                            value={field.value || ""}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(
+                                /[^0-9]/g,
+                                ""
+                              );
+                              console.log("Budget input value:", value);
+                              field.onChange(value || "0");
+                            }}
                             className={cn(
-                              "pl-8 pr-16 transition-all",
+                              "pr-16 pl-8 transition-all",
                               "hover:border-primary/50",
-                              "focus:border-primary focus:ring-1 focus:ring-primary",
-                              "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              "focus:border-primary"
                             )}
                           />
-                          <div className="flex absolute inset-y-0 left-3 items-center pointer-events-none text-muted-foreground">
+                          <div className="flex absolute inset-y-0 left-3 items-center pointer-events-none">
                             ₱
                           </div>
-                          <div className="flex absolute inset-y-0 right-3 items-center text-sm pointer-events-none text-muted-foreground">
+                          <div className="flex absolute inset-y-0 right-3 items-center pointer-events-none">
                             PHP
                           </div>
                         </div>
                       </FormControl>
-                      <div className="mt-1.5 text-xs text-muted-foreground">
-                        Enter numbers only, without commas or decimal points.
-                      </div>
                       <FormMessage />
                     </FormItem>
                   )}

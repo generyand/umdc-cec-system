@@ -5,6 +5,16 @@ import { Prisma } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import supabase from "../config/supbase.config.js";
 
+// Add multer types
+interface RequestWithFiles extends Request {
+  files?: Express.Multer.File[];
+}
+
+// Add this interface to extend the Request type
+interface MulterRequest extends Request {
+  files: Express.Multer.File[];
+}
+
 // Get all project proposals
 export const getAllProposals: RequestHandler = async (req, res) => {
   try {
@@ -71,24 +81,53 @@ export const getProposalById: RequestHandler = async (req, res) => {
 export const createProposal: RequestHandler = async (req, res) => {
   try {
     console.log("📝 Creating new proposal...");
-    const { files, department, program, ...proposalData } = req.body;
+    console.log("Received request body:", req.body);
 
-    console.log("🔍 Processing proposal data:", {
-      department,
-      program,
-      userId: req.user?.id,
-    });
+    // Validate required fields
+    if (!req.body.data) {
+      throw new ApiError(400, "Proposal data is required");
+    }
+
+    // Parse the proposal data
+    const proposalData = JSON.parse(req.body.data);
+    console.log("🔍 Processing proposal data:", proposalData);
+
+    // Validate essential fields
+    if (!proposalData.budget) {
+      throw new ApiError(400, "Budget is required");
+    }
+
+    if (!proposalData.department) {
+      throw new ApiError(400, "Department is required");
+    }
+
+    if (!proposalData.program) {
+      throw new ApiError(400, "Program is required");
+    }
 
     // Create the proposal
     const newProposal = await prisma.projectProposal.create({
       data: {
-        ...proposalData,
+        title: proposalData.title,
+        description: proposalData.description,
         budget: new Decimal(proposalData.budget),
         targetDate: new Date(proposalData.targetDate),
-        department: { connect: { id: parseInt(department) } },
-        program: { connect: { id: parseInt(program) } },
-        user: { connect: { id: req.user?.id } },
-        community: { connect: { id: parseInt(proposalData.partnerCommunity) } },
+        venue: proposalData.venue,
+        targetArea: proposalData.targetArea,
+        targetBeneficiaries: proposalData.targetBeneficiaries,
+        bannerProgram: proposalData.bannerProgram,
+        department: {
+          connect: { id: parseInt(proposalData.department) },
+        },
+        program: {
+          connect: { id: parseInt(proposalData.program) },
+        },
+        user: {
+          connect: { id: req.user?.id },
+        },
+        community: {
+          connect: { id: parseInt(proposalData.partnerCommunity) },
+        },
       },
       include: {
         department: true,
@@ -101,11 +140,14 @@ export const createProposal: RequestHandler = async (req, res) => {
     console.log(`✅ Proposal created with ID: ${newProposal.id}`);
 
     // Handle file uploads if present
-    if (files?.length > 0) {
-      console.log(`📎 Processing ${files.length} attachments...`);
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      console.log(`📎 Processing ${req.files.length} attachments...`);
+
       const attachments = await Promise.all(
-        files.map(async (file: any) => {
-          const fileName = `${Date.now()}-${file.name}`;
+        req.files.map(async (file) => {
+          const fileName = `${Date.now()}-${file.originalname}`;
+
+          // Upload to Supabase
           const { data, error } = await supabase.storage
             .from("project-attachments")
             .upload(`proposals/${newProposal.id}/${fileName}`, file.buffer, {
@@ -117,16 +159,18 @@ export const createProposal: RequestHandler = async (req, res) => {
             throw new ApiError(500, "Failed to upload file");
           }
 
+          // Get public URL
           const {
             data: { publicUrl },
           } = supabase.storage
             .from("project-attachments")
             .getPublicUrl(`proposals/${newProposal.id}/${fileName}`);
 
+          // Create attachment record
           return prisma.projectAttachment.create({
             data: {
               proposalId: newProposal.id,
-              fileName: file.name,
+              fileName: file.originalname,
               fileUrl: publicUrl,
               fileSize: file.size,
               fileType: file.mimetype,
@@ -137,6 +181,7 @@ export const createProposal: RequestHandler = async (req, res) => {
 
       console.log(`✅ Created ${attachments.length} attachment records`);
 
+      // Fetch the complete proposal with attachments
       const proposalWithAttachments = await prisma.projectProposal.findUnique({
         where: { id: newProposal.id },
         include: {
@@ -162,6 +207,7 @@ export const createProposal: RequestHandler = async (req, res) => {
     }
   } catch (error) {
     console.error("❌ Error creating proposal:", error);
+
     if (error instanceof ApiError) {
       res.status(error.statusCode).json({
         success: false,

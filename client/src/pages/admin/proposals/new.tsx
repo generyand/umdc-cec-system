@@ -47,6 +47,8 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
+import { projectProposalsService } from "@/services/api/project-proposals.service";
+import { AxiosError } from "axios";
 
 const departmentPrograms: Record<string, { value: string; label: string }[]> = {
   dae: [
@@ -118,6 +120,7 @@ const proposalFormSchema = z.object({
   department: z.string().min(1, "Please select a department"),
   program: z.string().min(1, "Please select a program"),
   bannerProgram: z.string().min(1, "Please select a banner program"),
+  partnerCommunity: z.string().min(1, "Please select a partner community"),
   targetBeneficiaries: z.string().min(5, "Please specify target beneficiaries"),
   targetArea: z.string().min(5, "Please specify target area"),
   targetDate: z.date({
@@ -189,37 +192,57 @@ export default function NewProposalPage() {
       department: "",
       program: "",
       bannerProgram: "",
+      partnerCommunity: "",
       targetBeneficiaries: "",
       targetArea: "",
+      targetDate: undefined,
       venue: "",
       budget: "",
       attachments: undefined,
     },
   });
 
-  const onSubmit = async (
-    // TODO: Add API call here
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    data: ProposalFormValues
-  ) => {
+  const onSubmit = async (data: ProposalFormValues) => {
     try {
       setIsSubmitting(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Convert FileList to File array
+      const files = data.attachments ? Array.from(data.attachments) : [];
+
+      await projectProposalsService.createProposal({
+        ...data,
+        files,
+      });
 
       toast.success("Proposal created successfully", {
         description: "Your proposal has been submitted for review.",
       });
       navigate("/admin/proposals");
     } catch (error) {
-      toast.error("Failed to create proposal", {
-        description:
-          "Please try again or contact support if the issue persists.",
-      });
+      if (error instanceof AxiosError) {
+        toast.error("Failed to create proposal", {
+          description:
+            error.response?.data?.message ||
+            "Please try again or contact support if the issue persists.",
+        });
+      } else {
+        toast.error("Failed to create proposal", {
+          description: "An unexpected error occurred. Please try again.",
+        });
+      }
       console.error(error);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Sample partner communities data
+  const partnerCommunities = [
+    { value: "1", label: "Community A" },
+    { value: "2", label: "Community B" },
+    { value: "3", label: "Community C" },
+    // Add more communities as needed
+  ];
 
   return (
     <motion.div
@@ -254,6 +277,7 @@ export default function NewProposalPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              {/* Basic Information Section */}
               <div className="space-y-8">
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -314,6 +338,7 @@ export default function NewProposalPage() {
                 </motion.div>
               </div>
 
+              {/* Department and Program Section */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -381,17 +406,10 @@ export default function NewProposalPage() {
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        disabled={!selectedDepartment}
                       >
                         <FormControl>
                           <SelectTrigger className="transition-all hover:border-primary/50">
-                            <SelectValue
-                              placeholder={
-                                selectedDepartment
-                                  ? "Select program"
-                                  : "Please select a department first"
-                              }
-                            />
+                            <SelectValue placeholder="Select program" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -414,10 +432,12 @@ export default function NewProposalPage() {
                 />
               </motion.div>
 
+              {/* Banner Program and Partner Community Section */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
+                className="grid grid-cols-1 gap-8 sm:grid-cols-2"
               >
                 <FormField
                   control={form.control}
@@ -425,9 +445,6 @@ export default function NewProposalPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="required">Banner Program</FormLabel>
-                      <FormDescription>
-                        Select the banner program for your extension activity.
-                      </FormDescription>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -457,8 +474,45 @@ export default function NewProposalPage() {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="partnerCommunity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="required">
+                        Partner Community
+                      </FormLabel>
+                      <FormDescription>
+                        Select the partner community for this proposal.
+                      </FormDescription>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="transition-all hover:border-primary/50">
+                            <SelectValue placeholder="Select partner community" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {partnerCommunities.map((community) => (
+                            <SelectItem
+                              key={community.value}
+                              value={community.value}
+                            >
+                              {community.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </motion.div>
 
+              {/* Target Information Section */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -510,6 +564,7 @@ export default function NewProposalPage() {
                 />
               </motion.div>
 
+              {/* Date and Venue Section */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -585,6 +640,7 @@ export default function NewProposalPage() {
                 />
               </motion.div>
 
+              {/* Budget Section */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -637,10 +693,11 @@ export default function NewProposalPage() {
                 />
               </motion.div>
 
+              {/* Attachments Section */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
+                transition={{ delay: 0.8 }}
                 className="space-y-4"
               >
                 <FormField
@@ -740,10 +797,11 @@ export default function NewProposalPage() {
                 />
               </motion.div>
 
+              {/* Submit Buttons */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
+                transition={{ delay: 0.9 }}
                 className="flex gap-4 justify-end pt-6 mt-6 border-t"
               >
                 <Button

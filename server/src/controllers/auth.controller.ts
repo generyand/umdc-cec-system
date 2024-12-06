@@ -77,6 +77,7 @@ export const logout = async (
 ): Promise<void> => {
   try {
     // Simply return success - token handling will be done on client side
+    console.log("Logout successful");
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     next(error);

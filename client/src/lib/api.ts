@@ -6,29 +6,37 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: false, // Changed to false since we're not using cookies anymore
+  withCredentials: false,
 });
 
-// Request interceptor - adds auth token to requests
+// Single request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = useAuth.getState().token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Remove Content-Type header if FormData is being sent
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Simple response interceptor - handles unauthorized errors
+// Single response interceptor
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      useAuth.getState().logout();
+  async (error) => {
+    // Only logout on 401 errors that aren't from the auth endpoints
+    if (
+      error.response?.status === 401 &&
+      !error.config.url?.includes("/auth/")
+    ) {
+      await useAuth.getState().logout();
     }
     return Promise.reject(error);
   }

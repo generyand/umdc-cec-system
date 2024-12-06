@@ -36,8 +36,13 @@ export const useAuth = create<AuthState>()(
       error: null,
 
       setToken: (token: string) => {
+        console.log("Setting token:", token);
         set({ token });
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        console.log(
+          "Current Authorization header:",
+          api.defaults.headers.common["Authorization"]
+        );
       },
 
       login: async (email: string, password: string) => {
@@ -49,8 +54,10 @@ export const useAuth = create<AuthState>()(
             password,
           });
 
-          // Update axios default authorization header
-          api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+          console.log("Login response data:", {
+            user: data.user,
+            token: data.token,
+          });
 
           set({
             user: data.user,
@@ -58,35 +65,50 @@ export const useAuth = create<AuthState>()(
             isLoading: false,
           });
 
-          console.log("User data:", data.user);
+          api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+          console.log("Auth state after login:", {
+            token: get().token,
+            authHeader: api.defaults.headers.common["Authorization"],
+          });
         } catch (error) {
+          console.error("Login error:", error);
           set({
             error: axios.isAxiosError(error)
               ? error.response?.data?.message || "Failed to login"
               : "An error occurred",
             isLoading: false,
           });
+          throw error;
         }
       },
 
       logout: async () => {
-        const currentState = get();
-
-        // Prevent recursive state updates and duplicate logouts
-        if (currentState.isLoading || !currentState.user) {
-          return false;
-        }
-
         try {
+          const currentState = get();
+          console.log("Current state before logout:", {
+            user: currentState.user,
+            token: currentState.token,
+            authHeader: api.defaults.headers.common["Authorization"],
+          });
+
+          if (currentState.isLoading || !currentState.user) {
+            return false;
+          }
+
           set({ isLoading: true, error: null });
 
-          // Call logout endpoint last
-          await api.post("/api/auth/logout");
+          // Send empty object instead of null
+          await api.post(
+            "/api/auth/logout",
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${currentState.token}`,
+              },
+            }
+          );
 
-          // Clear auth header
-          delete api.defaults.headers.common["Authorization"];
-
-          // Clear state first to prevent interceptor issues
+          // Clear state and headers after successful logout
           set({
             user: null,
             token: null,
@@ -94,17 +116,23 @@ export const useAuth = create<AuthState>()(
             error: null,
           });
 
+          delete api.defaults.headers.common["Authorization"];
+
+          console.log("Logout successful, cleared auth state:", {
+            currentUser: get().user,
+            currentToken: get().token,
+            authHeader: api.defaults.headers.common["Authorization"],
+          });
+
           return true;
         } catch (error) {
           console.error("Logout error:", error);
-          // Don't restore state on error, just update error message
           set({
             error: axios.isAxiosError(error)
               ? error.response?.data?.message || "Failed to logout"
               : "An error occurred",
             isLoading: false,
           });
-
           return false;
         }
       },
@@ -119,25 +147,31 @@ export const useAuth = create<AuthState>()(
             name,
           });
 
-          // Update axios default authorization header
-          api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
-
-          console.log(api.defaults.headers.common["Authorization"]);
-
-          console.log("User data:", data.user);
+          console.log("Register response data:", {
+            user: data.user,
+            token: data.token,
+          });
 
           set({
             user: data.user,
-            // token: data.token,
+            token: data.token,
             isLoading: false,
           });
+
+          api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+          console.log("Auth state after register:", {
+            token: get().token,
+            authHeader: api.defaults.headers.common["Authorization"],
+          });
         } catch (error) {
+          console.error("Register error:", error);
           set({
             error: axios.isAxiosError(error)
               ? error.response?.data?.message || "Failed to register"
               : "An error occurred",
             isLoading: false,
           });
+          throw error;
         }
       },
 
@@ -213,38 +247,21 @@ export const useAuth = create<AuthState>()(
     }),
     {
       name: "auth-storage",
-      partialize: (state) => ({
-        user: state.user,
-        token: state.token,
-      }),
+      partialize: (state) => {
+        console.log("Persisting auth state:", {
+          user: state.user,
+          token: state.token,
+        });
+        return {
+          user: state.user,
+          token: state.token,
+        };
+      },
     }
   )
 );
 
-// Add request interceptor to add token to all requests
-api.interceptors.request.use(
-  (config) => {
-    const { token } = useAuth.getState();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Simplified response interceptor - just handle errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // If unauthorized, logout user
-    if (error.response?.status === 401) {
-      useAuth.getState().logout();
-    }
-    return Promise.reject(error);
-  }
-);
+// Log initial state when the store is created
+console.log("Initial auth state:", useAuth.getState());
 
 export default api;

@@ -48,19 +48,22 @@ model Department {
 }
 
 model AcademicProgram {
-  id            Int        @id @default(autoincrement())
-  name          String     @unique
-  abbreviation  String     @unique
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  abbreviation  String         @unique
   description   String?
-  totalStudents Int        @default(0)
-  status        String     @default("ACTIVE")
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  totalStudents Int            @default(0)
+  status        String         @default("ACTIVE")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   departmentId  Int
-  department    Department @relation(fields: [departmentId], references: [id])
+  department    Department     @relation(fields: [departmentId], references: [id])
+  bannerProgramId Int?         // Optional foreign key to BannerProgram
+  bannerProgram BannerProgram? @relation(fields: [bannerProgramId], references: [id])
   projectProposals ProjectProposal[]
 
   @@index([departmentId])
+  @@index([bannerProgramId])
   @@map("academic_programs")
 }
 
@@ -151,23 +154,24 @@ model PartnerCommunity {
 }
 
 model BannerProgram {
-  id            Int               @id @default(autoincrement())
-  name          String            @unique
-  abbreviation  String            @unique @default("")
-  description   String?
-  yearStarted   Int
-  status        String            @default("ACTIVE")
+  id               Int               @id @default(autoincrement())
+  name             String            @unique
+  abbreviation     String            @unique
+  description      String?
+  yearStarted      Int
+  status           String            @default("ACTIVE")
   
   // Foreign Keys
-  departmentId  Int
-  department    Department        @relation(fields: [departmentId], references: [id])
+  departmentId     Int
+  department       Department        @relation(fields: [departmentId], references: [id])
   
   // Relationships
+  academicPrograms AcademicProgram[] // New relation field
   projectProposals ProjectProposal[]
   
   // Metadata
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   @@index([departmentId])
   @@index([status])

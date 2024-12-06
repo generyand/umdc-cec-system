@@ -31,7 +31,7 @@ export const useAuth = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
-      token: null,
+      token: localStorage.getItem("token"),
       isLoading: false,
       error: null,
 
@@ -43,6 +43,7 @@ export const useAuth = create<AuthState>()(
           "Current Authorization header:",
           api.defaults.headers.common["Authorization"]
         );
+        localStorage.setItem("token", token);
       },
 
       login: async (email: string, password: string) => {
@@ -123,6 +124,8 @@ export const useAuth = create<AuthState>()(
             currentToken: get().token,
             authHeader: api.defaults.headers.common["Authorization"],
           });
+
+          localStorage.removeItem("token");
 
           return true;
         } catch (error) {

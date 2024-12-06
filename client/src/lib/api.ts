@@ -29,28 +29,46 @@ api.interceptors.request.use(
 
 // Single response interceptor
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    console.log("API Error Interceptor:", {
-      status: error.response?.status,
-      url: error.config?.url,
-      method: error.config?.method,
-      errorMessage: error.response?.data?.message,
-    });
+  (response) => {
+    // Check if there's a new token in the response header
+    const newToken = response.headers["x-new-token"];
+    if (newToken) {
+      // Update the token in your auth state
+      useAuth.getState().setToken(newToken);
 
-    // Only logout on 401 errors that:
-    // 1. Aren't from auth endpoints
-    // 2. Aren't from proposal endpoints
-    // 3. Aren't from file uploads
-    // if (
-    //   error.response?.status === 401 &&
-    //   !error.config.url?.includes("/auth/") &&
-    //   // !error.config.url?.includes("/project-proposals") &&
-    //   !error.config.headers?.["Content-Type"]?.includes("multipart/form-data")
-    // ) {
-    //   console.log("Triggering logout due to unauthorized access");
-    //   await useAuth.getState().logout();
-    // }
+      // Update the token in localStorage if you're using it
+      localStorage.setItem("token", newToken);
+    }
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    // If the error is due to an expired token and we haven't tried to refresh yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        // Get the new token from the response header
+        const newToken = error.response.headers["x-new-token"];
+        if (newToken) {
+          // Update the token in your auth state
+          useAuth.getState().setToken(newToken);
+
+          // Update the authorization header
+          originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+
+          // Retry the original request with the new token
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        // If refresh fails, log out the user
+        useAuth.getState().logout();
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      }
+    }
+
     return Promise.reject(error);
   }
 );

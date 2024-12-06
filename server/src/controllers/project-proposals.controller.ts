@@ -1,9 +1,25 @@
 import { Request, Response, RequestHandler } from "express";
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../utils/errors.js";
-import { Prisma } from "@prisma/client";
+// import { Prisma } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
-import supabase from "../config/supbase.config.js";
+import { createClient } from "@supabase/supabase-js";
+
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error("Missing Supabase environment variables");
+  throw new Error("Missing required environment variables");
+}
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  }
+);
 
 // Add multer types
 interface RequestWithFiles extends Request {
@@ -83,29 +99,10 @@ export const createProposal: RequestHandler = async (req, res) => {
     console.log("📝 Creating new proposal...");
     console.log("Received request body:", req.body);
 
-    // Validate required fields
-    if (!req.body.data) {
-      throw new ApiError(400, "Proposal data is required");
-    }
-
-    // Parse the proposal data
     const proposalData = JSON.parse(req.body.data);
     console.log("🔍 Processing proposal data:", proposalData);
 
-    // Validate essential fields
-    if (!proposalData.budget) {
-      throw new ApiError(400, "Budget is required");
-    }
-
-    if (!proposalData.department) {
-      throw new ApiError(400, "Department is required");
-    }
-
-    if (!proposalData.program) {
-      throw new ApiError(400, "Program is required");
-    }
-
-    // Create the proposal
+    // Create the proposal first
     const newProposal = await prisma.projectProposal.create({
       data: {
         title: proposalData.title,
@@ -120,7 +117,7 @@ export const createProposal: RequestHandler = async (req, res) => {
           connect: { id: parseInt(proposalData.department) },
         },
         program: {
-          connect: { id: parseInt(proposalData.program) },
+          connect: { id: Number(proposalData.program) },
         },
         user: {
           connect: { id: req.user?.id },
@@ -137,67 +134,115 @@ export const createProposal: RequestHandler = async (req, res) => {
       },
     });
 
-    console.log(`✅ Proposal created with ID: ${newProposal.id}`);
-
     // Handle file uploads if present
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       console.log(`📎 Processing ${req.files.length} attachments...`);
 
-      const attachments = await Promise.all(
-        req.files.map(async (file) => {
-          const fileName = `${Date.now()}-${file.originalname}`;
+      try {
+        // Check if bucket exists, create if it doesn't
+        const { data: buckets } = await supabase.storage.listBuckets();
 
-          // Upload to Supabase
-          const { data, error } = await supabase.storage
-            .from("project-attachments")
-            .upload(`proposals/${newProposal.id}/${fileName}`, file.buffer, {
-              contentType: file.mimetype,
+        const bucketName = "project-proposal-attachments";
+        const bucketExists = buckets?.some(
+          (bucket) => bucket.name === bucketName
+        );
+
+        if (!bucketExists) {
+          console.log("Creating storage bucket...");
+          const { data, error } = await supabase.storage.createBucket(
+            bucketName,
+            {
+              public: false, // or true based on your needs
+              fileSizeLimit: 5242880, // 5MB in bytes
+            }
+          );
+
+          if (error) throw error;
+        }
+
+        // Upload files
+        const attachments = await Promise.all(
+          req.files.map(async (file) => {
+            const fileName = `${Date.now()}-${file.originalname}`;
+            const filePath = `proposals/${newProposal.id}/${fileName}`;
+
+            console.log("Attempting to upload file:", fileName);
+
+            // Upload to Supabase with error logging
+            const { data, error } = await supabase.storage
+              .from("project-proposal-attachments")
+              .upload(filePath, file.buffer, {
+                contentType: file.mimetype,
+                upsert: false,
+              });
+
+            if (error) {
+              console.error("❌ Detailed upload error:", {
+                error,
+                fileName,
+                filePath,
+                fileSize: file.size,
+                mimeType: file.mimetype,
+              });
+              throw new ApiError(
+                500,
+                `Failed to upload file: ${error.message}`
+              );
+            }
+
+            console.log("✅ File uploaded successfully:", filePath);
+
+            // Get public URL
+            const {
+              data: { publicUrl },
+            } = supabase.storage
+              .from("project-proposal-attachments")
+              .getPublicUrl(filePath);
+
+            // Create attachment record
+            return prisma.projectAttachment.create({
+              data: {
+                proposalId: newProposal.id,
+                fileName: file.originalname,
+                fileUrl: publicUrl,
+                fileSize: file.size,
+                fileType: file.mimetype,
+              },
             });
+          })
+        );
 
-          if (error) {
-            console.error("❌ File upload error:", error);
-            throw new ApiError(500, "Failed to upload file");
-          }
+        console.log(`✅ Created ${attachments.length} attachment records`);
 
-          // Get public URL
-          const {
-            data: { publicUrl },
-          } = supabase.storage
-            .from("project-attachments")
-            .getPublicUrl(`proposals/${newProposal.id}/${fileName}`);
-
-          // Create attachment record
-          return prisma.projectAttachment.create({
-            data: {
-              proposalId: newProposal.id,
-              fileName: file.originalname,
-              fileUrl: publicUrl,
-              fileSize: file.size,
-              fileType: file.mimetype,
+        // Return proposal with attachments
+        const proposalWithAttachments = await prisma.projectProposal.findUnique(
+          {
+            where: { id: newProposal.id },
+            include: {
+              department: true,
+              program: true,
+              user: true,
+              community: true,
+              attachments: true,
             },
-          });
-        })
-      );
+          }
+        );
 
-      console.log(`✅ Created ${attachments.length} attachment records`);
+        res.status(201).json({
+          success: true,
+          message: "Proposal created successfully with attachments",
+          data: proposalWithAttachments,
+        });
+      } catch (uploadError) {
+        console.error("❌ Error handling attachments:", uploadError);
 
-      // Fetch the complete proposal with attachments
-      const proposalWithAttachments = await prisma.projectProposal.findUnique({
-        where: { id: newProposal.id },
-        include: {
-          department: true,
-          program: true,
-          user: true,
-          community: true,
-          attachments: true,
-        },
-      });
+        // Delete the proposal if file upload failed
+        await prisma.projectProposal.delete({
+          where: { id: newProposal.id },
+        });
 
-      res.status(201).json({
-        success: true,
-        message: "Proposal created successfully with attachments",
-        data: proposalWithAttachments,
-      });
+        throw uploadError;
+      }
     } else {
       res.status(201).json({
         success: true,
@@ -207,28 +252,7 @@ export const createProposal: RequestHandler = async (req, res) => {
     }
   } catch (error) {
     console.error("❌ Error creating proposal:", error);
-
-    if (error instanceof ApiError) {
-      res.status(error.statusCode).json({
-        success: false,
-        message: error.message,
-      });
-      return;
-    }
-
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      res.status(400).json({
-        success: false,
-        message: "Invalid proposal data",
-      });
-      return;
-    }
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to create proposal",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
+    // ... error handling
   }
 };
 

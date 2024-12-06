@@ -50,6 +50,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { projectProposalsService } from "@/services/api/project-proposals.service";
 import { AxiosError } from "axios";
 import { useAuth } from "@/hooks/use-auth";
+import { AcademicProgram } from "../../../types/department.types";
 const departmentPrograms: Record<string, { value: string; label: string }[]> = {
   "2": [
     {
@@ -422,7 +423,16 @@ export default function NewProposalPage() {
                     <FormItem>
                       <FormLabel className="required">Program</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          console.log("Selected program code:", value);
+                          const program = AcademicProgram.find(
+                            (p) => p.code === value
+                          );
+                          console.log("Found program:", program);
+                          if (program) {
+                            field.onChange(program.id.toString());
+                          }
+                        }}
                         defaultValue={field.value}
                       >
                         <FormControl>

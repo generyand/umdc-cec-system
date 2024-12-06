@@ -1,8 +1,24 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Loader2, AlertCircle, ArrowLeft } from "lucide-react";
+import {
+  Loader2,
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  Users,
+  Building2,
+  GraduationCap,
+  Flag,
+  DollarSign,
+  FileText,
+  Paperclip,
+  Building,
+  Phone,
+  Mail,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 import { projectProposalsService } from "@/services/api/project-proposals.service";
@@ -14,14 +30,36 @@ interface Proposal {
   status: "PENDING" | "APPROVED" | "REJECTED";
   targetDate: string;
   budget: number;
-  bannerProgram: string;
+  targetBeneficiaries: string;
+  targetArea: string;
+  venue: string;
+  bannerProgram: {
+    name: string;
+    description: string;
+  } | null;
   department: {
     name: string;
   };
+  program: {
+    name: string;
+  } | null;
   user: {
     firstName: string;
     lastName: string;
   };
+  community: {
+    name: string;
+    communityType: string;
+    address: string;
+    contactPerson: string;
+    contactNumber: string;
+  } | null;
+  attachments: {
+    fileName: string;
+    fileUrl: string;
+    fileType: string;
+    uploadedAt: string;
+  }[];
   createdAt: string;
 }
 
@@ -46,6 +84,9 @@ export default function ProposalDetailsPage() {
       );
       if (!response.data.success)
         throw new Error("Failed to fetch proposal details");
+
+      console.log("Proposal Data:", response.data.data);
+
       setProposal(response.data.data);
     } catch (error) {
       setError("Failed to load proposal details. Please try again later.");
@@ -90,6 +131,11 @@ export default function ProposalDetailsPage() {
     }
   };
 
+  const formatStatus = (status: string | undefined) => {
+    if (!status) return "Unknown";
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -99,71 +145,106 @@ export default function ProposalDetailsPage() {
   }
 
   return (
-    <div className="container py-6 mx-auto space-y-6">
-      <Button
-        variant="ghost"
-        className="mb-4"
-        onClick={() => navigate("/admin/proposals")}
-      >
-        <ArrowLeft className="mr-2 w-4 h-4" />
-        Back to Proposals
-      </Button>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container py-8 mx-auto max-w-4xl">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/admin/community-engagement/proposals")}
+              className="hover:bg-gray-100"
+            >
+              <ArrowLeft className="mr-2 w-4 h-4" />
+              Back to Proposals
+            </Button>
+            <span
+              className={`px-4 py-2 rounded-full text-sm font-medium shadow-sm
+              ${getStatusBadgeVariant(proposal?.status as Proposal["status"])}`}
+            >
+              {formatStatus(proposal?.status)}
+            </span>
+          </div>
 
-      {error ? (
-        <Alert variant="destructive">
-          <AlertCircle className="w-4 h-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : (
-        proposal && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-2xl font-bold">
-                      {proposal.title}
-                    </CardTitle>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Submitted by {proposal.user.firstName}{" "}
-                      {proposal.user.lastName}
-                    </p>
-                  </div>
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                    ${getStatusBadgeVariant(proposal.status)}`}
-                  >
-                    {proposal.status.charAt(0).toUpperCase() +
-                      proposal.status.slice(1).toLowerCase()}
+          {error && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="w-4 h-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        {/* Main Content */}
+        {!error && proposal && (
+          <Card className="shadow-sm">
+            <CardContent className="p-8 space-y-8">
+              {/* Title Section */}
+              <div className="pb-6 border-b">
+                <h1 className="mb-2 text-2xl font-bold text-gray-900">
+                  {proposal.title}
+                </h1>
+                <div className="flex items-center text-sm text-gray-600">
+                  <span className="font-medium">
+                    {proposal.user.firstName} {proposal.user.lastName}
+                  </span>
+                  <span className="mx-2">•</span>
+                  <span>
+                    {new Date(proposal.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
+              </div>
+
+              {/* Key Details Section */}
+              <div className="grid grid-cols-2 gap-6 py-6 border-b">
+                <div className="flex gap-2 items-start">
+                  <Building2 className="w-5 h-5 text-gray-500 mt-0.5" />
                   <div>
-                    <h3 className="mb-2 font-semibold">Department</h3>
-                    <p>{proposal.department.name}</p>
+                    <h4 className="text-sm font-medium text-gray-500">
+                      Department
+                    </h4>
+                    <p className="mt-1">{proposal.department.name}</p>
                   </div>
-                  <div>
-                    <h3 className="mb-2 font-semibold">Banner Program</h3>
-                    <p>{proposal.bannerProgram}</p>
+                </div>
+
+                {proposal.program && (
+                  <div className="flex gap-2 items-start">
+                    <GraduationCap className="w-5 h-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Academic Program
+                      </h4>
+                      <p className="mt-1">{proposal.program.name}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="mb-2 font-semibold">Target Date</h3>
-                    <p>
-                      {new Date(proposal.targetDate).toLocaleDateString(
-                        undefined,
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
+                )}
+
+                {/* Banner Program Section */}
+                {proposal.bannerProgram && (
+                  <div className="flex col-span-2 gap-2 items-start">
+                    <Flag className="w-5 h-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Banner Program
+                      </h4>
+                      <p className="mt-1 font-medium">
+                        {proposal.bannerProgram.name}
+                      </p>
+                      {proposal.bannerProgram.description && (
+                        <p className="mt-1 text-sm text-gray-600">
+                          {proposal.bannerProgram.description}
+                        </p>
                       )}
-                    </p>
+                    </div>
                   </div>
+                )}
+
+                <div className="flex gap-2 items-start">
+                  <DollarSign className="w-5 h-5 text-gray-500 mt-0.5" />
                   <div>
-                    <h3 className="mb-2 font-semibold">Budget</h3>
-                    <p>
+                    <h4 className="text-sm font-medium text-gray-500">
+                      Budget
+                    </h4>
+                    <p className="mt-1 font-semibold">
                       {new Intl.NumberFormat("en-PH", {
                         style: "currency",
                         currency: "PHP",
@@ -171,33 +252,165 @@ export default function ProposalDetailsPage() {
                     </p>
                   </div>
                 </div>
+              </div>
 
-                <div>
-                  <h3 className="mb-2 font-semibold">Description</h3>
-                  <p className="whitespace-pre-wrap">{proposal.description}</p>
+              {/* Description Section */}
+              <div className="py-6 border-b">
+                <div className="flex gap-2 items-center mb-4">
+                  <FileText className="w-5 h-5 text-gray-500" />
+                  <h3 className="text-lg font-semibold">Description</h3>
                 </div>
+                <p className="leading-relaxed text-gray-700 whitespace-pre-wrap">
+                  {proposal.description}
+                </p>
+              </div>
 
-                {proposal.status === "PENDING" && (
-                  <div className="flex gap-4 pt-4">
-                    <Button
-                      className="bg-green-600 hover:bg-green-700"
-                      onClick={() => handleStatusUpdate("APPROVED")}
-                    >
-                      Approve Proposal
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleStatusUpdate("REJECTED")}
-                    >
-                      Reject Proposal
-                    </Button>
+              {/* Implementation Details */}
+              <div className="py-6 border-b">
+                <h3 className="mb-4 text-lg font-semibold">
+                  Implementation Details
+                </h3>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="flex gap-2 items-start">
+                    <Calendar className="w-5 h-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Target Date
+                      </h4>
+                      <p className="mt-1">
+                        {new Date(proposal.targetDate).toLocaleDateString(
+                          undefined,
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
+                      </p>
+                    </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )
-      )}
+                  <div className="flex gap-2 items-start">
+                    <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Venue
+                      </h4>
+                      <p className="mt-1">{proposal.venue}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-start">
+                    <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Target Area
+                      </h4>
+                      <p className="mt-1">{proposal.targetArea}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-start">
+                    <Users className="w-5 h-5 text-gray-500 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Target Beneficiaries
+                      </h4>
+                      <p className="mt-1">{proposal.targetBeneficiaries}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Community Partner Section */}
+              {proposal.community && (
+                <div className="py-6 border-b">
+                  <div className="flex gap-2 items-center mb-4">
+                    <Building className="w-5 h-5 text-gray-500" />
+                    <h3 className="text-lg font-semibold">Community Partner</h3>
+                  </div>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Name
+                      </h4>
+                      <p className="mt-1">{proposal.community.name}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Type
+                      </h4>
+                      <p className="mt-1">{proposal.community.communityType}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Address
+                      </h4>
+                      <p className="mt-1">{proposal.community.address}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Contact Details
+                      </h4>
+                      <p className="flex gap-2 items-center mt-1">
+                        <Mail className="w-4 h-4 text-gray-500" />
+                        {proposal.community.contactPerson}
+                      </p>
+                      <p className="flex gap-2 items-center mt-1">
+                        <Phone className="w-4 h-4 text-gray-500" />
+                        {proposal.community.contactNumber}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Attachments Section */}
+              {proposal.attachments && proposal.attachments.length > 0 && (
+                <div className="py-6 border-b">
+                  <div className="flex gap-2 items-center mb-4">
+                    <Paperclip className="w-5 h-5 text-gray-500" />
+                    <h3 className="text-lg font-semibold">Attachments</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {proposal.attachments.map((file) => (
+                      <a
+                        key={file.fileUrl}
+                        href={file.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center p-3 rounded-lg hover:bg-gray-50"
+                      >
+                        <span className="flex-1 text-blue-600 hover:underline">
+                          {file.fileName}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          {new Date(file.uploadedAt).toLocaleDateString()}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              {proposal.status === "PENDING" && (
+                <div className="flex gap-4 pt-6">
+                  <Button
+                    className="bg-green-600 hover:bg-green-700"
+                    onClick={() => handleStatusUpdate("APPROVED")}
+                  >
+                    Approve Proposal
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleStatusUpdate("REJECTED")}
+                  >
+                    Reject Proposal
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

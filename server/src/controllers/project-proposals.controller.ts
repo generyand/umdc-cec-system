@@ -102,6 +102,7 @@ export const getProposalById: RequestHandler = async (req, res) => {
         program: true,
         user: true,
         community: true,
+        bannerProgram: true,
         attachments: true,
       },
     });
@@ -128,40 +129,60 @@ export const getProposalById: RequestHandler = async (req, res) => {
 export const createProposal: RequestHandler = async (req, res) => {
   try {
     console.log("📝 Creating new proposal...");
-    console.log("Received request body:", req.body);
 
-    const proposalData = JSON.parse(req.body.data);
+    // Parse the JSON data if it's coming as a string
+    const proposalData =
+      typeof req.body.data === "string" ? JSON.parse(req.body.data) : req.body;
+
     console.log("🔍 Processing proposal data:", proposalData);
 
-    // Create the proposal first
-    const newProposal = await prisma.projectProposal.create({
-      data: {
-        title: proposalData.title,
-        description: proposalData.description,
-        budget: new Decimal(proposalData.budget),
-        targetDate: new Date(proposalData.targetDate),
-        venue: proposalData.venue,
-        targetArea: proposalData.targetArea,
-        targetBeneficiaries: proposalData.targetBeneficiaries,
-        bannerProgram: proposalData.bannerProgram,
-        department: {
-          connect: { id: parseInt(proposalData.department) },
-        },
-        program: {
-          connect: { id: Number(proposalData.program) },
-        },
-        user: {
-          connect: { id: req.user?.id },
-        },
-        community: {
-          connect: { id: parseInt(proposalData.partnerCommunity) },
+    // Destructure to remove partnerCommunity and use it for community connection
+    const { partnerCommunity, ...restData } = proposalData;
+
+    // Ensure the banner program data is properly structured
+    const data = {
+      ...restData,
+      bannerProgram: {
+        connect: {
+          id: Number(proposalData.bannerProgram.connect.id),
         },
       },
+      // Add other necessary field transformations
+      budget: new Decimal(proposalData.budget),
+      targetDate: new Date(proposalData.targetDate),
+      department: {
+        connect: {
+          id: Number(proposalData.department),
+        },
+      },
+      program: {
+        connect: {
+          id: Number(proposalData.program),
+        },
+      },
+      community: {
+        connect: {
+          id: Number(partnerCommunity),
+        },
+      },
+      user: {
+        connect: {
+          id: req.user?.id, // Assuming you have user data in the request
+        },
+      },
+    };
+
+    console.log("Processed data:", data);
+
+    // Create the proposal
+    const newProposal = await prisma.projectProposal.create({
+      data: data,
       include: {
         department: true,
         program: true,
         user: true,
         community: true,
+        bannerProgram: true,
       },
     });
 

@@ -51,6 +51,7 @@ import { projectProposalsService } from "@/services/api/project-proposals.servic
 import { AxiosError } from "axios";
 import { useAuth } from "@/hooks/use-auth";
 import { AcademicProgram } from "../../../types/department.types";
+// import { CreateProposalData } from "@/types/proposal.types";
 const departmentPrograms: Record<string, { value: string; label: string }[]> = {
   "2": [
     {
@@ -164,6 +165,71 @@ const partnerCommunities = [
   },
 ];
 
+const bannerPrograms = [
+  {
+    id: 1,
+    name: "KASUSYO",
+    description: "Kabalikat sa Usaping Sosyo-ekonomiko",
+  },
+  {
+    id: 2,
+    name: "KISLAP",
+    description: "Kaagapay sa Isyung Pangkalusugan",
+  },
+  {
+    id: 3,
+    name: "UM-HEART",
+    description: "UM Health Education Advocacy and Research Team",
+  },
+  {
+    id: 4,
+    name: "UMASINSO",
+    description: "UM Advocacy on Social Innovation and Sustainability Outreach",
+  },
+  {
+    id: 5,
+    name: "TURISMO MISMO",
+    description:
+      "Tourism Management Involvement in Sustainable Management Operations",
+  },
+  {
+    id: 6,
+    name: "BATUTA DEPENSA",
+    description: "Batas at Tulong sa Tao Defense Advocacy",
+  },
+  {
+    id: 7,
+    name: "ANAK NG UM",
+    description: "Aral at Nutrisyon Alang sa Kabataan ng UM",
+  },
+  {
+    id: 8,
+    name: "MUNTING PAARALAN",
+    description: "Mobile Education Program",
+  },
+  {
+    id: 9,
+    name: "PROJECT WELLNESS",
+    description:
+      "Wellness Education, Lifestyle Learning, Nurturing, Empowerment, Service, and Sustainability",
+  },
+  {
+    id: 10,
+    name: "BUMATI KA",
+    description: "Buksan ang Mundo at Turuan ang Iba",
+  },
+  {
+    id: 11,
+    name: "UMUNA",
+    description: "UM United Network of Advocates",
+  },
+  {
+    id: 12,
+    name: "UM STAR",
+    description: "UM Students Taking Action and Responsibility",
+  },
+];
+
 export default function NewProposalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
@@ -224,32 +290,33 @@ export default function NewProposalPage() {
   const onSubmit = async (data: ProposalFormValues) => {
     try {
       setIsSubmitting(true);
-      console.log("Form data before submission:", data); // Debug log
 
-      // Strict budget validation
-      if (!data.budget) {
-        console.error("Budget is missing:", data.budget);
-        toast.error("Budget is required");
-        setIsSubmitting(false);
-        return;
-      }
-
-      const files = data.attachments ? Array.from(data.attachments) : [];
       const token = useAuth.getState().token || "";
 
       const formData = {
         ...data,
-        budget: data.budget.toString(), // Ensure it's a string
-        files,
+        bannerProgram: {
+          connect: {
+            id: Number(data.bannerProgram),
+          },
+        },
+        budget: data.budget.toString(),
+        files: data.attachments ? Array.from(data.attachments) : [],
       };
 
-      console.log("Data being sent to service:", formData); // Debug log
+      console.log("Form Data being sent:", formData);
+
+      const form = new FormData();
+      form.append("data", JSON.stringify(formData));
+      if (data.attachments) {
+        Array.from(data.attachments).forEach((file) => {
+          form.append("files", file);
+        });
+      }
 
       await projectProposalsService.createProposal(formData, token);
 
-      toast.success("Proposal created successfully", {
-        description: "Your proposal has been submitted for review.",
-      });
+      toast.success("Proposal created successfully");
       navigate("/admin/");
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -481,7 +548,10 @@ export default function NewProposalPage() {
                     <FormItem>
                       <FormLabel className="required">Banner Program</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          console.log("Selected banner program:", value);
+                          field.onChange(value);
+                        }}
                         defaultValue={field.value}
                       >
                         <FormControl>
@@ -490,19 +560,21 @@ export default function NewProposalPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="0">Others/None</SelectItem>
-                          <SelectItem value="1">KASUSYO</SelectItem>
-                          <SelectItem value="2">KISLAP</SelectItem>
-                          <SelectItem value="3">UM-HEART</SelectItem>
-                          <SelectItem value="4">UMASINSO</SelectItem>
-                          <SelectItem value="5">TURISMO MISMO</SelectItem>
-                          <SelectItem value="6">BATUTA DEPENSA</SelectItem>
-                          <SelectItem value="7">ANAK NG UM</SelectItem>
-                          <SelectItem value="8">MUNTING PAARALAN</SelectItem>
-                          <SelectItem value="9">PROJECT WELLNESS</SelectItem>
-                          <SelectItem value="10">BUMATI KA</SelectItem>
-                          <SelectItem value="11">UMUNA</SelectItem>
-                          <SelectItem value="12">UM STAR</SelectItem>
+                          {bannerPrograms.map((program) => (
+                            <SelectItem
+                              key={program.id}
+                              value={program.id.toString()}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">
+                                  {program.name}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  {program.description}
+                                </span>
+                              </div>
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />

@@ -5,7 +5,11 @@ interface CreateProposalData {
   description: string;
   department: string;
   program: string;
-  bannerProgram: string;
+  bannerProgram: {
+    connect: {
+      id: number;
+    };
+  };
   partnerCommunity: string;
   targetBeneficiaries: string;
   targetArea: string;
@@ -13,6 +17,7 @@ interface CreateProposalData {
   venue: string;
   budget: string;
   files: File[];
+  attachments: FileList;
 }
 
 export const projectProposalsService = {

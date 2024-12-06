@@ -92,7 +92,7 @@ export default function ProposalsPage() {
   }, [searchQuery, statusFilter, proposals]);
 
   const handleViewDetails = (id: string) => {
-    navigate(`/admin/proposals/${id}`);
+    navigate(`/admin/community-engagement/proposals/${id}`);
   };
 
   const handleStatusUpdate = async (

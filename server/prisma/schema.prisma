@@ -153,6 +153,7 @@ model PartnerCommunity {
 model BannerProgram {
   id            Int               @id @default(autoincrement())
   name          String            @unique
+  abbreviation  String            @unique @default("")
   description   String?
   yearStarted   Int
   status        String            @default("ACTIVE")

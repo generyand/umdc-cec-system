@@ -42,7 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { departmentsApi } from "@/services/api/departments.services";
+import { departmentsApi } from "@/services/api/departments.service";
 import { DepartmentFormModal } from "@/components/admin/academic-departments/department-form-modal";
 import { AcademicProgram, Department } from "@/types/department.types";
 

@@ -54,4 +54,12 @@ export const projectProposalsService = {
       },
     });
   },
+
+  async getProposals(token: string) {
+    return await api.get("/api/project-proposals", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
 };

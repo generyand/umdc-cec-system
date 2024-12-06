@@ -36,12 +36,43 @@ export const getAllProposals: RequestHandler = async (req, res) => {
   try {
     console.log("📃 Fetching all proposals...");
     const proposals = await prisma.projectProposal.findMany({
-      include: {
-        department: true,
-        program: true,
-        user: true,
-        community: true,
-        attachments: true,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        bannerProgram: true,
+        targetDate: true,
+        budget: true,
+        status: true,
+        createdAt: true,
+        department: {
+          select: {
+            name: true,
+            abbreviation: true,
+          },
+        },
+        program: {
+          select: {
+            name: true,
+            abbreviation: true,
+          },
+        },
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        community: {
+          select: {
+            name: true,
+            communityType: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc", // Most recent proposals first
       },
     });
 

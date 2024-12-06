@@ -42,6 +42,7 @@ model Department {
   academicPrograms AcademicProgram[]
   users            User[]
   projectProposals ProjectProposal[]
+  bannerPrograms   BannerProgram[]
 
   @@map("departments")
 }
@@ -67,7 +68,8 @@ model ProjectProposal {
   id                 Int            @id @default(autoincrement())
   title             String
   description       String
-  bannerProgram     String
+  bannerProgramId  Int?
+  bannerProgram    BannerProgram?  @relation(fields: [bannerProgramId], references: [id])
   targetBeneficiaries String
   targetArea        String
   targetDate        DateTime
@@ -97,6 +99,7 @@ model ProjectProposal {
   @@index([userId])
   @@index([status])
   @@index([communityId])
+  @@index([bannerProgramId])
   
   @@map("project_proposals")
 }
@@ -145,4 +148,27 @@ model PartnerCommunity {
   @@index([status])
   @@index([communityType])
   @@map("partner_communities")
+}
+
+model BannerProgram {
+  id            Int               @id @default(autoincrement())
+  name          String            @unique
+  description   String?
+  yearStarted   Int
+  status        String            @default("ACTIVE")
+  
+  // Foreign Keys
+  departmentId  Int
+  department    Department        @relation(fields: [departmentId], references: [id])
+  
+  // Relationships
+  projectProposals ProjectProposal[]
+  
+  // Metadata
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([departmentId])
+  @@index([status])
+  @@map("banner_programs")
 }

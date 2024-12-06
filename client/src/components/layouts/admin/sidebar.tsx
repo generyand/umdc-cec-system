@@ -156,6 +156,14 @@ export function Sidebar({ className }: SidebarProps) {
           >
             <NavLink
               collapsed={!isOpen}
+              href="/admin/community-engagement/proposals"
+              icon={FileText}
+              isChild
+            >
+              Project Proposals
+            </NavLink>
+            <NavLink
+              collapsed={!isOpen}
               href="/admin/community-engagement/banner-programs"
               icon={Flag}
               isChild

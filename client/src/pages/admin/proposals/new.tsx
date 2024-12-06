@@ -149,6 +149,21 @@ const proposalFormSchema = z.object({
 
 type ProposalFormValues = z.infer<typeof proposalFormSchema>;
 
+const partnerCommunities = [
+  {
+    value: "1",
+    label: "Barangay Dawis",
+  },
+  {
+    value: "2",
+    label: "Barangay Ruparan",
+  },
+  {
+    value: "3",
+    label: "Barangay San Miguel",
+  },
+];
+
 export default function NewProposalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
@@ -235,7 +250,7 @@ export default function NewProposalPage() {
       toast.success("Proposal created successfully", {
         description: "Your proposal has been submitted for review.",
       });
-      navigate("/admin/proposals");
+      navigate("/admin/");
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error("Failed to create proposal", {
@@ -253,14 +268,6 @@ export default function NewProposalPage() {
       setIsSubmitting(false);
     }
   };
-
-  // Sample partner communities data
-  const partnerCommunities = [
-    { value: "1", label: "Community A" },
-    { value: "2", label: "Community B" },
-    { value: "3", label: "Community C" },
-    // Add more communities as needed
-  ];
 
   return (
     <motion.div

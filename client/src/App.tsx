@@ -26,6 +26,7 @@ import DepartmentPage from "./pages/admin/academic-departments/department";
 import NotFound from "./pages/not-found";
 import NewProposalPage from "./pages/admin/proposals/new";
 import BannerProgramsPage from "./pages/admin/banner-programs";
+import ProposalsPage from "./pages/admin/proposals";
 const App = () => {
   return (
     <>
@@ -83,6 +84,10 @@ const App = () => {
             <Route
               path="/admin/community-engagement/banner-programs"
               element={<BannerProgramsPage />}
+            />
+            <Route
+              path="/admin/community-engagement/proposals"
+              element={<ProposalsPage />}
             />
           </Route>
 

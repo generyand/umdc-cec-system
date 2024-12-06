@@ -28,6 +28,7 @@ import NewProposalPage from "./pages/admin/proposals/new";
 import BannerProgramsPage from "./pages/admin/banner-programs";
 import ProposalsPage from "./pages/admin/proposals";
 import ProposalDetailsPage from "./pages/admin/proposals/proposal-details";
+import MockDepartmentPage from "./pages/admin/academic-departments/mockDepartment";
 const App = () => {
   return (
     <>
@@ -87,12 +88,16 @@ const App = () => {
               element={<BannerProgramsPage />}
             />
             <Route
-              path="/admin/community-engagement/proposals"
+              path="/admin/community-engagement/projects-proposals"
               element={<ProposalsPage />}
             />
             <Route
               path="/admin/community-engagement/proposals/:id"
               element={<ProposalDetailsPage />}
+            />
+            <Route
+              path="/admin/academic-departments/mock-department"
+              element={<MockDepartmentPage />}
             />
           </Route>
 

@@ -20,6 +20,8 @@ interface CreateProposalData {
   attachments: FileList;
 }
 
+type ProposalStatus = "PENDING" | "APPROVED" | "RETURNED";
+
 export const projectProposalsService = {
   async createProposal(data: CreateProposalData, token: string) {
     console.log("Service received data:", data);
@@ -78,7 +80,7 @@ export const projectProposalsService = {
 
   async updateProposalStatus(
     id: string,
-    status: "APPROVED" | "REJECTED",
+    status: ProposalStatus,
     token: string
   ) {
     return await api.patch(

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  Loader2,
   AlertCircle,
   ArrowLeft,
   Calendar,
@@ -22,6 +21,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 import { projectProposalsService } from "@/services/api/project-proposals.service";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Proposal {
   id: number;
@@ -96,7 +96,7 @@ export default function ProposalDetailsPage() {
     }
   };
 
-  const handleStatusUpdate = async (newStatus: "APPROVED" | "REJECTED") => {
+  const handleStatusUpdate = async (newStatus: "APPROVED" | "RETURNED") => {
     try {
       setIsLoading(true);
       const response = await projectProposalsService.updateProposalStatus(
@@ -138,8 +138,108 @@ export default function ProposalDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="min-h-screen bg-gray-50">
+        <div className="container py-8 mx-auto max-w-4xl">
+          {/* Header Skeleton */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-6">
+              <Skeleton className="w-32 h-10" /> {/* Back button */}
+              <Skeleton className="w-24 h-8 rounded-full" />{" "}
+              {/* Status badge */}
+            </div>
+          </div>
+
+          {/* Main Content Skeleton */}
+          <Card className="shadow-sm">
+            <CardContent className="p-8 space-y-8">
+              {/* Title Section */}
+              <div className="pb-6 border-b">
+                <Skeleton className="mb-2 w-2/3 h-8" /> {/* Title */}
+                <div className="flex gap-2 items-center">
+                  <Skeleton className="w-40 h-5" /> {/* Author */}
+                  <Skeleton className="w-24 h-5" /> {/* Date */}
+                </div>
+              </div>
+
+              {/* Key Details Section */}
+              <div className="grid grid-cols-2 gap-6 py-6 border-b">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex gap-2 items-start">
+                    <Skeleton className="w-5 h-5" /> {/* Icon */}
+                    <div className="flex-1">
+                      <Skeleton className="mb-2 w-24 h-4" /> {/* Label */}
+                      <Skeleton className="w-full h-6" /> {/* Value */}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Description Section */}
+              <div className="py-6 border-b">
+                <div className="flex gap-2 items-center mb-4">
+                  <Skeleton className="w-5 h-5" /> {/* Icon */}
+                  <Skeleton className="w-32 h-6" /> {/* Section title */}
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="w-full h-4" />
+                  <Skeleton className="w-full h-4" />
+                  <Skeleton className="w-3/4 h-4" />
+                </div>
+              </div>
+
+              {/* Implementation Details */}
+              <div className="py-6 border-b">
+                <Skeleton className="mb-4 w-48 h-6" /> {/* Section title */}
+                <div className="grid gap-6 sm:grid-cols-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="flex gap-2 items-start">
+                      <Skeleton className="w-5 h-5" /> {/* Icon */}
+                      <div className="flex-1">
+                        <Skeleton className="mb-2 w-24 h-4" /> {/* Label */}
+                        <Skeleton className="w-full h-6" /> {/* Value */}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Community Partner Section */}
+              <div className="py-6 border-b">
+                <div className="flex gap-2 items-center mb-4">
+                  <Skeleton className="w-5 h-5" /> {/* Icon */}
+                  <Skeleton className="w-40 h-6" /> {/* Section title */}
+                </div>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i}>
+                      <Skeleton className="mb-2 w-24 h-4" /> {/* Label */}
+                      <Skeleton className="w-full h-6" /> {/* Value */}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Attachments Section */}
+              <div className="py-6 border-b">
+                <div className="flex gap-2 items-center mb-4">
+                  <Skeleton className="w-5 h-5" /> {/* Icon */}
+                  <Skeleton className="w-32 h-6" /> {/* Section title */}
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="w-full h-4" />
+                  <Skeleton className="w-full h-4" />
+                  <Skeleton className="w-3/4 h-4" />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 pt-6">
+                <Skeleton className="w-32 h-10" /> {/* Approve button */}
+                <Skeleton className="w-32 h-10" /> {/* Reject button */}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -152,7 +252,9 @@ export default function ProposalDetailsPage() {
           <div className="flex justify-between items-center mb-6">
             <Button
               variant="ghost"
-              onClick={() => navigate("/admin/community-engagement/proposals")}
+              onClick={() =>
+                navigate("/admin/community-engagement/projects-proposals")
+              }
               className="hover:bg-gray-100"
             >
               <ArrowLeft className="mr-2 w-4 h-4" />
@@ -401,9 +503,9 @@ export default function ProposalDetailsPage() {
                   </Button>
                   <Button
                     variant="destructive"
-                    onClick={() => handleStatusUpdate("REJECTED")}
+                    onClick={() => handleStatusUpdate("RETURNED")}
                   >
-                    Reject Proposal
+                    Return Proposal
                   </Button>
                 </div>
               )}

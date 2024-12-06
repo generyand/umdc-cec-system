@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/select";
 import { departmentsApi } from "@/services/api/departments.service";
 import { DepartmentFormModal } from "@/components/admin/academic-departments/department-form-modal";
-import { AcademicProgram, Department } from "@/types/department.types";
+import { Department, AcademicProgram } from "@/types/department.types";
 
 import {
   DASELogo,
@@ -60,6 +60,14 @@ import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Types
+interface AcademicProgram {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  departmentId: string;
+}
+
 interface DepartmentCardProps {
   id: string;
   name: string;
@@ -263,7 +271,7 @@ function DepartmentCard({
 }
 
 // Format departments data
-function formatDepartments(departments: Department[]) {
+function formatDepartments(departments: Department[]): DepartmentCardProps[] {
   return departments.map((department) => ({
     id: department.id,
     name: department.name,
@@ -272,7 +280,8 @@ function formatDepartments(departments: Department[]) {
     slug: department.slug || department.abbreviation.toLowerCase(),
     totalStudents: department.totalStudents,
     totalPrograms: department.totalPrograms,
-    academicPrograms: department.academicPrograms,
+    academicPrograms:
+      department.academicPrograms as unknown as AcademicProgram[],
   }));
 }
 

@@ -1,7 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../utils/errors.js";
-// import { Prisma } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import { createClient } from "@supabase/supabase-js";
 
@@ -354,23 +353,17 @@ export const updateProposalStatus = async (req: Request, res: Response) => {
     console.log(`📝 Updating proposal ${id} status to ${status}...`);
 
     // Validate status
-    const validStatuses = ["PENDING", "APPROVED", "REJECTED"];
+    const validStatuses = ["PENDING", "APPROVED", "RETURNED"] as const;
     if (!validStatuses.includes(status)) {
-      throw new ApiError(400, "Invalid status value");
+      throw new ApiError(
+        400,
+        `Invalid status value. Must be one of: ${validStatuses.join(", ")}`
+      );
     }
 
     const updatedProposal = await prisma.projectProposal.update({
       where: { id: parseInt(id) },
-      data: {
-        status,
-        updatedAt: new Date(),
-      },
-      include: {
-        department: true,
-        program: true,
-        user: true,
-        community: true,
-      },
+      data: { status },
     });
 
     console.log(`✅ Successfully updated proposal status to ${status}`);

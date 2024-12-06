@@ -7,6 +7,7 @@ import {
   createProposal,
   updateProposal,
   deleteProposal,
+  updateProposalStatus,
   //   getProposalsByDepartment,
   //   getProposalsByStatus,
   //   getProposalsByUser,
@@ -33,6 +34,9 @@ router.patch("/:id", authenticateToken, updateProposal);
 
 // Delete proposal
 router.delete("/:id", authenticateToken, deleteProposal);
+
+// Update proposal status
+router.patch("/:id/status", authenticateToken, updateProposalStatus);
 
 // Optional: Additional routes based on your needs
 // Get proposals by department

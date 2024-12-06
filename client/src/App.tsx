@@ -27,6 +27,7 @@ import NotFound from "./pages/not-found";
 import NewProposalPage from "./pages/admin/proposals/new";
 import BannerProgramsPage from "./pages/admin/banner-programs";
 import ProposalsPage from "./pages/admin/proposals";
+import ProposalDetailsPage from "./pages/admin/proposals/proposal-details";
 const App = () => {
   return (
     <>
@@ -88,6 +89,10 @@ const App = () => {
             <Route
               path="/admin/community-engagement/proposals"
               element={<ProposalsPage />}
+            />
+            <Route
+              path="/admin/community-engagement/proposals/:id"
+              element={<ProposalDetailsPage />}
             />
           </Route>
 

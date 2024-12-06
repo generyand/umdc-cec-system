@@ -62,4 +62,28 @@ export const projectProposalsService = {
       },
     });
   },
+
+  async getProposalById(id: string, token: string) {
+    return await api.get(`/api/project-proposals/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  async updateProposalStatus(
+    id: string,
+    status: "APPROVED" | "REJECTED",
+    token: string
+  ) {
+    return await api.patch(
+      `/api/project-proposals/${id}/status`,
+      { status },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  },
 };

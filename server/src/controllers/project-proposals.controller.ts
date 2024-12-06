@@ -323,3 +323,44 @@ export const deleteProposal = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error deleting proposal", error });
   }
 };
+
+// Update proposal status
+export const updateProposalStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    console.log(`📝 Updating proposal ${id} status to ${status}...`);
+
+    // Validate status
+    const validStatuses = ["PENDING", "APPROVED", "REJECTED"];
+    if (!validStatuses.includes(status)) {
+      throw new ApiError(400, "Invalid status value");
+    }
+
+    const updatedProposal = await prisma.projectProposal.update({
+      where: { id: parseInt(id) },
+      data: {
+        status,
+        updatedAt: new Date(),
+      },
+      include: {
+        department: true,
+        program: true,
+        user: true,
+        community: true,
+      },
+    });
+
+    console.log(`✅ Successfully updated proposal status to ${status}`);
+    res.status(200).json({
+      success: true,
+      message: "Proposal status updated successfully",
+      data: updatedProposal,
+    });
+  } catch (error) {
+    console.error("❌ Error updating proposal status:", error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(500, "Failed to update proposal status");
+  }
+};

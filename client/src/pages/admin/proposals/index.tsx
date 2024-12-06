@@ -101,13 +101,11 @@ export default function ProposalsPage() {
   ) => {
     try {
       // TODO: Replace with actual API endpoint
-      await fetch(`/api/proposals/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
+      await projectProposalsService.updateProposalStatus(
+        id,
+        newStatus,
+        useAuth.getState().token as string
+      );
       fetchProposals(); // Refresh the list
     } catch (error) {
       console.error("Error updating proposal status:", error);

@@ -263,73 +263,52 @@ export default function NewProposalPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {/* Basic Information Section */}
-              <div className="space-y-8">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="grid grid-cols-1 gap-6 md:grid-cols-2"
+              >
+                {/* Title - Full width */}
+                <div className="md:col-span-2">
                   <FormField
                     control={form.control}
                     name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="required">
-                          Title of Activity
-                        </FormLabel>
-                        <FormDescription>
-                          Provide a clear and concise title for your extension
-                          program.
-                        </FormDescription>
+                        <FormLabel className="required">Title</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="e.g., Computer Literacy Enhancement Program (CLEP)"
-                            className="transition-all hover:border-primary/50 focus:border-primary"
                             {...field}
+                            className="transition-all hover:border-primary/50"
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </motion.div>
+                </div>
 
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.25 }}
-                >
+                {/* Description - Full width */}
+                <div className="md:col-span-2">
                   <FormField
                     control={form.control}
                     name="description"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="required">Description</FormLabel>
-                        <FormDescription>
-                          Provide a detailed description of your extension
-                          program and its objectives.
-                        </FormDescription>
                         <FormControl>
                           <Textarea
-                            placeholder="Describe your extension program..."
-                            className="min-h-[120px] resize-y transition-all hover:border-primary/50 focus:border-primary"
                             {...field}
+                            className="min-h-[120px] transition-all hover:border-primary/50"
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </motion.div>
-              </div>
+                </div>
 
-              {/* Department and Program Section */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="grid grid-cols-1 gap-8 sm:grid-cols-2"
-              >
+                {/* Department and Program - Side by side */}
                 <FormField
                   control={form.control}
                   name="department"
@@ -413,15 +392,8 @@ export default function NewProposalPage() {
                     </FormItem>
                   )}
                 />
-              </motion.div>
 
-              {/* Banner Program and Partner Community Section */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="grid grid-cols-1 gap-8 sm:grid-cols-2"
-              >
+                {/* Banner Program and Partner Community - Side by side */}
                 <FormField
                   control={form.control}
                   name="bannerProgram"
@@ -497,15 +469,8 @@ export default function NewProposalPage() {
                     </FormItem>
                   )}
                 />
-              </motion.div>
 
-              {/* Target Information Section */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="grid grid-cols-1 gap-8 sm:grid-cols-2"
-              >
+                {/* Target Beneficiaries and Target Area - Side by side */}
                 <FormField
                   control={form.control}
                   name="targetBeneficiaries"
@@ -549,15 +514,8 @@ export default function NewProposalPage() {
                     </FormItem>
                   )}
                 />
-              </motion.div>
 
-              {/* Date and Venue Section */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="grid grid-cols-1 gap-8 sm:grid-cols-2"
-              >
+                {/* Target Date and Venue - Side by side */}
                 <FormField
                   control={form.control}
                   name="targetDate"
@@ -625,162 +583,157 @@ export default function NewProposalPage() {
                     </FormItem>
                   )}
                 />
-              </motion.div>
 
-              {/* Budget Section */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-              >
-                <FormField
-                  control={form.control}
-                  name="budget"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="required">
-                        Budget Proposal
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative max-w-[240px]">
-                          <Input
-                            type="text"
-                            placeholder="0"
-                            {...field}
-                            value={field.value || ""}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(
-                                /[^0-9]/g,
-                                ""
-                              );
-                              console.log("Budget input value:", value);
-                              field.onChange(value || "0");
-                            }}
-                            className={cn(
-                              "pr-16 pl-8 transition-all",
-                              "hover:border-primary/50",
-                              "focus:border-primary"
-                            )}
-                          />
-                          <div className="flex absolute inset-y-0 left-3 items-center pointer-events-none">
-                            ₱
-                          </div>
-                          <div className="flex absolute inset-y-0 right-3 items-center pointer-events-none">
-                            PHP
-                          </div>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </motion.div>
-
-              {/* Attachments Section */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="space-y-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="attachments"
-                  render={({ field: { onChange, value, ...field } }) => (
-                    <FormItem>
-                      <FormLabel className="required">Attachments</FormLabel>
-                      <FormDescription>
-                        Upload the soft copy or scanned documents of your
-                        proposal (PDF files only, max 5MB each).
-                      </FormDescription>
-                      <FormControl>
-                        <div
-                          onDragOver={(e) => e.preventDefault()}
-                          onDrop={(e) => handleFileDrop(e, onChange)}
-                          className="space-y-4"
-                        >
-                          <div
-                            className={cn(
-                              "flex flex-col justify-center items-center p-6 w-full rounded-lg border-2 border-dashed",
-                              "transition-colors duration-200 ease-in-out",
-                              "hover:border-primary/50",
-                              "cursor-pointer"
-                            )}
-                            onClick={() =>
-                              document.getElementById("file-upload")?.click()
-                            }
-                          >
-                            <Upload className="mb-4 w-10 h-10 text-muted-foreground" />
-                            <div className="space-y-1 text-center">
-                              <p className="text-sm text-muted-foreground">
-                                <span className="font-semibold text-foreground">
-                                  Click to upload
-                                </span>{" "}
-                                or drag and drop
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                PDF files only (max 5MB each)
-                              </p>
-                            </div>
+                {/* Budget - Half width */}
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="budget"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="required">
+                          Budget Proposal
+                        </FormLabel>
+                        <FormControl>
+                          <div className="relative max-w-[240px]">
                             <Input
-                              id="file-upload"
-                              type="file"
-                              multiple
-                              accept=".pdf"
-                              onChange={(e) => onChange(e.target.files)}
-                              className="hidden"
+                              type="text"
+                              placeholder="0"
                               {...field}
-                            />
-                          </div>
+                              value={field.value || ""}
+                              onChange={(e) => {
+                                // Allow leading zeros and only numbers
+                                const value = e.target.value.replace(
+                                  /[^\d]/g,
+                                  ""
+                                );
 
-                          {value && value.length > 0 && (
-                            <div className="grid gap-3">
-                              {Array.from(value).map((file, i) => (
-                                <div
-                                  key={i}
-                                  className={cn(
-                                    "flex justify-between items-center",
-                                    "p-3 rounded-lg border bg-muted/30",
-                                    "text-sm text-muted-foreground"
-                                  )}
-                                >
-                                  <div className="flex gap-3 items-center">
-                                    <FileText className="w-4 h-4 shrink-0" />
-                                    <div className="min-w-0">
-                                      <p className="font-medium truncate">
-                                        {file.name}
-                                      </p>
-                                      <p className="text-xs">
-                                        {(file.size / 1024 / 1024).toFixed(2)}{" "}
-                                        MB
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="w-8 h-8 text-muted-foreground hover:text-foreground"
-                                    onClick={() =>
-                                      removeFile(value, i, onChange)
-                                    }
-                                  >
-                                    <X className="w-4 h-4" />
-                                    <span className="sr-only">Remove file</span>
-                                  </Button>
-                                </div>
-                              ))}
+                                // If empty, set to empty string instead of "0"
+                                field.onChange(value);
+                              }}
+                              className={cn(
+                                "pr-16 pl-8 transition-all",
+                                "hover:border-primary/50",
+                                "focus:border-primary"
+                              )}
+                            />
+                            <div className="flex absolute inset-y-0 left-3 items-center pointer-events-none">
+                              ₱
                             </div>
-                          )}
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                            <div className="flex absolute inset-y-0 right-3 items-center pointer-events-none">
+                              PHP
+                            </div>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Attachments - Full width */}
+                <div className="md:col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="attachments"
+                    render={({ field: { onChange, value, ...field } }) => (
+                      <FormItem>
+                        <FormLabel className="required">Attachments</FormLabel>
+                        <FormDescription>
+                          Upload the soft copy or scanned documents of your
+                          proposal (PDF files only, max 5MB each).
+                        </FormDescription>
+                        <FormControl>
+                          <div
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={(e) => handleFileDrop(e, onChange)}
+                            className="space-y-4"
+                          >
+                            <div
+                              className={cn(
+                                "flex flex-col justify-center items-center p-6 w-full rounded-lg border-2 border-dashed",
+                                "transition-colors duration-200 ease-in-out",
+                                "hover:border-primary/50",
+                                "cursor-pointer"
+                              )}
+                              onClick={() =>
+                                document.getElementById("file-upload")?.click()
+                              }
+                            >
+                              <Upload className="mb-4 w-10 h-10 text-muted-foreground" />
+                              <div className="space-y-1 text-center">
+                                <p className="text-sm text-muted-foreground">
+                                  <span className="font-semibold text-foreground">
+                                    Click to upload
+                                  </span>{" "}
+                                  or drag and drop
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  PDF files only (max 5MB each)
+                                </p>
+                              </div>
+                              <Input
+                                id="file-upload"
+                                type="file"
+                                multiple
+                                accept=".pdf"
+                                onChange={(e) => onChange(e.target.files)}
+                                className="hidden"
+                                {...field}
+                              />
+                            </div>
+
+                            {value && value.length > 0 && (
+                              <div className="grid gap-3">
+                                {Array.from(value).map((file, i) => (
+                                  <div
+                                    key={i}
+                                    className={cn(
+                                      "flex justify-between items-center",
+                                      "p-3 rounded-lg border bg-muted/30",
+                                      "text-sm text-muted-foreground"
+                                    )}
+                                  >
+                                    <div className="flex gap-3 items-center">
+                                      <FileText className="w-4 h-4 shrink-0" />
+                                      <div className="min-w-0">
+                                        <p className="font-medium truncate">
+                                          {file.name}
+                                        </p>
+                                        <p className="text-xs">
+                                          {(file.size / 1024 / 1024).toFixed(2)}{" "}
+                                          MB
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="w-8 h-8 text-muted-foreground hover:text-foreground"
+                                      onClick={() =>
+                                        removeFile(value, i, onChange)
+                                      }
+                                    >
+                                      <X className="w-4 h-4" />
+                                      <span className="sr-only">
+                                        Remove file
+                                      </span>
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </motion.div>
 
-              {/* Submit Buttons */}
+              {/* Submit Buttons - Full width */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

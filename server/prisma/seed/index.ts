@@ -9,6 +9,7 @@ async function main() {
   await prisma.bannerProgram.deleteMany();
   await prisma.academicProgram.deleteMany();
   await prisma.department.deleteMany();
+  await prisma.partnerCommunity.deleteMany();
 
   // Seed departments first (your existing department seed)
   const departments = [
@@ -359,6 +360,52 @@ async function main() {
     console.log(
       `Created academic program: ${academicProgram.name} (${academicProgram.abbreviation})`
     );
+  }
+
+  const communities = [
+    {
+      name: "Barangay San Miguel",
+      communityType: "Barangay",
+      address: "San Miguel, Digos City, Davao del Sur",
+      adoptionStart: new Date("2023-01-15"),
+      status: "ACTIVE",
+      contactPerson: "Hon. Maria Santos",
+      contactEmail: "sanmiguel.digos@gmail.com",
+      contactNumber: "09123456789",
+      description:
+        "A progressive barangay known for its agricultural activities and strong community engagement in educational programs.",
+    },
+    {
+      name: "Barangay Dawis",
+      communityType: "Barangay",
+      address: "Dawis, Digos City, Davao del Sur",
+      adoptionStart: new Date("2023-03-01"),
+      status: "ACTIVE",
+      contactPerson: "Hon. Pedro Reyes",
+      contactEmail: "dawis.digos@gmail.com",
+      contactNumber: "09234567890",
+      description:
+        "A developing barangay with focus on youth development and environmental sustainability initiatives.",
+    },
+    {
+      name: "Barangay Ruparan",
+      communityType: "Barangay",
+      address: "Ruparan, Digos City, Davao del Sur",
+      adoptionStart: new Date("2023-02-15"),
+      status: "ACTIVE",
+      contactPerson: "Hon. Juan Dela Cruz",
+      contactEmail: "ruparan.digos@gmail.com",
+      contactNumber: "09345678901",
+      description:
+        "An emerging barangay with strong emphasis on community-based learning and social development programs.",
+    },
+  ];
+
+  for (const community of communities) {
+    const partnerCommunity = await prisma.partnerCommunity.create({
+      data: community,
+    });
+    console.log(`Created partner community: ${partnerCommunity.name}`);
   }
 
   console.log("Seeding finished.");

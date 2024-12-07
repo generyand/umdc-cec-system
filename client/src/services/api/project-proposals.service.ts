@@ -93,4 +93,11 @@ export const projectProposalsService = {
       }
     );
   },
+
+  getDepartmentPrograms: async () => {
+    const response = await api.get(
+      "/api/project-proposals/dropdown-options/departments"
+    );
+    return response.data;
+  },
 };

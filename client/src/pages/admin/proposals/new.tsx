@@ -47,77 +47,25 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
-import { projectProposalsService } from "@/services/api/project-proposals.service";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AxiosError } from "axios";
 import { useAuth } from "@/hooks/use-auth";
-import { AcademicProgram } from "../../../types/department.types";
-// import { CreateProposalData } from "@/types/proposal.types";
-const departmentPrograms: Record<string, { value: string; label: string }[]> = {
-  "2": [
-    {
-      value: "bsa",
-      label: "Bachelor of Science in Accountancy (BSA)",
-    },
-    {
-      value: "bsma",
-      label: "Bachelor of Science in Management Accounting (BSMA)",
-    },
-  ],
-  "3": [
-    {
-      value: "ab-polsci",
-      label: "Bachelor of Arts in Political Science (AB POLSCI)",
-    },
-    { value: "ab-com", label: "Bachelor of Arts in Communication (AB COM)" },
-    { value: "bssw", label: "Bachelor of Science in Social Work (BSSW)" },
-    { value: "bsp", label: "Bachelor of Science in Psychology (BSP)" },
-  ],
-  "4": [
-    {
-      value: "bsba",
-      label: "Bachelor of Science in Business Administration (BSBA)",
-    },
-    {
-      value: "bstm",
-      label: "Bachelor of Science in Tourism Management (BSTM)",
-    },
-  ],
-  "5": [{ value: "bsc", label: "Bachelor of Science in Criminology (BSC)" }],
-  "6": [
-    {
-      value: "bsed",
-      label: "Bachelor of Science in Secondary Education (BSED)",
-    },
-    { value: "beed", label: "Bachelor in Elementary Education (BEED)" },
-    { value: "bped", label: "Bachelor of Physical Education (BPED)" },
-    {
-      value: "btvted",
-      label: "Bachelor of Technical Vocational Teacher Education (BTVTED)",
-    },
-  ],
-  "1": [
-    {
-      value: "bsit",
-      label: "Bachelor of Science in Information Technology (BSIT)",
-    },
-    {
-      value: "bscpe",
-      label: "Bachelor of Science in Computer Engineering (BSCPE)",
-    },
-  ],
-  "7": [
-    {
-      value: "stem",
-      label: "Science, Technology, Engineering & Mathematics (STEM)",
-    },
-    { value: "abm", label: "Accountancy, Business & Management (ABM)" },
-    { value: "humss", label: "Humanities & Social Sciences (HUMSS)" },
-    { value: "gas", label: "General Academic Strand (GAS)" },
-    { value: "tvl", label: "Technical Vocational Livelihood (TVL)" },
-  ],
-  "8": [{ value: "ntp", label: "Non-teaching Personnel (NTP)" }],
-  "9": [{ value: "alumni", label: "Alumni" }],
-};
+import { projectProposalsService } from "@/services/api/project-proposals.service";
+
+interface Program {
+  id: number;
+  name: string;
+  abbreviation: string;
+}
+
+interface DepartmentWithPrograms {
+  id: number;
+  name: string;
+  abbreviation: string;
+  academicPrograms: Program[];
+  bannerPrograms: Program[];
+}
 
 const proposalFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
@@ -165,75 +113,22 @@ const partnerCommunities = [
   },
 ];
 
-const bannerPrograms = [
-  {
-    id: 1,
-    name: "KASUSYO",
-    description: "Kabalikat sa Usaping Sosyo-ekonomiko",
-  },
-  {
-    id: 2,
-    name: "KISLAP",
-    description: "Kaagapay sa Isyung Pangkalusugan",
-  },
-  {
-    id: 3,
-    name: "UM-HEART",
-    description: "UM Health Education Advocacy and Research Team",
-  },
-  {
-    id: 4,
-    name: "UMASINSO",
-    description: "UM Advocacy on Social Innovation and Sustainability Outreach",
-  },
-  {
-    id: 5,
-    name: "TURISMO MISMO",
-    description:
-      "Tourism Management Involvement in Sustainable Management Operations",
-  },
-  {
-    id: 6,
-    name: "BATUTA DEPENSA",
-    description: "Batas at Tulong sa Tao Defense Advocacy",
-  },
-  {
-    id: 7,
-    name: "ANAK NG UM",
-    description: "Aral at Nutrisyon Alang sa Kabataan ng UM",
-  },
-  {
-    id: 8,
-    name: "MUNTING PAARALAN",
-    description: "Mobile Education Program",
-  },
-  {
-    id: 9,
-    name: "PROJECT WELLNESS",
-    description:
-      "Wellness Education, Lifestyle Learning, Nurturing, Empowerment, Service, and Sustainability",
-  },
-  {
-    id: 10,
-    name: "BUMATI KA",
-    description: "Buksan ang Mundo at Turuan ang Iba",
-  },
-  {
-    id: 11,
-    name: "UMUNA",
-    description: "UM United Network of Advocates",
-  },
-  {
-    id: 12,
-    name: "UM STAR",
-    description: "UM Students Taking Action and Responsibility",
-  },
-];
-
 export default function NewProposalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
   const navigate = useNavigate();
+  const { token } = useAuth();
+
+  // Fetch departments data
+  const { data: departmentsData, isLoading: isDepartmentsLoading } = useQuery({
+    queryKey: ["departmentPrograms"],
+    queryFn: () => projectProposalsService.getDepartmentPrograms(),
+  });
+
+  const departments = departmentsData?.data || [];
+  const selectedDepartmentData = departments.find(
+    (dept: DepartmentWithPrograms) => dept.id.toString() === selectedDepartment
+  );
 
   const handleFileDrop = useCallback(
     (
@@ -291,8 +186,6 @@ export default function NewProposalPage() {
     try {
       setIsSubmitting(true);
 
-      const token = useAuth.getState().token || "";
-
       const formData = {
         ...data,
         bannerProgram: {
@@ -314,10 +207,10 @@ export default function NewProposalPage() {
         });
       }
 
-      await projectProposalsService.createProposal(formData, token);
+      await projectProposalsService.createProposal(formData, token || "");
 
       toast.success("Proposal created successfully");
-      navigate("/admin/");
+      navigate("/admin/community-engagement/proposals");
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error("Failed to create proposal", {
@@ -445,10 +338,11 @@ export default function NewProposalPage() {
                       <FormLabel className="required">Department</FormLabel>
                       <Select
                         onValueChange={(value) => {
-                          console.log("Selected department:", value); // Debug log
                           field.onChange(value);
                           setSelectedDepartment(value);
-                          form.setValue("program", ""); // Reset program when department changes
+                          // Reset dependent fields
+                          form.setValue("program", "");
+                          form.setValue("bannerProgram", "");
                         }}
                         defaultValue={field.value}
                       >
@@ -458,31 +352,21 @@ export default function NewProposalPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="1">
-                            Department of Technical Programs (DTP)
-                          </SelectItem>
-                          <SelectItem value="2">
-                            Department of Accounting Education (DAE)
-                          </SelectItem>
-                          <SelectItem value="3">
-                            Department of Arts & Sciences Education (DASE)
-                          </SelectItem>
-                          <SelectItem value="4">
-                            Department of Business Administration (DBA)
-                          </SelectItem>
-                          <SelectItem value="5">
-                            Department of Criminal Justice Education (DCJE)
-                          </SelectItem>
-                          <SelectItem value="6">
-                            Department of Teacher Education (DTE)
-                          </SelectItem>
-                          <SelectItem value="7">
-                            Senior High School (SHS)
-                          </SelectItem>
-                          <SelectItem value="8">
-                            Non-teaching Personnel (NTP)
-                          </SelectItem>
-                          <SelectItem value="9">Alumni</SelectItem>
+                          {isDepartmentsLoading ? (
+                            <div className="p-2">
+                              <Skeleton className="w-full h-8" />
+                              <Skeleton className="mt-2 w-full h-8" />
+                            </div>
+                          ) : (
+                            departments.map((dept: DepartmentWithPrograms) => (
+                              <SelectItem
+                                key={dept.id}
+                                value={dept.id.toString()}
+                              >
+                                {dept.name} ({dept.abbreviation})
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -497,17 +381,9 @@ export default function NewProposalPage() {
                     <FormItem>
                       <FormLabel className="required">Program</FormLabel>
                       <Select
-                        onValueChange={(value) => {
-                          console.log("Selected program code:", value);
-                          const program = AcademicProgram.find(
-                            (p) => p.code === value
-                          );
-                          console.log("Found program:", program);
-                          if (program) {
-                            field.onChange(program.id.toString());
-                          }
-                        }}
+                        onValueChange={field.onChange}
                         defaultValue={field.value}
+                        disabled={!selectedDepartment}
                       >
                         <FormControl>
                           <SelectTrigger className="transition-all hover:border-primary/50">
@@ -515,17 +391,22 @@ export default function NewProposalPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {selectedDepartment &&
-                            departmentPrograms[selectedDepartment]?.map(
-                              (program) => (
+                          {isDepartmentsLoading ? (
+                            <div className="p-2">
+                              <Skeleton className="w-full h-8" />
+                            </div>
+                          ) : (
+                            selectedDepartmentData?.academicPrograms.map(
+                              (program: Program) => (
                                 <SelectItem
-                                  key={program.value}
-                                  value={program.value}
+                                  key={program.id}
+                                  value={program.id.toString()}
                                 >
-                                  {program.label}
+                                  {program.name} ({program.abbreviation})
                                 </SelectItem>
                               )
-                            )}
+                            )
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -548,11 +429,9 @@ export default function NewProposalPage() {
                     <FormItem>
                       <FormLabel className="required">Banner Program</FormLabel>
                       <Select
-                        onValueChange={(value) => {
-                          console.log("Selected banner program:", value);
-                          field.onChange(value);
-                        }}
+                        onValueChange={field.onChange}
                         defaultValue={field.value}
+                        disabled={!selectedDepartment}
                       >
                         <FormControl>
                           <SelectTrigger className="transition-all hover:border-primary/50">
@@ -560,21 +439,22 @@ export default function NewProposalPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {bannerPrograms.map((program) => (
-                            <SelectItem
-                              key={program.id}
-                              value={program.id.toString()}
-                            >
-                              <div className="flex flex-col">
-                                <span className="font-medium">
-                                  {program.name}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                  {program.description}
-                                </span>
-                              </div>
-                            </SelectItem>
-                          ))}
+                          {isDepartmentsLoading ? (
+                            <div className="p-2">
+                              <Skeleton className="w-full h-8" />
+                            </div>
+                          ) : (
+                            selectedDepartmentData?.bannerPrograms.map(
+                              (program: Program) => (
+                                <SelectItem
+                                  key={program.id}
+                                  value={program.id.toString()}
+                                >
+                                  {program.name} ({program.abbreviation})
+                                </SelectItem>
+                              )
+                            )
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />

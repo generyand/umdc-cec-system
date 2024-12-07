@@ -428,9 +428,9 @@ export const getDepartmentsWithPrograms: RequestHandler = async (req, res) => {
       };
     });
 
-    console.log(
-      `✅ Successfully fetched ${transformedDepartments.length} departments`
-    );
+    // console.log(
+    //   `✅ Successfully fetched ${transformedDepartments.length} departments`
+    // );
 
     res.status(200).json({
       success: true,

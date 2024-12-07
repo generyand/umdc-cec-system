@@ -1,7 +1,11 @@
 import { cn } from "@/lib/utils";
+import { NavLink } from "@/components/admin/nav-link";
+import { useSidebarStore } from "@/store/use-sidebar-store";
+import { useState } from "react";
 import {
+  LucideIcon,
   Home,
-  LayoutDashboard,
+  // LayoutDashboard,
   Building2,
   Users,
   BarChart3,
@@ -20,21 +24,146 @@ import {
   Bell,
   FileBox,
   Wrench,
+  Calendar,
 } from "lucide-react";
-import { NavLink } from "@/components/admin/nav-link";
-import { useSidebarStore } from "@/store/use-sidebar-store";
-import { useState } from "react";
 
+// Types
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
+
+interface NavItem {
+  title: string;
+  href: string;
+  icon: LucideIcon;
+  children?: NavItem[];
+}
 
 interface CollapsibleSectionProps {
   title: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   isOpen: boolean;
   collapsed: boolean;
+  isExpanded: boolean;
+  onToggle: () => void;
   children: React.ReactNode;
 }
 
+// Navigation Configuration
+const navigationItems: NavItem[] = [
+  { title: "Home", href: "/admin", icon: Home },
+  // { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  {
+    title: "Academic Departments",
+    href: "/admin/academic-departments",
+    icon: School,
+  },
+  {
+    title: "Community Engagement",
+    href: "#",
+    icon: Handshake,
+    children: [
+      {
+        title: "Project Proposals",
+        href: "/admin/community-engagement/projects-proposals",
+        icon: FileText,
+      },
+      {
+        title: "Banner Programs",
+        href: "/admin/community-engagement/banner-programs",
+        icon: Flag,
+      },
+      {
+        title: "Partner Communities",
+        href: "/admin/community-engagement/partner-communities",
+        icon: Users,
+      },
+      {
+        title: "Partnerships & Linkages",
+        href: "/admin/community-engagement/partnerships-and-linkages",
+        icon: Building2,
+      },
+    ],
+  },
+  {
+    title: "Service Programs",
+    href: "#",
+    icon: BookOpen,
+    children: [
+      { title: "ROTC", href: "/admin/service-programs/rotc", icon: Users },
+      { title: "NSTP", href: "/admin/service-programs/nstp", icon: Users },
+    ],
+  },
+  {
+    title: "Events & Activities",
+    href: "/admin/events-and-activities",
+    icon: Calendar,
+  },
+  {
+    title: "Analytics & Reports",
+    href: "#",
+    icon: BarChart3,
+    children: [
+      {
+        title: "Reports",
+        href: "/admin/analytics-and-reports/reports",
+        icon: FileText,
+      },
+      {
+        title: "Impact Metrics",
+        href: "/admin/analytics-and-reports/impact-metrics",
+        icon: TrendingUp,
+      },
+    ],
+  },
+  {
+    title: "Administration",
+    href: "#",
+    icon: Settings,
+    children: [
+      {
+        title: "User Management",
+        href: "/admin/administration/user-management",
+        icon: UserCog,
+      },
+      {
+        title: "Department Settings",
+        href: "/admin/administration/department-settings",
+        icon: Building,
+      },
+      {
+        title: "System Settings",
+        href: "/admin/administration/system-settings",
+        icon: Settings,
+      },
+      {
+        title: "Approvals",
+        href: "/admin/administration/approvals",
+        icon: CheckSquare,
+      },
+      {
+        title: "Activity Logs",
+        href: "/admin/administration/activity-logs",
+        icon: History,
+      },
+      {
+        title: "Announcements",
+        href: "/admin/administration/announcements",
+        icon: Bell,
+      },
+      {
+        title: "Documents",
+        href: "/admin/administration/documents",
+        icon: FileBox,
+      },
+      {
+        title: "Maintenance",
+        href: "/admin/administration/maintenance",
+        icon: Wrench,
+      },
+    ],
+  },
+];
+
+// Reusable Components
 function CollapsibleSection({
   title,
   icon: Icon,
@@ -42,10 +171,7 @@ function CollapsibleSection({
   children,
   isExpanded,
   onToggle,
-}: CollapsibleSectionProps & {
-  isExpanded: boolean;
-  onToggle: () => void;
-}) {
+}: CollapsibleSectionProps) {
   return (
     <div className="relative">
       <button
@@ -64,8 +190,7 @@ function CollapsibleSection({
         <div className={cn("flex items-center min-w-0", !collapsed && "gap-3")}>
           <Icon
             className={cn(
-              "w-4 h-4 shrink-0",
-              "transition-transform duration-200",
+              "w-4 h-4 shrink-0 transition-transform duration-200",
               "group-hover:text-foreground",
               isExpanded && "text-foreground",
               !isExpanded && "text-muted-foreground",
@@ -77,8 +202,7 @@ function CollapsibleSection({
         {!collapsed && (
           <ChevronDown
             className={cn(
-              "w-4 h-4 shrink-0",
-              "transition-transform duration-200",
+              "w-4 h-4 shrink-0 transition-transform duration-200",
               isExpanded && "transform rotate-180",
               "text-muted-foreground group-hover:text-foreground",
               isExpanded && "text-foreground"
@@ -89,8 +213,7 @@ function CollapsibleSection({
       {isExpanded && (
         <div
           className={cn(
-            "mt-1 space-y-1",
-            "pl-4",
+            "pl-4 mt-1 space-y-1",
             "relative before:absolute before:left-3 before:top-1 before:bottom-2",
             "before:w-px before:bg-accent/60",
             "duration-200 animate-in slide-in-from-top-2"
@@ -103,13 +226,53 @@ function CollapsibleSection({
   );
 }
 
+// Main Component
 export function Sidebar({ className }: SidebarProps) {
   const isOpen = useSidebarStore((state) => state.isOpen);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const handleSectionToggle = (sectionTitle: string) => {
-    setExpandedSection((currentSection) =>
-      currentSection === sectionTitle ? null : sectionTitle
+    setExpandedSection((current) =>
+      current === sectionTitle ? null : sectionTitle
+    );
+  };
+
+  const renderNavItem = (item: NavItem) => {
+    if (item.children) {
+      return (
+        <CollapsibleSection
+          key={item.title}
+          title={item.title}
+          icon={item.icon}
+          isOpen={isOpen}
+          collapsed={!isOpen}
+          isExpanded={expandedSection === item.title}
+          onToggle={() => handleSectionToggle(item.title)}
+        >
+          {item.children.map((child) => (
+            <NavLink
+              key={child.href}
+              collapsed={!isOpen}
+              href={child.href}
+              icon={child.icon}
+              isChild
+            >
+              {child.title}
+            </NavLink>
+          ))}
+        </CollapsibleSection>
+      );
+    }
+
+    return (
+      <NavLink
+        key={item.href}
+        collapsed={!isOpen}
+        href={item.href}
+        icon={item.icon}
+      >
+        {item.title}
+      </NavLink>
     );
   };
 
@@ -118,204 +281,13 @@ export function Sidebar({ className }: SidebarProps) {
       className={cn(
         "border-r backdrop-blur",
         isOpen ? "w-[260px]" : "w-[70px]",
-        "transition-all duration-300 max-md:hidden",
-        "shadow-sm",
+        "shadow-sm transition-all duration-300 max-md:hidden",
         className
       )}
     >
       <div className="flex flex-col h-screen">
         <nav className="overflow-y-auto flex-1 p-2 space-y-2">
-          <NavLink collapsed={!isOpen} href="/admin" icon={Home}>
-            Home
-          </NavLink>
-
-          <NavLink
-            collapsed={!isOpen}
-            href="/admin/dashboard"
-            icon={LayoutDashboard}
-          >
-            Dashboard
-          </NavLink>
-
-          <NavLink
-            collapsed={!isOpen}
-            href="/admin/academic-departments"
-            icon={School}
-          >
-            Academic Departments
-          </NavLink>
-
-          {/* Community Engagement Section */}
-          <CollapsibleSection
-            title="Community Engagement"
-            icon={Handshake}
-            isOpen={isOpen}
-            collapsed={!isOpen}
-            isExpanded={expandedSection === "Community Engagement"}
-            onToggle={() => handleSectionToggle("Community Engagement")}
-          >
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/community-engagement/projects-proposals"
-              icon={FileText}
-              isChild
-            >
-              Project Proposals
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/community-engagement/banner-programs"
-              icon={Flag}
-              isChild
-            >
-              Banner Programs
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/community-engagement/partner-communities"
-              icon={Users}
-              isChild
-            >
-              Partner Communities
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/community-engagement/partnerships-and-linkages"
-              icon={Building2}
-              isChild
-            >
-              Partnerships & Linkages
-            </NavLink>
-          </CollapsibleSection>
-
-          {/* Service Programs Section */}
-          <CollapsibleSection
-            title="Service Programs"
-            icon={BookOpen}
-            isOpen={isOpen}
-            collapsed={!isOpen}
-            isExpanded={expandedSection === "Service Programs"}
-            onToggle={() => handleSectionToggle("Service Programs")}
-          >
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/service-programs/rotc"
-              icon={Users}
-              isChild
-            >
-              ROTC
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/service-programs/nstp"
-              icon={Users}
-              isChild
-            >
-              NSTP
-            </NavLink>
-          </CollapsibleSection>
-
-          {/* Analytics & Reports Section */}
-          <CollapsibleSection
-            title="Analytics & Reports"
-            icon={BarChart3}
-            isOpen={isOpen}
-            collapsed={!isOpen}
-            isExpanded={expandedSection === "Analytics & Reports"}
-            onToggle={() => handleSectionToggle("Analytics & Reports")}
-          >
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/analytics-and-reports/reports"
-              icon={FileText}
-              isChild
-            >
-              Reports
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/analytics-and-reports/impact-metrics"
-              icon={TrendingUp}
-              isChild
-            >
-              Impact Metrics
-            </NavLink>
-          </CollapsibleSection>
-
-          {/* Administration Section */}
-          <CollapsibleSection
-            title="Administration"
-            icon={Settings}
-            isOpen={isOpen}
-            collapsed={!isOpen}
-            isExpanded={expandedSection === "Administration"}
-            onToggle={() => handleSectionToggle("Administration")}
-          >
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/administration/user-management"
-              icon={UserCog}
-              isChild
-            >
-              User Management
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/administration/department-settings"
-              icon={Building}
-              isChild
-            >
-              Department Settings
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/administration/system-settings"
-              icon={Settings}
-              isChild
-            >
-              System Settings
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/administration/approvals"
-              icon={CheckSquare}
-              isChild
-            >
-              Approvals
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/administration/activity-logs"
-              icon={History}
-              isChild
-            >
-              Activity Logs
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/administration/announcements"
-              icon={Bell}
-              isChild
-            >
-              Announcements
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/administration/documents"
-              icon={FileBox}
-              isChild
-            >
-              Documents
-            </NavLink>
-            <NavLink
-              collapsed={!isOpen}
-              href="/admin/administration/maintenance"
-              icon={Wrench}
-              isChild
-            >
-              Maintenance
-            </NavLink>
-          </CollapsibleSection>
+          {navigationItems.map(renderNavItem)}
         </nav>
       </div>
     </div>

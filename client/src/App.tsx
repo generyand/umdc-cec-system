@@ -66,7 +66,10 @@ const App = () => {
               path="/admin/community-engagement/partnerships-and-linkages"
               element={<PartnershipsAndLinkagesPage />}
             />
-            <Route path="/admin/events" element={<EventsPage />} />
+            <Route
+              path="/admin/events-and-activities"
+              element={<EventsPage />}
+            />
             <Route path="/admin/service-programs/rotc" element={<ROTCPage />} />
             <Route path="/admin/service-programs/nstp" element={<NSTPPage />} />
             <Route

@@ -12,6 +12,8 @@ import {
   FolderPlus,
   FileBarChart,
   Calendar,
+  Building2,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -112,12 +114,39 @@ export default function HomePage() {
       href: "/calendar",
       icon: Calendar,
     },
+    // {
+    //   title: "Reports Dashboard",
+    //   description: "View and generate reports",
+    //   href: "/reports",
+    //   icon: FileBarChart,
+    // },
+  ];
+
+  const departmentPerformance = [
     {
-      title: "Reports Dashboard",
-      description: "View and generate reports",
-      href: "/reports",
-      icon: FileBarChart,
+      name: "DAE",
+      fullName: "Department of Accounting Education",
+      programs: 6,
+      participation: 88,
+      status: "active",
+      activePrograms: [
+        "Financial Literacy Workshop",
+        "Basic Bookkeeping for SMEs",
+      ],
     },
+    // Add 2-3 more departments for initial display
+  ];
+
+  const pendingApprovals = [
+    {
+      id: 1,
+      title: "Community Financial Education Workshop",
+      department: "DAE",
+      submittedBy: "Prof. Garcia",
+      status: "pending_review",
+      submitDate: "2024-03-20",
+    },
+    // Add 2-3 more items for initial display
   ];
 
   return (
@@ -263,6 +292,124 @@ export default function HomePage() {
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {announcement.date}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        {/* Add Department Performance */}
+        <Card className="md:col-span-1">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="flex gap-2 items-center">
+                  <Building2 className="w-5 h-5 text-primary" />
+                  Department Overview
+                </CardTitle>
+                <CardDescription>
+                  Active programs and participation
+                </CardDescription>
+              </div>
+              <Button variant="outline" size="sm">
+                View All
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[300px] pr-4">
+              <div className="space-y-4">
+                {departmentPerformance.map((dept) => (
+                  <div
+                    key={dept.name}
+                    className="p-4 space-y-3 rounded-lg transition-colors hover:bg-muted/50"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="flex gap-2 items-center">
+                          <span className="font-medium">{dept.name}</span>
+                          <Badge variant="outline">
+                            {dept.programs} programs
+                          </Badge>
+                        </div>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {dept.fullName}
+                        </p>
+                      </div>
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "capitalize",
+                          dept.status === "active" &&
+                            "bg-green-500/10 text-green-500"
+                        )}
+                      >
+                        {dept.status}
+                      </Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Active Programs:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {dept.activePrograms.map((program) => (
+                          <Badge
+                            key={program}
+                            variant="outline"
+                            className="text-xs"
+                          >
+                            {program}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        {/* Add Status Overview */}
+        <Card className="md:col-span-1">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="flex gap-2 items-center">
+                  <AlertCircle className="w-5 h-5 text-primary" />
+                  Pending Approvals
+                </CardTitle>
+                <CardDescription>Items requiring attention</CardDescription>
+              </div>
+              <Button variant="outline" size="sm">
+                View All
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[300px] pr-4">
+              <div className="space-y-4">
+                {pendingApprovals.map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-4 rounded-lg transition-colors cursor-pointer hover:bg-muted/50"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
+                        <p className="font-medium">{item.title}</p>
+                        <div className="flex gap-2 items-center text-sm">
+                          <Badge variant="outline">{item.department}</Badge>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground">
+                            {item.submittedBy}
+                          </span>
+                        </div>
+                      </div>
+                      <Badge variant="secondary">Pending Review</Badge>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Submitted on{" "}
+                      {new Date(item.submitDate).toLocaleDateString()}
                     </p>
                   </div>
                 ))}

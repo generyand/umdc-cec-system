@@ -11,6 +11,9 @@
     "clean": "rm -rf dist",
     "build:clean": "npm run clean && npm run build"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed/index.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -43,7 +46,8 @@
     "nodemon": "^3.1.7",
     "prisma": "^6.0.0",
     "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2"
   }
 }

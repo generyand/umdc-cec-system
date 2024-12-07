@@ -8,13 +8,13 @@ import {
   // LayoutDashboard,
   Building2,
   Users,
-  BarChart3,
+  // BarChart3,
   ChevronDown,
   Handshake,
   School,
-  BookOpen,
+  // BookOpen,
   FileText,
-  TrendingUp,
+  // TrendingUp,
   Flag,
   Settings,
   UserCog,
@@ -83,37 +83,37 @@ const navigationItems: NavItem[] = [
       },
     ],
   },
-  {
-    title: "Service Programs",
-    href: "#",
-    icon: BookOpen,
-    children: [
-      { title: "ROTC", href: "/admin/service-programs/rotc", icon: Users },
-      { title: "NSTP", href: "/admin/service-programs/nstp", icon: Users },
-    ],
-  },
+  // {
+  //   title: "Service Programs",
+  //   href: "#",
+  //   icon: BookOpen,
+  //   children: [
+  //     { title: "ROTC", href: "/admin/service-programs/rotc", icon: Users },
+  //     { title: "NSTP", href: "/admin/service-programs/nstp", icon: Users },
+  //   ],
+  // },
   {
     title: "Events & Activities",
     href: "/admin/events-and-activities",
     icon: Calendar,
   },
-  {
-    title: "Analytics & Reports",
-    href: "#",
-    icon: BarChart3,
-    children: [
-      {
-        title: "Reports",
-        href: "/admin/analytics-and-reports/reports",
-        icon: FileText,
-      },
-      {
-        title: "Impact Metrics",
-        href: "/admin/analytics-and-reports/impact-metrics",
-        icon: TrendingUp,
-      },
-    ],
-  },
+  // {
+  //   title: "Analytics & Reports",
+  //   href: "#",
+  //   icon: BarChart3,
+  //   children: [
+  //     {
+  //       title: "Reports",
+  //       href: "/admin/analytics-and-reports/reports",
+  //       icon: FileText,
+  //     },
+  //     {
+  //       title: "Impact Metrics",
+  //       href: "/admin/analytics-and-reports/impact-metrics",
+  //       icon: TrendingUp,
+  //     },
+  //   ],
+  // },
   {
     title: "Administration",
     href: "#",

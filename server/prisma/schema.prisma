@@ -67,6 +67,31 @@ model AcademicProgram {
   @@map("academic_programs")
 }
 
+model BannerProgram {
+  id           Int     @id @default(autoincrement())
+  name         String  @unique
+  abbreviation String  @unique
+  description  String?
+  yearStarted  Int
+  status       String  @default("ACTIVE")
+
+  // Foreign Keys
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  // Relationships
+  academicPrograms AcademicProgram[] // New relation field
+  projectProposals ProjectProposal[]
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([departmentId])
+  @@index([status])
+  @@map("banner_programs")
+}
+
 model ProjectProposal {
   id                  Int            @id @default(autoincrement())
   title               String
@@ -107,7 +132,6 @@ model ProjectProposal {
   @@map("project_proposals")
 }
 
-// New model for file attachments
 model ProjectAttachment {
   id         Int      @id @default(autoincrement())
   fileName   String // Original file name
@@ -122,60 +146,6 @@ model ProjectAttachment {
 
   @@index([proposalId])
   @@map("project_attachments")
-}
-
-model PartnerCommunity {
-  id            Int       @id @default(autoincrement())
-  name          String
-  communityType String // Barangay, NGO, School, etc.
-  address       String
-  adoptionStart DateTime
-  adoptionEnd   DateTime? // Optional end date (for ongoing partnerships)
-  status        String    @default("ACTIVE") // ACTIVE, INACTIVE, COMPLETED
-
-  // Contact Information
-  contactPerson String
-  contactEmail  String? // Optional email
-  contactNumber String
-
-  // Additional Details
-  description String? // Brief description or notes about the partnership
-
-  // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relationships
-  projectProposals ProjectProposal[]
-
-  @@index([status])
-  @@index([communityType])
-  @@map("partner_communities")
-}
-
-model BannerProgram {
-  id           Int     @id @default(autoincrement())
-  name         String  @unique
-  abbreviation String  @unique
-  description  String?
-  yearStarted  Int
-  status       String  @default("ACTIVE")
-
-  // Foreign Keys
-  departmentId Int
-  department   Department @relation(fields: [departmentId], references: [id])
-
-  // Relationships
-  academicPrograms AcademicProgram[] // New relation field
-  projectProposals ProjectProposal[]
-
-  // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([departmentId])
-  @@index([status])
-  @@map("banner_programs")
 }
 
 model Activity {
@@ -226,4 +196,33 @@ model ActivityDocument {
   @@index([category])
   @@index([activityId])
   @@map("activity_documents")
+}
+
+model PartnerCommunity {
+  id            Int       @id @default(autoincrement())
+  name          String
+  communityType String // Barangay, NGO, School, etc.
+  address       String
+  adoptionStart DateTime
+  adoptionEnd   DateTime? // Optional end date (for ongoing partnerships)
+  status        String    @default("ACTIVE") // ACTIVE, INACTIVE, COMPLETED
+
+  // Contact Information
+  contactPerson String
+  contactEmail  String? // Optional email
+  contactNumber String
+
+  // Additional Details
+  description String? // Brief description or notes about the partnership
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  projectProposals ProjectProposal[]
+
+  @@index([status])
+  @@index([communityType])
+  @@map("partner_communities")
 }

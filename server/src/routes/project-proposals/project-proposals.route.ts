@@ -8,6 +8,7 @@ import {
   updateProposal,
   deleteProposal,
   updateProposalStatus,
+  getDepartmentsWithPrograms,
   //   getProposalsByDepartment,
   //   getProposalsByStatus,
   //   getProposalsByUser,
@@ -37,6 +38,13 @@ router.delete("/:id", authenticateToken, deleteProposal);
 
 // Update proposal status
 router.patch("/:id/status", authenticateToken, updateProposalStatus);
+
+// Get departments with minimal program info. Used for dropdowns in proposal form.
+router.get(
+  "/dropdown-options/departments",
+  authenticateToken,
+  getDepartmentsWithPrograms
+);
 
 // Optional: Additional routes based on your needs
 // Get proposals by department

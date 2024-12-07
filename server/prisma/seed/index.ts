@@ -6,6 +6,7 @@ async function main() {
   console.log("Start seeding...");
 
   // Clear existing data
+  await prisma.bannerProgram.deleteMany();
   await prisma.academicProgram.deleteMany();
   await prisma.department.deleteMany();
 
@@ -67,9 +68,127 @@ async function main() {
     );
   }
 
-  // Seed academic programs
-  const academicPrograms = [
+  const bannerPrograms = [
     // DAE Programs
+    {
+      name: "KASUSYO",
+      abbreviation: "KASUSYO",
+      description:
+        "Community outreach program focusing on financial literacy and basic accounting education for local communities.",
+      status: "ACTIVE",
+      yearStarted: 2013,
+      departmentId: departmentMap.get("DAE"),
+    },
+
+    // DASE Programs
+    {
+      name: "Kabataan Isulong Lahing Pinoy",
+      abbreviation: "KISLAP",
+      description:
+        "Youth development program promoting Filipino culture and values through educational activities.",
+      status: "ACTIVE",
+      yearStarted: 2012,
+      departmentId: departmentMap.get("DASE"),
+    },
+    {
+      name: "Healing of Emotional and Mental Adversities for Renewed Townsmen",
+      abbreviation: "UM-HEART",
+      description:
+        "Mental health awareness and support program for local communities.",
+      status: "ACTIVE",
+      yearStarted: 2022,
+      departmentId: departmentMap.get("DASE"),
+    },
+
+    // DBA Programs
+    {
+      name: "UM at Akoo SIgurado sa Negosyo Aasenso",
+      abbreviation: "UMASINSO",
+      description:
+        "Entrepreneurship development program supporting local business initiatives.",
+      status: "ACTIVE",
+      yearStarted: 2012,
+      departmentId: departmentMap.get("DBA"),
+    },
+    {
+      name: "TURISMO MISMO",
+      abbreviation: "TURISMO MISMO",
+      description:
+        "Tourism promotion and development program for local destinations.",
+      status: "ACTIVE",
+      yearStarted: 2023,
+      departmentId: departmentMap.get("DBA"),
+    },
+
+    // DCJE Programs
+    {
+      name: "Barangay ay TUlungan ng TAmang DEPENSA",
+      abbreviation: "BATUTA DEPENSA",
+      description: "Community safety and security awareness program.",
+      status: "ACTIVE",
+      yearStarted: 2012,
+      departmentId: departmentMap.get("DCJE"),
+    },
+
+    // DTE Programs
+    {
+      name: "Alagaan Natin ang Kabataan ng Umunlad at Mapagkalinga",
+      abbreviation: "ANAK NG UM",
+      description: "Child education and development support program.",
+      status: "ACTIVE",
+      yearStarted: 2012,
+      departmentId: departmentMap.get("DTE"),
+    },
+    {
+      name: "MUNTING PAARALAN",
+      abbreviation: "MUNTING PAARALAN",
+      description: "Alternative learning program for underprivileged children.",
+      status: "ACTIVE",
+      yearStarted: 2013,
+      departmentId: departmentMap.get("DTE"),
+    },
+    {
+      name: "PROJECT WELLNESS",
+      abbreviation: "PROJECT WELLNESS",
+      description: "Health and wellness education program for schools.",
+      status: "ACTIVE",
+      yearStarted: 2023,
+      departmentId: departmentMap.get("DTE"),
+    },
+
+    // DTP Programs
+    {
+      name: "Baranggay at UM Magka-agapay sa Tamang Impormasyon para sa Kaunlaran",
+      abbreviation: "BUMATI KA",
+      description: "Technology literacy and information dissemination program.",
+      status: "ACTIVE",
+      yearStarted: 2012,
+      departmentId: departmentMap.get("DTP"),
+    },
+    {
+      name: "UM at Barangay ay Uunlad na May Bagong Teknolohiya",
+      abbreviation: "UMUNA",
+      description: "Community technology advancement and training program.",
+      status: "ACTIVE",
+      yearStarted: 2022,
+      departmentId: departmentMap.get("DTP"),
+    },
+  ];
+
+  // Create banner programs and store their IDs
+  const bannerProgramMap = new Map();
+  for (const program of bannerPrograms) {
+    const bannerProgram = await prisma.bannerProgram.create({
+      data: program,
+    });
+    bannerProgramMap.set(bannerProgram.abbreviation, bannerProgram.id);
+    console.log(
+      `Created banner program: ${bannerProgram.name} (${bannerProgram.abbreviation})`
+    );
+  }
+
+  const academicPrograms = [
+    // KASUSYO Programs
     {
       name: "Bachelor of Science in Accountancy",
       abbreviation: "BSA",
@@ -78,6 +197,7 @@ async function main() {
       totalStudents: 200,
       status: "ACTIVE",
       departmentId: departmentMap.get("DAE"),
+      bannerProgramId: bannerProgramMap.get("KASUSYO"),
     },
     {
       name: "Bachelor of Science in Management Accounting",
@@ -87,9 +207,10 @@ async function main() {
       totalStudents: 180,
       status: "ACTIVE",
       departmentId: departmentMap.get("DAE"),
+      bannerProgramId: bannerProgramMap.get("KASUSYO"),
     },
 
-    // DASE Programs
+    // KISLAP Programs
     {
       name: "Bachelor of Arts in Political Science",
       abbreviation: "AB POLSCI",
@@ -98,6 +219,7 @@ async function main() {
       totalStudents: 150,
       status: "ACTIVE",
       departmentId: departmentMap.get("DASE"),
+      bannerProgramId: bannerProgramMap.get("KISLAP"),
     },
     {
       name: "Bachelor of Arts in Communication",
@@ -107,6 +229,7 @@ async function main() {
       totalStudents: 160,
       status: "ACTIVE",
       departmentId: departmentMap.get("DASE"),
+      bannerProgramId: bannerProgramMap.get("KISLAP"),
     },
     {
       name: "Bachelor of Science in Social Work",
@@ -116,7 +239,10 @@ async function main() {
       totalStudents: 140,
       status: "ACTIVE",
       departmentId: departmentMap.get("DASE"),
+      bannerProgramId: bannerProgramMap.get("KISLAP"),
     },
+
+    // UM-HEART Programs
     {
       name: "Bachelor of Science in Psychology",
       abbreviation: "BSP",
@@ -125,18 +251,10 @@ async function main() {
       totalStudents: 170,
       status: "ACTIVE",
       departmentId: departmentMap.get("DASE"),
-    },
-    {
-      name: "Bachelor of Arts in English",
-      abbreviation: "ABENG",
-      description:
-        "Program focusing on English language, literature, and linguistics.",
-      totalStudents: 0,
-      status: "INACTIVE",
-      departmentId: departmentMap.get("DASE"),
+      bannerProgramId: bannerProgramMap.get("UM-HEART"),
     },
 
-    // DBA Programs
+    // UMASINSO Programs
     {
       name: "Bachelor of Science in Business Administration",
       abbreviation: "BSBA",
@@ -145,7 +263,10 @@ async function main() {
       totalStudents: 190,
       status: "ACTIVE",
       departmentId: departmentMap.get("DBA"),
+      bannerProgramId: bannerProgramMap.get("UMASINSO"),
     },
+
+    // TURISMO MISMO Programs
     {
       name: "Bachelor of Science in Tourism Management",
       abbreviation: "BSTM",
@@ -154,9 +275,10 @@ async function main() {
       totalStudents: 160,
       status: "ACTIVE",
       departmentId: departmentMap.get("DBA"),
+      bannerProgramId: bannerProgramMap.get("TURISMO MISMO"),
     },
 
-    // DCJE Programs
+    // BATUTA DEPENSA Programs
     {
       name: "Bachelor of Science in Criminology",
       abbreviation: "BSC",
@@ -165,9 +287,10 @@ async function main() {
       totalStudents: 200,
       status: "ACTIVE",
       departmentId: departmentMap.get("DCJE"),
+      bannerProgramId: bannerProgramMap.get("BATUTA DEPENSA"),
     },
 
-    // DTE Programs
+    // ANAK NG UM Programs
     {
       name: "Bachelor of Science in Secondary Education",
       abbreviation: "BSED",
@@ -176,7 +299,10 @@ async function main() {
       totalStudents: 180,
       status: "ACTIVE",
       departmentId: departmentMap.get("DTE"),
+      bannerProgramId: bannerProgramMap.get("ANAK NG UM"),
     },
+
+    // MUNTING PAARALAN Programs
     {
       name: "Bachelor in Elementary Education",
       abbreviation: "BEED",
@@ -185,7 +311,10 @@ async function main() {
       totalStudents: 170,
       status: "ACTIVE",
       departmentId: departmentMap.get("DTE"),
+      bannerProgramId: bannerProgramMap.get("MUNTING PAARALAN"),
     },
+
+    // PROJECT WELLNESS Programs
     {
       name: "Bachelor of Physical Education",
       abbreviation: "BPED",
@@ -194,27 +323,10 @@ async function main() {
       totalStudents: 150,
       status: "ACTIVE",
       departmentId: departmentMap.get("DTE"),
-    },
-    {
-      name: "Bachelor of Technical Vocational Teacher Education",
-      abbreviation: "BTVTED",
-      description:
-        "Program preparing educators for technical and vocational education.",
-      totalStudents: 140,
-      status: "ACTIVE",
-      departmentId: departmentMap.get("DTE"),
-    },
-    {
-      name: "Bachelor of Science in Nursing Education",
-      abbreviation: "BSNED",
-      description:
-        "Program combining nursing and education principles for healthcare education.",
-      totalStudents: 0,
-      status: "INACTIVE",
-      departmentId: departmentMap.get("DTE"),
+      bannerProgramId: bannerProgramMap.get("PROJECT WELLNESS"),
     },
 
-    // DTP Programs
+    // BUMATI KA Programs
     {
       name: "Bachelor of Science in Information Technology",
       abbreviation: "BSIT",
@@ -223,7 +335,10 @@ async function main() {
       totalStudents: 200,
       status: "ACTIVE",
       departmentId: departmentMap.get("DTP"),
+      bannerProgramId: bannerProgramMap.get("BUMATI KA"),
     },
+
+    // UMUNA Programs
     {
       name: "Bachelor of Science in Computer Engineering",
       abbreviation: "BSCPE",
@@ -232,6 +347,7 @@ async function main() {
       totalStudents: 180,
       status: "ACTIVE",
       departmentId: departmentMap.get("DTP"),
+      bannerProgramId: bannerProgramMap.get("UMUNA"),
     },
   ];
 

@@ -111,7 +111,7 @@ export default function HomePage() {
     {
       title: "Calendar",
       description: "Extension activities schedule",
-      href: "/calendar",
+      href: "/admin/events-and-activities",
       icon: Calendar,
     },
     // {
@@ -434,7 +434,7 @@ export default function HomePage() {
                   key={link.title}
                   variant="outline"
                   className="flex flex-col items-start p-6 space-y-3 h-auto transition-colors hover:bg-primary/5 hover:border-primary"
-                  onClick={() => console.log(`Navigate to ${link.href}`)}
+                  onClick={() => navigate(link.href)}
                 >
                   <div className="p-2 rounded-lg bg-primary/10">
                     <link.icon className="w-5 h-5 text-primary" />

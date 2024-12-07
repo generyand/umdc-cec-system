@@ -175,7 +175,7 @@ export default function EventsPage() {
   initialDate.setDate(1); // Set to first day of current month
 
   const [events, setEvents] = useState<Event[]>(allEvents);
-  const [view, setView] = useState<Views>("month");
+  const [view, setView] = useState<typeof Views.MONTH>("month");
   const [date, setDate] = useState(initialDate);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
@@ -295,7 +295,7 @@ export default function EventsPage() {
             endAccessor="end"
             style={calendarStyles}
             view={view}
-            onView={setView}
+            onView={(newView) => setView(newView as typeof Views.MONTH)}
             date={date}
             onNavigate={(newDate) => setDate(newDate)}
             onSelectEvent={handleSelectEvent}

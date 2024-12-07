@@ -9,20 +9,20 @@ datasource db {
 }
 
 model User {
-  id                 String     @id @default(cuid())
-  email              String     @unique
+  id                 String            @id @default(cuid())
+  email              String            @unique
   firstName          String
   lastName           String
-  role               String     @default("FOCAL_PERSON")
+  role               String            @default("FOCAL_PERSON")
   contactNumber      String?
-  status             String     @default("ACTIVE")
+  status             String            @default("ACTIVE")
   hashedPassword     String
   resetPasswordToken String?
   resetTokenExpiry   DateTime?
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
   departmentId       Int?
-  department         Department? @relation(fields: [departmentId], references: [id])
+  department         Department?       @relation(fields: [departmentId], references: [id])
   projectProposals   ProjectProposal[]
 
   @@index([email])
@@ -48,18 +48,18 @@ model Department {
 }
 
 model AcademicProgram {
-  id            Int            @id @default(autoincrement())
-  name          String         @unique
-  abbreviation  String         @unique
-  description   String?
-  totalStudents Int            @default(0)
-  status        String         @default("ACTIVE")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  departmentId  Int
-  department    Department     @relation(fields: [departmentId], references: [id])
-  bannerProgramId Int?         // Optional foreign key to BannerProgram
-  bannerProgram BannerProgram? @relation(fields: [bannerProgramId], references: [id])
+  id               Int               @id @default(autoincrement())
+  name             String            @unique
+  abbreviation     String            @unique
+  description      String?
+  totalStudents    Int               @default(0)
+  status           String            @default("ACTIVE")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  departmentId     Int
+  department       Department        @relation(fields: [departmentId], references: [id])
+  bannerProgramId  Int? // Optional foreign key to BannerProgram
+  bannerProgram    BannerProgram?    @relation(fields: [bannerProgramId], references: [id])
   projectProposals ProjectProposal[]
 
   @@index([departmentId])
@@ -68,34 +68,35 @@ model AcademicProgram {
 }
 
 model ProjectProposal {
-  id                 Int            @id @default(autoincrement())
-  title             String
-  description       String
-  bannerProgramId  Int?
-  bannerProgram    BannerProgram?  @relation(fields: [bannerProgramId], references: [id])
+  id                  Int            @id @default(autoincrement())
+  title               String
+  description         String
+  bannerProgramId     Int?
+  bannerProgram       BannerProgram? @relation(fields: [bannerProgramId], references: [id])
   targetBeneficiaries String
-  targetArea        String
-  targetDate        DateTime
-  venue             String
-  budget            Decimal        @db.Decimal(10, 2)
-  status            String         @default("PENDING")
-  
+  targetArea          String
+  targetDate          DateTime
+  venue               String
+  budget              Decimal        @db.Decimal(10, 2)
+  status              String         @default("PENDING")
+
   // File attachments
-  attachments       ProjectAttachment[]  // One-to-many relationship with attachments
-  
+  attachments ProjectAttachment[] // One-to-many relationship with attachments
+
   // Foreign Keys
-  departmentId      Int
-  department        Department     @relation(fields: [departmentId], references: [id])
-  programId         Int?
-  program          AcademicProgram? @relation(fields: [programId], references: [id])
-  
+  departmentId Int
+  department   Department       @relation(fields: [departmentId], references: [id])
+  programId    Int?
+  program      AcademicProgram? @relation(fields: [programId], references: [id])
+
   // Metadata
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  userId            String
-  user              User          @relation(fields: [userId], references: [id])
-  communityId       Int?
-  community         PartnerCommunity? @relation(fields: [communityId], references: [id])
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  userId      String
+  user        User              @relation(fields: [userId], references: [id])
+  communityId Int?
+  community   PartnerCommunity? @relation(fields: [communityId], references: [id])
+  activities  Activity[] // Add this relation field
 
   @@index([departmentId])
   @@index([programId])
@@ -103,47 +104,46 @@ model ProjectProposal {
   @@index([status])
   @@index([communityId])
   @@index([bannerProgramId])
-  
   @@map("project_proposals")
 }
 
 // New model for file attachments
 model ProjectAttachment {
-  id              Int            @id @default(autoincrement())
-  fileName        String         // Original file name
-  fileUrl         String         // URL or path where the file is stored
-  fileSize        Int           // Size in bytes
-  fileType        String         // MIME type (e.g., "application/pdf")
-  uploadedAt      DateTime       @default(now())
-  
+  id         Int      @id @default(autoincrement())
+  fileName   String // Original file name
+  fileUrl    String // URL or path where the file is stored
+  fileSize   Int // Size in bytes
+  fileType   String // MIME type (e.g., "application/pdf")
+  uploadedAt DateTime @default(now())
+
   // Relationship with ProjectProposal
-  proposalId      Int
-  proposal        ProjectProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposalId Int
+  proposal   ProjectProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
 
   @@index([proposalId])
   @@map("project_attachments")
 }
 
 model PartnerCommunity {
-  id              Int       @id @default(autoincrement())
-  name            String    
-  communityType   String    // Barangay, NGO, School, etc.
-  address         String    
-  adoptionStart   DateTime
-  adoptionEnd     DateTime? // Optional end date (for ongoing partnerships)
-  status          String    @default("ACTIVE")  // ACTIVE, INACTIVE, COMPLETED
+  id            Int       @id @default(autoincrement())
+  name          String
+  communityType String // Barangay, NGO, School, etc.
+  address       String
+  adoptionStart DateTime
+  adoptionEnd   DateTime? // Optional end date (for ongoing partnerships)
+  status        String    @default("ACTIVE") // ACTIVE, INACTIVE, COMPLETED
 
   // Contact Information
-  contactPerson   String
-  contactEmail    String?   // Optional email
-  contactNumber   String
-  
+  contactPerson String
+  contactEmail  String? // Optional email
+  contactNumber String
+
   // Additional Details
-  description     String?   // Brief description or notes about the partnership
-  
+  description String? // Brief description or notes about the partnership
+
   // Metadata
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relationships
   projectProposals ProjectProposal[]
@@ -154,26 +154,76 @@ model PartnerCommunity {
 }
 
 model BannerProgram {
-  id               Int               @id @default(autoincrement())
-  name             String            @unique
-  abbreviation     String            @unique
-  description      String?
-  yearStarted      Int
-  status           String            @default("ACTIVE")
-  
+  id           Int     @id @default(autoincrement())
+  name         String  @unique
+  abbreviation String  @unique
+  description  String?
+  yearStarted  Int
+  status       String  @default("ACTIVE")
+
   // Foreign Keys
-  departmentId     Int
-  department       Department        @relation(fields: [departmentId], references: [id])
-  
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id])
+
   // Relationships
   academicPrograms AcademicProgram[] // New relation field
   projectProposals ProjectProposal[]
-  
+
   // Metadata
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([departmentId])
   @@index([status])
   @@map("banner_programs")
+}
+
+model Activity {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  venue       String
+  budget      Decimal  @db.Decimal(10, 2)
+  status      String   @default("ONGOING") // ONGOING, COMPLETED, CANCELLED
+
+  // Proposal Document (required)
+  proposalFile   ActivityDocument @relation("ProposalFile", fields: [proposalFileId], references: [id])
+  proposalFileId Int              @unique // One-to-one relationship
+
+  // Other documentation (optional, multiple)
+  documents ActivityDocument[] @relation("ActivityDocuments")
+
+  // Relationship with ProjectProposal
+  proposalId Int
+  proposal   ProjectProposal @relation(fields: [proposalId], references: [id])
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([proposalId])
+  @@index([status])
+  @@map("activities")
+}
+
+model ActivityDocument {
+  id          Int      @id @default(autoincrement())
+  fileName    String
+  fileUrl     String
+  fileSize    Int
+  fileType    String // MIME type
+  category    String // PROPOSAL_FILE, DOCUMENTATION, FEEDBACK, IMAGE, etc.
+  description String? // Optional description of the document
+  uploadedAt  DateTime @default(now())
+
+  // Relationships
+  activityId  Int? // Make it optional since not all documents are regular attachments
+  activity    Activity? @relation("ActivityDocuments", fields: [activityId], references: [id])
+  proposalFor Activity? @relation("ProposalFile") // For proposal files
+
+  @@index([category])
+  @@index([activityId])
+  @@map("activity_documents")
 }

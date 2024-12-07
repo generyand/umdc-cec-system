@@ -9,7 +9,7 @@ import {
   Building2,
   GraduationCap,
   Flag,
-  DollarSign,
+  HandCoins,
   FileText,
   Paperclip,
   Building,
@@ -341,7 +341,7 @@ export default function ProposalDetailsPage() {
                 )}
 
                 <div className="flex gap-2 items-start">
-                  <DollarSign className="w-5 h-5 text-gray-500 mt-0.5" />
+                  <HandCoins className="w-5 h-5 text-gray-500 mt-0.5" />
                   <div>
                     <h4 className="text-sm font-medium text-gray-500">
                       Budget

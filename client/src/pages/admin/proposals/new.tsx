@@ -101,15 +101,15 @@ type ProposalFormValues = z.infer<typeof proposalFormSchema>;
 const partnerCommunities = [
   {
     value: "1",
-    label: "Barangay Dawis",
+    label: "Barangay San Miguel",
   },
   {
     value: "2",
-    label: "Barangay Ruparan",
+    label: "Barangay Dawis",
   },
   {
     value: "3",
-    label: "Barangay San Miguel",
+    label: "Barangay Ruparan",
   },
 ];
 
@@ -400,6 +400,9 @@ export default function NewProposalPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="required">Banner Program</FormLabel>
+                      <FormDescription>
+                        Select the banner program for this proposal.
+                      </FormDescription>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}

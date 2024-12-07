@@ -14,6 +14,7 @@ export const register: Handler = async (req, res, next) => {
       firstName,
       lastName,
       departmentId,
+      role,
       contactNumber,
     } = req.body;
 
@@ -40,6 +41,7 @@ export const register: Handler = async (req, res, next) => {
       firstName,
       lastName,
       departmentId,
+      role,
       contactNumber,
     });
 

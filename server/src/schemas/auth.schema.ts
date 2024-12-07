@@ -21,7 +21,8 @@ export const registerSchema = z.object({
     departmentId: z
       .number()
       .int("Department ID must be an integer")
-      .positive("Invalid department ID"),
+      .positive("Invalid department ID")
+      .optional(),
     contactNumber: z.string().optional(),
   }),
 });

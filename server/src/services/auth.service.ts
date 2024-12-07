@@ -21,6 +21,7 @@ interface RegisterParams {
   firstName: string;
   lastName: string;
   departmentId: number;
+  role: string;
   contactNumber?: string;
 }
 
@@ -35,6 +36,7 @@ export const authService = {
     firstName,
     lastName,
     departmentId,
+    role,
     contactNumber,
   }: RegisterParams) {
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -46,6 +48,7 @@ export const authService = {
         lastName,
         departmentId,
         contactNumber,
+        role,
         hashedPassword,
       },
       select: {
@@ -55,6 +58,7 @@ export const authService = {
         lastName: true,
         departmentId: true,
         contactNumber: true,
+        role: true,
         createdAt: true,
       },
     });

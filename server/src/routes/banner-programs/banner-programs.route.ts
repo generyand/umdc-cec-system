@@ -5,8 +5,8 @@ import {
   getBannerProgramById,
   getBannerPrograms,
   updateBannerProgram,
-} from "@/controllers/banner-programs.controller.js";
-import { authenticateToken } from "@/middleware/auth.middleware.js";
+} from "../../controllers/banner-programs.controller.js";
+import { authenticateToken } from "../../middleware/auth.middleware.js";
 
 const router = Router();
 

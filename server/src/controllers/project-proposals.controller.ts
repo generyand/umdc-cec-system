@@ -220,6 +220,7 @@ export const createProposal: RequestHandler = async (req, res) => {
             console.log("Attempting to upload file:", fileName);
 
             // Upload to Supabase with error logging
+            // @ts-ignore for now
             const { data, error } = await supabase.storage
               .from("project-proposal-attachments")
               .upload(filePath, file.buffer, {

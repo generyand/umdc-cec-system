@@ -6,29 +6,42 @@ export async function getBannerPrograms(
   res: Response
 ): Promise<void> {
   try {
-    const bannerPrograms = await prisma.bannerProgram.findMany({
-      select: {
-        name: true,
-        abbreviation: true,
-        description: true,
-        status: true,
-        department: {
-          select: {
-            name: true,
+    const [bannerPrograms, departments] = await Promise.all([
+      prisma.bannerProgram.findMany({
+        select: {
+          id: true,
+          name: true,
+          abbreviation: true,
+          description: true,
+          status: true,
+          department: {
+            select: {
+              name: true,
+            },
+          },
+          activities: {
+            select: {
+              status: true,
+            },
           },
         },
-        activities: {
-          select: {
-            status: true,
-          },
+        orderBy: {
+          id: "asc",
         },
-      },
-      orderBy: {
-        id: "asc",
-      },
-    });
+      }),
+      prisma.department.findMany({
+        select: {
+          id: true,
+          name: true,
+        },
+        orderBy: {
+          name: "asc",
+        },
+      }),
+    ]);
 
     const transformedBannerPrograms = bannerPrograms.map((program) => ({
+      id: program.id,
       name: program.name,
       abbreviation: program.abbreviation,
       description: program.description,
@@ -46,7 +59,10 @@ export async function getBannerPrograms(
     res.status(200).json({
       success: true,
       message: "Banner programs retrieved successfully",
-      data: transformedBannerPrograms,
+      data: {
+        bannerPrograms: transformedBannerPrograms,
+        departments: departments,
+      },
     });
   } catch (error) {
     res.status(500).json({

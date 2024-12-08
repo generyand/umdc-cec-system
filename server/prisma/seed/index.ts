@@ -103,7 +103,7 @@ async function main() {
 
     // DBA Programs
     {
-      name: "UM at Akoo SIgurado sa Negosyo Aasenso",
+      name: "UM at Ako SIgurado sa Negosyo Aasenso",
       abbreviation: "UMASINSO",
       description:
         "Entrepreneurship development program supporting local business initiatives.",

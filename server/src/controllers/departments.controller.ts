@@ -100,11 +100,11 @@ export const getDepartmentById: RequestHandler = async (
               description: true,
               status: true,
               yearStarted: true,
-              _count: {
-                select: {
-                  projectProposals: true,
-                },
-              },
+              // _count: {
+              //   select: {
+              //     projectProposals: true,
+              //   },
+              // },
             },
             orderBy: {
               name: "asc",
@@ -113,7 +113,7 @@ export const getDepartmentById: RequestHandler = async (
         },
       }),
 
-      // Simplified activity query with renamed fields
+      // Simplified activity query with direct program selection
       prisma.activity.findMany({
         where: {
           departmentId: departmentId,
@@ -127,17 +127,12 @@ export const getDepartmentById: RequestHandler = async (
           partnerCommunity: {
             select: {
               name: true,
-              // location: true,
             },
           },
-          proposal: {
+          bannerProgram: {
             select: {
-              program: {
-                select: {
-                  name: true,
-                  abbreviation: true,
-                },
-              },
+              name: true,
+              abbreviation: true,
             },
           },
         },
@@ -176,13 +171,9 @@ export const getDepartmentById: RequestHandler = async (
         name: program.name,
         description: program.description,
         status: program.status,
-        totalProposals: program._count.projectProposals,
+        yearStarted: program.yearStarted,
       })),
-      activities: departmentActivities.map((activity) => ({
-        ...activity,
-        program: activity.proposal.program,
-        proposal: undefined,
-      })),
+      activities: departmentActivities,
     };
 
     console.log(`✅ Successfully fetched department: ${department.name}`);

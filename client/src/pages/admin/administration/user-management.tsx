@@ -88,13 +88,17 @@ const userFormSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   role: z.enum(["SUPER_ADMIN", "ADMIN", "STAFF"] as [UserRole, ...UserRole[]]),
-  position: z.enum([
-    "CEC_HEAD",
-    "DEAN",
-    "VP_DIRECTOR",
-    "PROGRAM_HEAD",
-    "FOCAL_PERSON",
-  ] as [UserPosition, ...UserPosition[]]),
+  position: z
+    .enum([
+      "CEC_HEAD",
+      "CEC_OFFICE_ASSISTANT",
+      "CEC_COORDINATOR",
+      "VP_DIRECTOR",
+      "DEAN",
+      "PROGRAM_HEAD",
+      "FOCAL_PERSON",
+    ] as [UserPosition, ...UserPosition[]])
+    .nullable(),
   departmentId: z.number(),
   contactNumber: z.string().optional(),
 });
@@ -117,7 +121,7 @@ export default function UserManagementPage() {
       email: "",
       password: "UMDC@cec@2024",
       role: UserRole.STAFF,
-      position: UserPosition.FOCAL_PERSON,
+      position: null,
       departmentId: 0,
       contactNumber: "",
     },
@@ -241,6 +245,7 @@ export default function UserManagementPage() {
       await addUser({
         ...restData,
         departmentId: departmentId ?? 0,
+        position: restData.position ?? undefined,
       });
 
       setIsDialogOpen(false);
@@ -255,6 +260,19 @@ export default function UserManagementPage() {
       );
       console.error("Error creating user:", error);
     }
+  };
+
+  const formatPosition = (position: UserPosition): string => {
+    const formats: Record<UserPosition, string> = {
+      CEC_HEAD: "CEC Head",
+      CEC_OFFICE_ASSISTANT: "CEC Office Assistant",
+      CEC_COORDINATOR: "CEC Coordinator",
+      VP_DIRECTOR: "VP Director",
+      DEAN: "Dean",
+      PROGRAM_HEAD: "Program Head",
+      FOCAL_PERSON: "Focal Person",
+    };
+    return formats[position] || position;
   };
 
   return (
@@ -464,8 +482,10 @@ export default function UserManagementPage() {
                     <FormItem>
                       <FormLabel>Position</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        onValueChange={(value) =>
+                          field.onChange(value === "NONE" ? null : value)
+                        }
+                        value={field.value ?? "NONE"}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -473,18 +493,21 @@ export default function UserManagementPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="NONE">None</SelectItem>
                           <SelectItem value="CEC_HEAD">CEC Head</SelectItem>
+                          <SelectItem value="CEC_OFFICE_ASSISTANT">
+                            CEC Office Assistant
+                          </SelectItem>
+                          <SelectItem value="CEC_COORDINATOR">
+                            CEC Coordinator
+                          </SelectItem>
+                          <SelectItem value="VP_DIRECTOR">
+                            VP Director
+                          </SelectItem>
                           <SelectItem value="DEAN">Dean</SelectItem>
-                          <SelectItem value="VP_BRANCH_OPERATOR">
-                            VP Branch Operator
-                          </SelectItem>
-                          <SelectItem value="DEPARTMENT_HEAD">
-                            Department Head
-                          </SelectItem>
                           <SelectItem value="PROGRAM_HEAD">
                             Program Head
                           </SelectItem>
-                          <SelectItem value="FACULTY">Faculty</SelectItem>
                           <SelectItem value="FOCAL_PERSON">
                             Focal Person
                           </SelectItem>
@@ -664,7 +687,9 @@ export default function UserManagementPage() {
                 </TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.department?.name ?? "—"}</TableCell>
-                <TableCell>{user.position ?? "—"}</TableCell>
+                <TableCell>
+                  {user.position ? formatPosition(user.position) : "—"}
+                </TableCell>
                 <TableCell>{user.role}</TableCell>
                 <TableCell>{user.contactNumber ?? "—"}</TableCell>
                 <TableCell>

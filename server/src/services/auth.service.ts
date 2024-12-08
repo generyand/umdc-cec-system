@@ -62,6 +62,7 @@ export const authService = {
         departmentId: true,
         contactNumber: true,
         role: true,
+        position: true,
         createdAt: true,
       },
     });
@@ -107,6 +108,7 @@ export const authService = {
         department: user.department,
         contactNumber: user.contactNumber,
         role: user.role,
+        position: user.position,
       },
       accessToken,
     };

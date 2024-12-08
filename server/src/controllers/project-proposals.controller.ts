@@ -21,14 +21,14 @@ const supabase = createClient(
 );
 
 // Add multer types
-interface RequestWithFiles extends Request {
-  files?: Express.Multer.File[];
-}
+// interface RequestWithFiles extends Request {
+//   files?: Express.Multer.File[];
+// }
 
-// Add this interface to extend the Request type
-interface MulterRequest extends Request {
-  files: Express.Multer.File[];
-}
+// // Add this interface to extend the Request type
+// interface MulterRequest extends Request {
+//   files: Express.Multer.File[];
+// }
 
 // Get all project proposals
 export const getAllProposals: RequestHandler = async (req, res) => {
@@ -200,15 +200,15 @@ export const createProposal: RequestHandler = async (req, res) => {
 
         if (!bucketExists) {
           console.log("Creating storage bucket...");
-          const { data, error } = await supabase.storage.createBucket(
-            bucketName,
-            {
+          const { data: bucketData, error } =
+            await supabase.storage.createBucket(bucketName, {
               public: false, // or true based on your needs
               fileSizeLimit: 5242880, // 5MB in bytes
-            }
-          );
+            });
 
           if (error) throw error;
+
+          console.log("✅ Storage bucket created successfully:", bucketData);
         }
 
         // Upload files

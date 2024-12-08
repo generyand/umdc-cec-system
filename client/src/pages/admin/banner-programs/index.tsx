@@ -13,137 +13,159 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { bannerProgramsService } from "@/services/api/banner-programs.service";
+import { bannerProgramsApi } from "@/services/api/banner-programs.service";
+
+interface BannerProgram {
+  name: string;
+  abbreviation: string;
+  description: string;
+  status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+  department: {
+    name: string;
+  };
+  activeProjects: number;
+  completedProjects: number;
+}
 
 const BannerProgramsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState("all");
-  const [yearFilter, setYearFilter] = useState("all");
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["bannerPrograms"],
-    queryFn: bannerProgramsService.getBannerPrograms,
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["banner-programs"],
+    queryFn: bannerProgramsApi.getBannerPrograms,
   });
 
-  console.log(data);
+  const programs = response?.data ?? [];
 
-  const programs = data?.data ?? [];
+  const filteredPrograms = programs.filter((program: BannerProgram) => {
+    const matchesSearch =
+      program.abbreviation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      program.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || program.status === statusFilter;
+    const matchesDepartment =
+      departmentFilter === "all" ||
+      program.department.name === departmentFilter;
 
-  const getStatusColor = (status: string) => {
+    return matchesSearch && matchesStatus && matchesDepartment;
+  });
+
+  const getStatusColor = (status: "ACTIVE" | "INACTIVE" | "SUSPENDED") => {
     switch (status) {
-      case "Active":
-        return "bg-green-100 text-green-800";
-      case "Inactive":
-        return "bg-red-100 text-red-800";
-      case "Suspended":
-        return "bg-yellow-100 text-yellow-800";
+      case "ACTIVE":
+        return "bg-emerald-100 text-emerald-800";
+      case "INACTIVE":
+        return "bg-slate-100 text-slate-800";
+      case "SUSPENDED":
+        return "bg-amber-100 text-amber-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
 
-  const filteredPrograms = programs.filter((program) => {
-    const matchesSearch =
-      program.fullTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      program.shortTitle.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || program.status === statusFilter;
-    const matchesDepartment =
-      departmentFilter === "all" || program.department === departmentFilter;
-    const matchesYear =
-      yearFilter === "all" || program.year.toString() === yearFilter;
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-    return matchesSearch && matchesStatus && matchesDepartment && matchesYear;
-  });
+  if (isError) {
+    return <div>Error loading banner programs</div>;
+  }
 
   return (
-    <div className="container space-y-8">
-      {/* Header Section - Enhanced with action button */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="container py-8 space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Banner Programs</h1>
-          <p className="mt-1 text-muted-foreground">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Banner Programs
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
             Manage and monitor University of Mindanao's flagship extension
             programs
           </p>
         </div>
-        <Button className="w-full sm:w-auto">
+        <Button size="sm" className="w-full md:w-auto">
           <PlusCircle className="mr-2 w-4 h-4" />
-          Add New Program
+          New Program
         </Button>
       </div>
 
-      {/* Filters Section - Enhanced with better layout and search icon */}
-      <div className="p-4 rounded-lg border bg-card">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:gap-6">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search programs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8"
-            />
+      {/* Search and Filters Card */}
+      <Card>
+        <CardContent className="p-4 sm:p-6">
+          <div className="space-y-4">
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 w-4 h-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search by name or abbreviation..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+
+            {/* Filters */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="INACTIVE">Inactive</SelectItem>
+                  <SelectItem value="SUSPENDED">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={departmentFilter}
+                onValueChange={setDepartmentFilter}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Department" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Departments</SelectItem>
+                  <SelectItem value="Community Extension">
+                    Community Extension
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Inactive">Inactive</SelectItem>
-              <SelectItem value="Suspended">Suspended</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by department" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              <SelectItem value="Community Extension">
-                Community Extension
-              </SelectItem>
-              {/* Add more departments */}
-            </SelectContent>
-          </Select>
-
-          <Select value={yearFilter} onValueChange={setYearFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by year" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Years</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2023">2023</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Programs Grid - Enhanced with better spacing and hover effects */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {filteredPrograms.length === 0 ? (
-          <div className="col-span-full py-12 text-center">
+      {/* Programs Grid */}
+      {filteredPrograms.length === 0 ? (
+        <Card>
+          <CardContent className="p-6 text-center">
             <p className="text-muted-foreground">
               No programs found matching your criteria
             </p>
-          </div>
-        ) : (
-          filteredPrograms.map((program) => (
-            <Card key={program.id} className="transition-all hover:shadow-md">
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filteredPrograms.map((program: BannerProgram) => (
+            <Card key={program.name} className="transition-all hover:shadow-md">
               <CardContent className="p-6">
+                {/* Program Header */}
                 <div className="flex gap-4 justify-between items-start">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold truncate">
-                      {program.shortTitle}
+                  <div className="flex-1 space-y-1">
+                    <h3 className="font-semibold tracking-tight leading-none">
+                      {program.name}
                     </h3>
-                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                      {program.fullTitle}
+                    <p className="text-sm text-muted-foreground">
+                      {program.abbreviation}
                     </p>
                   </div>
                   <Badge
@@ -154,38 +176,38 @@ const BannerProgramsPage = () => {
                   </Badge>
                 </div>
 
-                <div className="mt-4 space-y-3">
-                  <div className="flex items-center text-sm">
-                    <span className="font-medium min-w-24">Department:</span>
-                    <span>{program.department}</span>
-                  </div>
-                  <p className="text-sm">{program.description}</p>
+                {/* Department */}
+                <div className="mt-4">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {program.department.name}
+                  </p>
                 </div>
 
-                <div className="flex flex-col gap-4 justify-between mt-4 sm:flex-row">
-                  <div className="text-sm">
-                    <span className="font-medium">Active Projects: </span>
-                    <Badge variant="secondary" className="ml-1">
+                {/* Description */}
+                <p className="mt-3 text-sm line-clamp-2">
+                  {program.description}
+                </p>
+
+                {/* Stats */}
+                <div className="flex gap-4 justify-between items-center mt-6">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">Active</span>
+                    <Badge variant="outline" className="mt-1">
                       {program.activeProjects}
                     </Badge>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {program.partnerCommunities.map((community) => (
-                      <Badge
-                        key={community}
-                        variant="outline"
-                        className="text-xs"
-                      >
-                        {community}
-                      </Badge>
-                    ))}
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">Completed</span>
+                    <Badge variant="outline" className="mt-1">
+                      {program.completedProjects}
+                    </Badge>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

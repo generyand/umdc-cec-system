@@ -50,10 +50,17 @@
   @apply text-sm p-2;
 }
 
+.fc .fc-daygrid-day-number {
+  @apply text-sm p-2;
+}
+
 /* Event styling */
 .fc-event {
-  @apply cursor-pointer border-none rounded-md shadow-sm;
+  @apply cursor-pointer border-none rounded-md shadow-sm text-white;
   background: var(--fc-event-bg-color);
+}
+
+.fc-list-event-graphic {
 }
 
 .fc-event:hover {
@@ -103,8 +110,41 @@
 /* Custom scrollbar for the calendar */
 
 /* List view styles */
-.fc-list-day-cushion {
-  @apply bg-muted/50 !important;
+.fc-list {
+  @apply border-none;
+}
+
+.fc .fc-list-empty {
+  @apply bg-background text-muted-foreground;
+}
+
+.fc .fc-list-event {
+  @apply border-none bg-blue-600;
+}
+
+.fc .fc-list-event:hover td {
+  @apply bg-muted/50;
+}
+
+.fc .fc-list-event-title {
+  @apply font-medium text-white;
+}
+
+.fc .fc-list-day-cushion {
+  @apply bg-muted/30 !important;
+}
+
+.fc .fc-list-event-time {
+  @apply text-white;
+}
+
+/* Dark mode adjustments for list view */
+[data-theme="dark"] .fc .fc-list-day-cushion {
+  @apply bg-muted/20 !important;
+}
+
+[data-theme="dark"] .fc .fc-list-event:hover td {
+  @apply bg-muted/30;
 }
 
 /* Responsive adjustments */

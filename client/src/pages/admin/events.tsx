@@ -4,6 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import multiMonthPlugin from "@fullcalendar/multimonth";
+import listPlugin from "@fullcalendar/list";
 
 import { cn } from "@/lib/utils";
 import "./calendar.css";
@@ -150,6 +151,7 @@ export default function EventsPage() {
   // Handle event click
   const handleEventClick = (info: any) => {
     setSelectedEvent(info.event);
+    console.log(info.event);
   };
 
   // Handle date selection
@@ -204,12 +206,14 @@ export default function EventsPage() {
               timeGridPlugin,
               interactionPlugin,
               multiMonthPlugin,
+              listPlugin,
             ]}
             initialView="dayGridMonth"
             headerToolbar={{
               left: "prev,next today",
               center: "title",
-              right: "multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay",
+              right:
+                "multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay,listMonth",
             }}
             events={events.map((event) => ({
               ...event,
@@ -281,6 +285,14 @@ export default function EventsPage() {
                 dayMaxEventRows: 2,
                 showNonCurrentDates: false,
                 dayHeaderFormat: { weekday: "short" },
+              },
+              listMonth: {
+                listDayFormat: {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                },
+                listDaySideFormat: { weekday: "long" },
               },
             }}
           />

@@ -29,6 +29,7 @@ import BannerProgramsPage from "./pages/admin/banner-programs";
 import ProposalsPage from "./pages/admin/proposals";
 import ProposalDetailsPage from "./pages/admin/proposals/proposal-details";
 // import MockDepartmentPage from "./pages/admin/academic-departments/mockDepartment";
+import UserManagementPage from "./pages/admin/administration/user-management";
 const App = () => {
   return (
     <>
@@ -98,10 +99,10 @@ const App = () => {
               path="/admin/community-engagement/proposals/:id"
               element={<ProposalDetailsPage />}
             />
-            {/* <Route
-              path="/admin/academic-departments/mock-department"
-              element={<MockDepartmentPage />}
-            /> */}
+            <Route
+              path="/admin/administration/user-management"
+              element={<UserManagementPage />}
+            />
           </Route>
 
           {/* Catch all route - redirect to login */}

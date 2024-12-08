@@ -72,3 +72,12 @@ export const updateUserProfile = async (
     res.status(500).json({ error: "Failed to update profile" });
   }
 };
+
+export const getUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const users = await prisma.user.findMany();
+  res.json(users);
+};

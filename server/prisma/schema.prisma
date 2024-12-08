@@ -8,12 +8,29 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum UserRole {
+  SUPER_ADMIN     // Full system access
+  ADMIN           // Department-wide access and approvals
+  STAFF           // Basic access for project creation/management
+}
+
+enum UserPosition {
+  CEC_HEAD
+  CEC_OFFICE_ASSISTANT
+  CEC_COORDINATOR
+  VP_DIRECTOR
+  DEAN
+  PROGRAM_HEAD
+  FOCAL_PERSON
+}
+
 model User {
   id                 String            @id @default(cuid())
   email              String            @unique
   firstName          String
   lastName           String
-  role               String            @default("FOCAL_PERSON")
+  role               UserRole          @default(STAFF)
+  position           UserPosition?     // Add this field, making it optional since not all users might have positions
   contactNumber      String?
   status             String            @default("ACTIVE")
   hashedPassword     String

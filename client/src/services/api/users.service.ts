@@ -26,6 +26,12 @@ interface User {
   position?: UserPosition;
 }
 
+export const getUsers = async () => {
+  const response = await api.get("/api/users");
+  console.log(response.data);
+  return response.data;
+};
+
 export const addUser = async (data: User) => {
   const response = await api.post("/api/users", data);
   return response.data;

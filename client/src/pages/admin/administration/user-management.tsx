@@ -52,21 +52,24 @@ import { DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-  position: string;
-  status: "Active" | "Inactive";
-  lastLogin: string;
-}
+import { addUser, getUsers } from "@/services/api/users.service";
+import { useQuery } from "@tanstack/react-query";
 
 interface Department {
   id: number;
   name: string;
+}
+
+interface User {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: "SUPER_ADMIN" | "ADMIN" | "STAFF" | "FOCAL_PERSON";
+  position: string | null;
+  department: Department | null;
+  contactNumber: string | null;
+  status: "ACTIVE" | "INACTIVE";
 }
 
 const userFormSchema = z.object({
@@ -88,32 +91,17 @@ const userFormSchema = z.object({
   contactNumber: z.string().optional(),
 });
 
-type UserFormValues = z.infer<typeof userFormSchema>;
-
 export default function UserManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [users] = useState<User[]>([
-    {
-      id: "1",
-      name: "John Doe",
-      email: "john@example.com",
-      role: "Admin",
-      status: "Active",
-      position: "Professor",
-      password: "",
-      lastLogin: "2024-03-20 10:30 AM",
-    },
-    // Add more mock data as needed
-  ]);
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  type UserFormValues = z.infer<typeof userFormSchema>;
 
   const [departments] = useState<Department[]>([
     { id: 1, name: "Computer Engineering" },
     { id: 2, name: "Civil Engineering" },
     { id: 3, name: "Electrical Engineering" },
-    // Add more departments as needed
   ]);
 
   const form = useForm<UserFormValues>({
@@ -130,9 +118,35 @@ export default function UserManagementPage() {
     },
   });
 
+  const {
+    data: users = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center p-6">
+        <div className="w-8 h-8 rounded-full border-b-2 border-gray-900 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-red-500">
+        Error loading users: {error.message}
+      </div>
+    );
+  }
+
   const onSubmit = async (data: UserFormValues) => {
     try {
       // Add your API call here to create user
+      await addUser(data);
       console.log(data);
       setIsDialogOpen(false);
       form.reset();
@@ -393,24 +407,29 @@ export default function UserManagementPage() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Department</TableHead>
               <TableHead>Position</TableHead>
               <TableHead>Role</TableHead>
+              <TableHead>Contact</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Last Login</TableHead>
               <TableHead className="w-[60px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {users.map((user: User) => (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
+                <TableCell className="font-medium">
+                  {`${user.firstName} ${user.lastName}`}
+                </TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.position}</TableCell>
+                <TableCell>{user.department?.name ?? "—"}</TableCell>
+                <TableCell>{user.position ?? "—"}</TableCell>
                 <TableCell>{user.role}</TableCell>
+                <TableCell>{user.contactNumber ?? "—"}</TableCell>
                 <TableCell>
                   <span
                     className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                      user.status === "Active"
+                      user.status === "ACTIVE"
                         ? "bg-green-100 text-green-700"
                         : "bg-gray-100 text-gray-700"
                     }`}
@@ -418,7 +437,6 @@ export default function UserManagementPage() {
                     {user.status}
                   </span>
                 </TableCell>
-                <TableCell>{user.lastLogin}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

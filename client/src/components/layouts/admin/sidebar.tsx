@@ -22,8 +22,8 @@ import {
   CheckSquare,
   History,
   Bell,
-  FileBox,
-  Wrench,
+  // FileBox,
+  // Wrench,
   Calendar,
 } from "lucide-react";
 
@@ -129,11 +129,11 @@ const navigationItems: NavItem[] = [
         href: "/admin/administration/department-settings",
         icon: Building,
       },
-      {
-        title: "System Settings",
-        href: "/admin/administration/system-settings",
-        icon: Settings,
-      },
+      // {
+      //   title: "System Settings",
+      //   href: "/admin/administration/system-settings",
+      //   icon: Settings,
+      // },
       {
         title: "Approvals",
         href: "/admin/administration/approvals",
@@ -149,16 +149,16 @@ const navigationItems: NavItem[] = [
         href: "/admin/administration/announcements",
         icon: Bell,
       },
-      {
-        title: "Documents",
-        href: "/admin/administration/documents",
-        icon: FileBox,
-      },
-      {
-        title: "Maintenance",
-        href: "/admin/administration/maintenance",
-        icon: Wrench,
-      },
+      // {
+      //   title: "Documents",
+      //   href: "/admin/administration/documents",
+      //   icon: FileBox,
+      // },
+      // {
+      //   title: "Maintenance",
+      //   href: "/admin/administration/maintenance",
+      //   icon: Wrench,
+      // },
     ],
   },
 ];

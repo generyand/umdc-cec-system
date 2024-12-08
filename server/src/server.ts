@@ -12,7 +12,7 @@ import usersRoutes from "./routes/users/users.route.js";
 import departmentsRoutes from "./routes/departments/departments.route.js";
 import academicProgramsRoutes from "./routes/academic-programs/academic-programs.route.js";
 import projectProposalsRoutes from "./routes/project-proposals/project-proposals.route.js";
-// import { Server } from "http";
+import bannerProgramsRoutes from "./routes/banner-programs/banner-programs.route.js";
 
 async function createServer() {
   // Initialize configuration
@@ -41,6 +41,7 @@ async function createServer() {
   app.use("/api/users", usersRoutes);
   app.use("/api/departments", departmentsRoutes);
   app.use("/api/academic-programs", academicProgramsRoutes);
+  app.use("/api/banner-programs", bannerProgramsRoutes);
   app.use("/api/project-proposals", projectProposalsRoutes);
 
   // Error handling middleware (should be last)

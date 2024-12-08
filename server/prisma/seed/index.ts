@@ -237,10 +237,20 @@ async function main() {
       abbreviation: "BSSW",
       description:
         "Program preparing students for professional social work practice and community development.",
-      totalStudents: 140,
+      totalStudents: 80,
       status: "ACTIVE",
       departmentId: departmentMap.get("DASE"),
       bannerProgramId: bannerProgramMap.get("KISLAP"),
+    },
+    {
+      name: "Bachelor of Science in English",
+      abbreviation: "ABENG",
+      description:
+        "Program focusing on English language, literature, and communication studies.",
+      totalStudents: 0,
+      status: "INACTIVE",
+      departmentId: departmentMap.get("DASE"),
+      bannerProgramId: null,
     },
 
     // UM-HEART Programs
@@ -325,6 +335,26 @@ async function main() {
       status: "ACTIVE",
       departmentId: departmentMap.get("DTE"),
       bannerProgramId: bannerProgramMap.get("PROJECT WELLNESS"),
+    },
+    {
+      name: "Bachelor of Science in Special Needs Education",
+      abbreviation: "BSNED",
+      description:
+        "Program preparing teachers for special needs education with focus on inclusive teaching methods.",
+      totalStudents: 0,
+      status: "INACTIVE",
+      departmentId: departmentMap.get("DTE"),
+      bannerProgramId: null,
+    },
+    {
+      name: "Bachelor of Technical-Vocational Teacher Education",
+      abbreviation: "BTVTED",
+      description:
+        "Program preparing teachers for technical-vocational education and training.",
+      totalStudents: 70,
+      status: "INACTIVE",
+      departmentId: departmentMap.get("DTE"),
+      bannerProgramId: null,
     },
 
     // BUMATI KA Programs

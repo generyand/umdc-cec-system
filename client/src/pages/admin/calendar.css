@@ -1,308 +1,138 @@
-.custom-calendar {
-  font-family: ui-sans-serif, system-ui, sans-serif;
+/* Base calendar styling */
+.fc {
+  --fc-border-color: hsl(var(--border));
+  --fc-button-bg-color: hsl(var(--primary));
+  --fc-button-border-color: hsl(var(--primary));
+  --fc-button-hover-bg-color: hsl(var(--primary));
+  --fc-button-hover-border-color: hsl(var(--primary));
+  --fc-button-active-bg-color: hsl(var(--primary));
+  --fc-button-active-border-color: hsl(var(--primary));
+  --fc-event-bg-color: hsl(var(--primary) / 0.8);
+  --fc-event-border-color: hsl(var(--primary));
+  --fc-today-bg-color: hsl(var(--primary) / 0.05);
 }
 
-/* Header styling */
-.custom-calendar .rbc-header {
-  padding: 1rem 0.75rem;
-  font-weight: 600;
-  color: rgb(31, 41, 55); /* gray-800 - darker for better contrast */
-  border-color: rgb(226, 232, 240);
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
+/* Header toolbar buttons */
+.fc .fc-button {
+  @apply shadow-none rounded-md border px-3 py-2 text-sm font-medium transition-colors;
+  background: var(--fc-button-bg-color);
 }
 
-/* Today's cell styling */
-.custom-calendar .rbc-today {
-  background-color: rgb(243, 244, 246);
-  position: relative;
+.fc .fc-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
 }
 
-/* Month view container */
-.custom-calendar .rbc-month-view {
-  border-color: rgb(226, 232, 240);
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+.fc .fc-button-primary:not(:disabled):hover {
+  @apply opacity-90;
 }
 
-/* Toolbar container */
-.rbc-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 0 1.5rem 0;
-  margin: 0;
-  gap: 1rem;
-  box-shadow: none !important;
+/* Today button */
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  @apply bg-primary/90 shadow-none;
 }
 
-/* Center label (month/year display) */
-.rbc-toolbar-label {
-  font-size: 1rem;
-  font-weight: 500;
-  color: hsl(var(--foreground));
-  flex: 1;
-  text-align: center;
+/* Table headers */
+.fc .fc-col-header-cell {
+  @apply bg-muted/50 py-2;
 }
 
-/* Button groups (navigation and view options) */
-.rbc-btn-group {
-  display: inline-flex;
-  gap: 0.25rem;
+.fc .fc-col-header-cell-cushion {
+  @apply text-sm font-medium py-2;
 }
 
-/* Individual buttons - Base styles */
-.rbc-btn-group button {
-  background: transparent;
-  border: 1px solid hsl(var(--border));
-  color: hsl(var(--foreground));
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 0.375rem;
-  transition: all 150ms ease;
-  box-shadow: none !important;
+/* Day grid cells */
+.fc .fc-daygrid-day {
+  @apply border-border;
 }
 
-/* Navigation buttons (Today, Prev, Next) */
-.rbc-toolbar .rbc-btn-group:first-child button {
-  background: transparent;
-}
-
-.rbc-toolbar .rbc-btn-group:first-child button:hover,
-.rbc-toolbar .rbc-btn-group:first-child button:active {
-  background-color: hsl(var(--accent));
-  color: hsl(var(--accent-foreground));
-}
-
-/* View selection buttons (Month, Week, Day, Agenda) */
-.rbc-toolbar .rbc-btn-group:last-child button.rbc-active,
-.rbc-toolbar .rbc-btn-group:last-child button.rbc-active:focus,
-.rbc-toolbar .rbc-btn-group:last-child button.rbc-active:hover {
-  background-color: hsl(var(--primary));
-  border-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-  .rbc-toolbar-label {
-    color: hsl(var(--foreground));
-  }
-
-  .rbc-toolbar .rbc-btn-group:first-child button {
-    background: transparent;
-    border-color: hsl(var(--border));
-    color: hsl(var(--foreground));
-  }
-
-  .rbc-toolbar .rbc-btn-group:first-child button:hover,
-  .rbc-toolbar .rbc-btn-group:first-child button:active {
-    background-color: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
-  }
-
-  .rbc-toolbar .rbc-btn-group:last-child button.rbc-active,
-  .rbc-toolbar .rbc-btn-group:last-child button.rbc-active:focus,
-  .rbc-toolbar .rbc-btn-group:last-child button.rbc-active:hover {
-    background-color: hsl(var(--primary));
-    border-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-  }
+.fc .fc-daygrid-day-number {
+  @apply text-sm p-2;
 }
 
 /* Event styling */
-.custom-calendar .rbc-event {
-  border-radius: 0.375rem;
-  border: none;
-  background-color: rgb(37, 99, 235); /* blue-600 - better contrast */
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  margin: 0.125rem;
+.fc-event {
+  @apply cursor-pointer border-none rounded-md shadow-sm;
+  background: var(--fc-event-bg-color);
 }
 
-.custom-calendar .rbc-event-content {
-  font-weight: 500;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.875rem;
-  color: white; /* Ensuring text is always white on colored background */
+.fc-event:hover {
+  @apply opacity-90;
 }
 
-/* Date cell styling */
-.custom-calendar .rbc-date-cell {
-  padding: 0.5rem;
-  font-size: 0.875rem;
-  color: rgb(31, 41, 55); /* gray-800 - better contrast */
+.fc-event-main {
+  @apply p-1;
 }
 
-/* Off-range dates - add if missing */
-.custom-calendar .rbc-off-range-bg {
-  background-color: rgb(250, 250, 250);
+/* Today's date highlight */
+.fc .fc-day-today {
+  background: var(--fc-today-bg-color) !important;
 }
 
-/* Selected cell - add if missing */
-.custom-calendar .rbc-selected-cell {
-  background-color: rgb(239, 246, 255);
+/* More events popover */
+.fc .fc-more-popover {
+  @apply rounded-lg border border-border shadow-lg;
 }
 
-/* Add these additional selectors for better coverage */
-.custom-calendar .rbc-row-segment {
-  padding: 0 4px 1px;
+.fc .fc-more-popover .fc-popover-header {
+  @apply bg-muted/50 px-3 py-2;
 }
 
-.custom-calendar .rbc-day-bg + .rbc-day-bg {
-  border-left: 1px solid rgb(226, 232, 240);
+/* Time grid specific styles */
+.fc .fc-timegrid-slot-label {
+  @apply text-sm text-muted-foreground;
 }
 
-/* Dark mode - increase specificity */
-@media (prefers-color-scheme: dark) {
-  /* All borders within the calendar */
-  .custom-calendar.custom-calendar .rbc-month-view,
-  .custom-calendar.custom-calendar .rbc-month-row + .rbc-month-row,
-  .custom-calendar.custom-calendar .rbc-day-bg + .rbc-day-bg,
-  .custom-calendar.custom-calendar .rbc-header,
-  .custom-calendar.custom-calendar .rbc-header + .rbc-header,
-  .custom-calendar.custom-calendar .rbc-day-bg,
-  .custom-calendar.custom-calendar .rbc-date-cell {
-    border-color: rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Month view container */
-  .custom-calendar.custom-calendar .rbc-month-view {
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Row borders */
-  .custom-calendar.custom-calendar .rbc-month-row {
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Cell borders */
-  .custom-calendar.custom-calendar .rbc-day-bg {
-    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Header bottom border */
-  .custom-calendar.custom-calendar .rbc-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Individual day cells */
-  .custom-calendar.custom-calendar .rbc-day-bg + .rbc-day-bg {
-    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Month rows */
-  .custom-calendar.custom-calendar .rbc-month-row + .rbc-month-row {
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Headers */
-  .custom-calendar.custom-calendar .rbc-header + .rbc-header {
-    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Catch-all for any remaining borders */
-  .custom-calendar.custom-calendar .rbc-month-view *,
-  .custom-calendar.custom-calendar .rbc-month-row *,
-  .custom-calendar.custom-calendar .rbc-row-content * {
-    border-color: rgba(255, 255, 255, 0.1) !important;
-  }
+.fc .fc-timegrid-axis {
+  @apply border-border;
 }
 
-/* Button group styling */
-.custom-calendar .rbc-btn-group {
-  display: flex;
-  gap: 0.5rem;
+/* Year view specific styles */
+.fc .fc-multimonth-header {
+  @apply bg-muted/50 py-2;
 }
 
-.rbc-calendar {
-  min-height: 600px;
-  width: 100%;
+.fc .fc-multimonth-title {
+  @apply text-lg font-semibold;
 }
 
-.rbc-month-view {
-  border: 1px solid #ddd;
-  height: 100%;
+/* Custom scrollbar for the calendar */
+.fc-scroller {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: hsl(var(--primary) / 0.1) transparent; /* Firefox */
 }
 
-.rbc-header {
-  padding: 10px;
-  font-weight: bold;
-  border-bottom: 1px solid #ddd;
+/* Webkit browsers (Chrome, Safari, etc.) */
+.fc-scroller::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.rbc-date-cell {
-  padding: 5px;
+.fc-scroller::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Optional: Style improvements */
-.rbc-today {
-  background-color: rgba(var(--primary), 0.1);
+.fc-scroller::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--primary) / 0.1);
+  border-radius: 3px;
 }
 
-.rbc-event {
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  border: none;
-  border-radius: 4px;
+.fc-scroller::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--primary) / 0.2);
 }
 
-@media (prefers-color-scheme: dark) {
-  /* All borders within the calendar */
-  .custom-calendar.custom-calendar .rbc-month-view,
-  .custom-calendar.custom-calendar .rbc-month-row + .rbc-month-row,
-  .custom-calendar.custom-calendar .rbc-day-bg + .rbc-day-bg,
-  .custom-calendar.custom-calendar .rbc-header,
-  .custom-calendar.custom-calendar .rbc-header + .rbc-header,
-  .custom-calendar.custom-calendar .rbc-day-bg,
-  .custom-calendar.custom-calendar .rbc-date-cell {
-    border-color: rgba(255, 255, 255, 0.1) !important;
+/* List view styles */
+.fc-list-day-cushion {
+  @apply bg-muted/50 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .fc .fc-toolbar {
+    @apply flex-col gap-4;
   }
 
-  /* Month view container */
-  .custom-calendar.custom-calendar .rbc-month-view {
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Row borders */
-  .custom-calendar.custom-calendar .rbc-month-row {
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Cell borders */
-  .custom-calendar.custom-calendar .rbc-day-bg {
-    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Header bottom border */
-  .custom-calendar.custom-calendar .rbc-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Individual day cells */
-  .custom-calendar.custom-calendar .rbc-day-bg + .rbc-day-bg {
-    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Month rows */
-  .custom-calendar.custom-calendar .rbc-month-row + .rbc-month-row {
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Headers */
-  .custom-calendar.custom-calendar .rbc-header + .rbc-header {
-    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Catch-all for any remaining borders */
-  .custom-calendar.custom-calendar .rbc-month-view *,
-  .custom-calendar.custom-calendar .rbc-month-row *,
-  .custom-calendar.custom-calendar .rbc-row-content * {
-    border-color: rgba(255, 255, 255, 0.1) !important;
+  .fc .fc-toolbar-title {
+    @apply text-lg;
   }
 }

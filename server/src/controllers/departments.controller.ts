@@ -99,6 +99,7 @@ export const getDepartmentById: RequestHandler = async (
               name: true,
               description: true,
               status: true,
+              yearStarted: true,
               _count: {
                 select: {
                   projectProposals: true,
@@ -170,12 +171,17 @@ export const getDepartmentById: RequestHandler = async (
           (prog) => prog.status === "INACTIVE"
         ),
       },
-      bannerPrograms: department.bannerPrograms,
-      // Transform activities to include program info from proposal
+      bannerPrograms: department.bannerPrograms.map((program) => ({
+        id: program.id,
+        name: program.name,
+        description: program.description,
+        status: program.status,
+        totalProposals: program._count.projectProposals,
+      })),
       activities: departmentActivities.map((activity) => ({
         ...activity,
         program: activity.proposal.program,
-        proposal: undefined, // Remove the nested proposal data
+        proposal: undefined,
       })),
     };
 

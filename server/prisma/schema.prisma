@@ -83,6 +83,7 @@ model BannerProgram {
   // Relationships
   academicPrograms AcademicProgram[] // New relation field
   projectProposals ProjectProposal[]
+  activities       Activity[]
 
   // Metadata
   createdAt DateTime @default(now())
@@ -149,12 +150,19 @@ model ProjectAttachment {
   @@map("project_attachments")
 }
 
+enum ActivityStatus {
+  UPCOMING      // Activity is approved and waiting to be conducted (future date)
+  ONGOING       // Activity is currently being implemented
+  COMPLETED     // Activity has been conducted and finished
+  CANCELLED     // Activity was cancelled
+}
+
 model Activity {
   id               Int               @id @default(autoincrement())
   title            String
   description      String?
   targetDate       DateTime
-  status           String      // or ActivityStatus if you have an enum
+  status           ActivityStatus @default(UPCOMING)
   
   // Direct relationships
   departmentId     Int
@@ -178,9 +186,14 @@ model Activity {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
+  // Add these new fields
+  bannerProgramId   Int?
+  bannerProgram     BannerProgram? @relation(fields: [bannerProgramId], references: [id])
+
   @@index([departmentId])
   @@index([partnerCommunityId])
   @@index([status])
+  @@index([bannerProgramId])
   @@map("activities")
 }
 

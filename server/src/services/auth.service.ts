@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, UserPosition, UserRole } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { AuthError } from "../utils/errors.js";
 import bcrypt from "bcryptjs";
@@ -21,7 +21,8 @@ interface RegisterParams {
   firstName: string;
   lastName: string;
   departmentId: number;
-  role: string;
+  role: UserRole;
+  position?: UserPosition;
   contactNumber?: string;
 }
 
@@ -37,6 +38,7 @@ export const authService = {
     lastName,
     departmentId,
     role,
+    position,
     contactNumber,
   }: RegisterParams) {
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -49,6 +51,7 @@ export const authService = {
         departmentId,
         contactNumber,
         role,
+        position,
         hashedPassword,
       },
       select: {

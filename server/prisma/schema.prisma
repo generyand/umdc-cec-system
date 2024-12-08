@@ -9,7 +9,7 @@ datasource db {
 }
 
 enum UserRole {
-  SUPER_ADMIN     // Full system access
+  SUPER_ADMIN    // Full system access
   ADMIN           // Department-wide access and approvals
   STAFF           // Basic access for project creation/management
 }

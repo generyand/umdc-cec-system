@@ -43,6 +43,7 @@ model Department {
   users            User[]
   projectProposals ProjectProposal[]
   bannerPrograms   BannerProgram[]
+  activities       Activity[]
 
   @@map("departments")
 }
@@ -149,31 +150,36 @@ model ProjectAttachment {
 }
 
 model Activity {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  startDate   DateTime
-  endDate     DateTime
-  venue       String
-  budget      Decimal  @db.Decimal(10, 2)
-  status      String   @default("ONGOING") // ONGOING, COMPLETED, CANCELLED
-
+  id               Int               @id @default(autoincrement())
+  title            String
+  description      String?
+  targetDate       DateTime
+  status           String      // or ActivityStatus if you have an enum
+  
+  // Direct relationships
+  departmentId     Int
+  department       Department        @relation(fields: [departmentId], references: [id])
+  
+  partnerCommunityId Int
+  partnerCommunity   PartnerCommunity  @relation(fields: [partnerCommunityId], references: [id])
+  
   // Proposal Document (required)
-  proposalFile   ActivityDocument @relation("ProposalFile", fields: [proposalFileId], references: [id])
-  proposalFileId Int              @unique // One-to-one relationship
+  proposalFile     ActivityDocument @relation("ProposalFile", fields: [proposalFileId], references: [id])
+  proposalFileId   Int              @unique // One-to-one relationship
 
   // Other documentation (optional, multiple)
-  documents ActivityDocument[] @relation("ActivityDocuments")
+  documents        ActivityDocument[] @relation("ActivityDocuments")
 
   // Relationship with ProjectProposal
-  proposalId Int
-  proposal   ProjectProposal @relation(fields: [proposalId], references: [id])
+  proposalId       Int
+  proposal         ProjectProposal @relation(fields: [proposalId], references: [id])
 
   // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  @@index([proposalId])
+  @@index([departmentId])
+  @@index([partnerCommunityId])
   @@index([status])
   @@map("activities")
 }
@@ -199,7 +205,7 @@ model ActivityDocument {
 }
 
 model PartnerCommunity {
-  id            Int       @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   name          String
   communityType String // Barangay, NGO, School, etc.
   address       String
@@ -221,6 +227,7 @@ model PartnerCommunity {
 
   // Relationships
   projectProposals ProjectProposal[]
+  activities       Activity[]
 
   @@index([status])
   @@index([communityType])

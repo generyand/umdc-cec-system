@@ -73,42 +73,117 @@ export const getDepartmentById: RequestHandler = async (
     console.log(`📃 Fetching department with ID: ${id}`);
 
     const departmentId = parseInt(id, 10);
-    const department = await prisma.department.findUnique({
-      where: { id: departmentId },
-      include: {
-        users: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            role: true,
-            status: true,
-            contactNumber: true,
+    const [department, departmentActivities] = await prisma.$transaction([
+      prisma.department.findUnique({
+        where: { id: departmentId },
+        select: {
+          name: true,
+          abbreviation: true,
+          description: true,
+          academicPrograms: {
+            select: {
+              id: true,
+              name: true,
+              abbreviation: true,
+              description: true,
+              totalStudents: true,
+              status: true,
+            },
+            orderBy: {
+              name: "asc",
+            },
+          },
+          bannerPrograms: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              status: true,
+              _count: {
+                select: {
+                  projectProposals: true,
+                },
+              },
+            },
+            orderBy: {
+              name: "asc",
+            },
           },
         },
-        academicPrograms: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            totalStudents: true,
-            status: true,
+      }),
+
+      // Simplified activity query with renamed fields
+      prisma.activity.findMany({
+        where: {
+          departmentId: departmentId,
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          targetDate: true,
+          status: true,
+          partnerCommunity: {
+            select: {
+              name: true,
+              // location: true,
+            },
+          },
+          proposal: {
+            select: {
+              program: {
+                select: {
+                  name: true,
+                  abbreviation: true,
+                },
+              },
+            },
           },
         },
-      },
-    });
+        orderBy: {
+          targetDate: "desc",
+        },
+      }),
+    ]);
 
     if (!department) {
       console.log(`❌ Department with ID ${id} not found`);
       throw new ApiError(404, "Department not found");
     }
 
+    // Transform the data to organize it better
+    const transformedData = {
+      department: {
+        name: department.name,
+        abbreviation: department.abbreviation,
+        description: department.description,
+        totalStudents: department.academicPrograms.reduce(
+          (sum, program) => sum + (program.totalStudents || 0),
+          0
+        ),
+      },
+      academicPrograms: {
+        active: department.academicPrograms.filter(
+          (prog) => prog.status === "ACTIVE"
+        ),
+        inactive: department.academicPrograms.filter(
+          (prog) => prog.status === "INACTIVE"
+        ),
+      },
+      bannerPrograms: department.bannerPrograms,
+      // Transform activities to include program info from proposal
+      activities: departmentActivities.map((activity) => ({
+        ...activity,
+        program: activity.proposal.program,
+        proposal: undefined, // Remove the nested proposal data
+      })),
+    };
+
     console.log(`✅ Successfully fetched department: ${department.name}`);
     res.status(200).json({
       success: true,
       message: "Department fetched successfully",
-      data: department,
+      data: transformedData,
     });
   } catch (error) {
     console.error("❌ Error fetching department:", error);

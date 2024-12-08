@@ -1,37 +1,50 @@
-export interface AcademicProgramType {
+export interface AcademicProgram {
   id: number;
-  code: string;
-  name: string;
-  departmentId: number;
-}
-
-export const AcademicProgram: AcademicProgramType[] = [
-  // Department of Technical Programs (DTP) - ID: 1
-  {
-    id: 1,
-    code: "bsit",
-    name: "Bachelor of Science in Information Technology",
-    departmentId: 1,
-  },
-  {
-    id: 2,
-    code: "bscpe",
-    name: "Bachelor of Science in Computer Engineering",
-    departmentId: 1,
-  },
-  // Add other programs here...
-];
-
-export interface Department {
-  id: string;
   name: string;
   abbreviation: string;
-  description: string | null;
-  slug?: string;
-  status: string;
+  description: string;
   totalStudents: number;
-  totalPrograms: number;
-  academicPrograms: AcademicProgramType[];
+  status: "ACTIVE" | "INACTIVE";
+}
+
+export interface BannerProgram {
+  id: number;
+  name: string;
+  abbreviation: string;
+  description: string;
+  status: "ACTIVE" | "INACTIVE";
+  yearStarted: number;
+}
+
+export interface Activity {
+  id: number;
+  title: string;
+  description: string | null;
+  targetDate: string;
+  status: string;
+  partnerCommunity: {
+    name: string;
+  };
+  bannerProgram: {
+    name: string;
+    abbreviation: string;
+  } | null;
+}
+
+export interface Department {
+  department: {
+    id: number | string;
+    name: string;
+    abbreviation: string;
+    description: string | undefined;
+    totalStudents: number;
+  };
+  academicPrograms: {
+    active: AcademicProgram[];
+    inactive: AcademicProgram[];
+  };
+  bannerPrograms: BannerProgram[];
+  activities: Activity[];
 }
 
 export interface ServiceResponse<T> {

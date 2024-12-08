@@ -34,11 +34,28 @@ export const departmentsApi = {
     return response.data;
   },
 
-  getById: async (id: string): Promise<ServiceResponse<Department>> => {
-    const response = await api.get<ServiceResponse<Department>>(
-      `/api/departments/${id}`
-    );
-    return response.data;
+  getById: async (
+    id: number | string
+  ): Promise<ServiceResponse<Department>> => {
+    try {
+      console.log("Fetching department with ID:", id);
+      console.log("Request URL:", `/api/departments/${id}`);
+
+      const response = await api.get<ServiceResponse<Department>>(
+        `/api/departments/${id}`
+      );
+
+      console.log("Response received:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching department:", error);
+      return {
+        success: false,
+        data: null as unknown as Department,
+        message:
+          error instanceof Error ? error.message : "Failed to fetch department",
+      };
+    }
   },
 
   update: async (

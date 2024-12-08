@@ -82,7 +82,7 @@ const App = () => {
             />
 
             <Route
-              path="/admin/academic-departments/:slug"
+              path="/admin/academic-departments/:id"
               element={<DepartmentPage />}
             />
             <Route path="/admin/proposals/new" element={<NewProposalPage />} />

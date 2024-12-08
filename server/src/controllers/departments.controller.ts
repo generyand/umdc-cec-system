@@ -100,6 +100,7 @@ export const getDepartmentById: RequestHandler = async (
               description: true,
               status: true,
               yearStarted: true,
+              abbreviation: true,
               // _count: {
               //   select: {
               //     projectProposals: true,
@@ -170,6 +171,7 @@ export const getDepartmentById: RequestHandler = async (
         id: program.id,
         name: program.name,
         description: program.description,
+        abbreviation: program.abbreviation,
         status: program.status,
         yearStarted: program.yearStarted,
       })),

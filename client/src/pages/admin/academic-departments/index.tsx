@@ -11,7 +11,7 @@ import {
   Trash2,
   Plus,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/select";
 import { departmentsApi } from "@/services/api/departments.service";
 import { DepartmentFormModal } from "@/components/admin/academic-departments/department-form-modal";
-import { Department, AcademicProgram } from "@/types/department.types";
+import { AcademicProgram } from "@/types/department.types";
 
 import {
   DASELogo,
@@ -58,30 +58,7 @@ import {
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
-
-// Types
-interface AcademicProgram {
-  id: string;
-  name: string;
-  code: string;
-  description?: string;
-  departmentId: string;
-}
-
-interface DepartmentCardProps {
-  id: string;
-  name: string;
-  slug: string;
-  abbreviation: string;
-  description: string;
-  totalStudents: number;
-  totalPrograms: number;
-  academicPrograms: AcademicProgram[];
-  onDepartmentDeleted?: () => void;
-}
-
-// Create a type for department abbreviations to ensure type safety
-//
+import { Link } from "react-router-dom";
 
 // Map logos to department abbreviations using imported URLs
 const departmentLogos: Record<string, string> = {
@@ -134,6 +111,42 @@ function getLogoByAbbreviation(abbreviation: string): React.ReactNode {
   );
 }
 
+interface DepartmentCardProps {
+  id: string;
+  name: string;
+  abbreviation: string;
+  description: string;
+  slug: string;
+  totalStudents: number;
+  totalPrograms: number;
+  academicPrograms: {
+    active: AcademicProgram[];
+    inactive: AcademicProgram[];
+  };
+  onDepartmentDeleted?: () => void;
+}
+
+interface Department {
+  id: string;
+  name: string;
+  abbreviation: string;
+  description: string;
+  logoUrl: string | null;
+  totalStudents: number;
+  totalPrograms: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  academicPrograms: {
+    id: number;
+    name: string;
+    abbreviation: string;
+    description: string;
+    totalStudents: number;
+    status: "ACTIVE" | "INACTIVE";
+  }[];
+}
+
 function DepartmentCard({
   id,
   name,
@@ -145,11 +158,13 @@ function DepartmentCard({
 }: DepartmentCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  // const navigate = useNavigate();
+  // const queryClient = useQueryClient();
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const response = await departmentsApi.delete(id);
+      const response = await departmentsApi.delete(id.toString());
 
       if (response.success) {
         toast.success(`${name} department deleted successfully`);
@@ -166,9 +181,25 @@ function DepartmentCard({
     }
   };
 
+  // const handleDepartmentClick = async () => {
+  //   try {
+  //     // Prefetch the department data
+  //     await queryClient.prefetchQuery({
+  //       queryKey: ["department", id],
+  //       queryFn: () => departmentsApi.getById(id),
+  //     });
+
+  //     // Navigate to department page
+  //     navigate(`/admin/academic-departments/${id}`);
+  //   } catch (error) {
+  //     toast.error("Failed to load department details");
+  //     console.error(error);
+  //   }
+  // };
+
   return (
     <motion.div
-      className="block rounded-lg border group bg-card hover:shadow-lg hover:border-primary/20"
+      className="block rounded-lg border cursor-pointer group bg-card hover:shadow-lg hover:border-primary/20"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
@@ -204,7 +235,10 @@ function DepartmentCard({
         </Link>
 
         {/* Menu Button */}
-        <div className="absolute top-0 right-0">
+        <div
+          className="absolute top-0 right-0"
+          onClick={(e) => e.stopPropagation()}
+        >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -218,7 +252,12 @@ function DepartmentCard({
             <DropdownMenuContent align="end">
               <DepartmentFormModal
                 mode="edit"
-                department={{ id, name, abbreviation, description }}
+                department={{
+                  id: id.toString(),
+                  name,
+                  abbreviation,
+                  description,
+                }}
                 onSuccess={onDepartmentDeleted}
                 trigger={
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -271,17 +310,26 @@ function DepartmentCard({
 
 // Format departments data
 function formatDepartments(departments: Department[]): DepartmentCardProps[] {
-  return departments.map((department) => ({
-    id: department.id,
-    name: department.name,
-    abbreviation: department.abbreviation,
-    description: department.description || "",
-    slug: department.slug || department.abbreviation.toLowerCase(),
-    totalStudents: department.totalStudents,
-    totalPrograms: department.totalPrograms,
-    academicPrograms:
-      department.academicPrograms as unknown as AcademicProgram[],
-  }));
+  if (!departments) return [];
+
+  return departments
+    .map((dept) => ({
+      id: dept.id,
+      name: dept.name,
+      abbreviation: dept.abbreviation,
+      description: dept.description || "",
+      slug: dept.abbreviation.toLowerCase(),
+      totalStudents: dept.totalStudents,
+      totalPrograms: dept.totalPrograms,
+      academicPrograms: {
+        // If academicPrograms is an array, split it by status
+        active:
+          dept.academicPrograms?.filter((p) => p.status === "ACTIVE") || [],
+        inactive:
+          dept.academicPrograms?.filter((p) => p.status === "INACTIVE") || [],
+      },
+    }))
+    .filter((dept): dept is DepartmentCardProps => dept !== null);
 }
 
 // Add this new component for loading state
@@ -324,7 +372,8 @@ export default function DepartmentsPage() {
   });
 
   const formattedDepartments = departmentsData?.data
-    ? formatDepartments(departmentsData.data)
+    ? // @ts-expect-error - TODO: Fix this type
+      formatDepartments(departmentsData.data)
     : [];
 
   // Render loading state

@@ -3,6 +3,7 @@ import { authenticateToken } from "../../middleware/auth.middleware.js";
 import {
   updateUserProfile,
   getUsers,
+  addUser,
 } from "../../controllers/users.controller.js";
 
 const router = Router();
@@ -10,5 +11,5 @@ const router = Router();
 // PATCH is used for partial updates to user profile
 router.get("/", authenticateToken, getUsers);
 router.patch("/:userId/profile", authenticateToken, updateUserProfile);
-
+router.post("/", authenticateToken, addUser);
 export default router;

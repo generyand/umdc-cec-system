@@ -96,29 +96,13 @@
   @apply text-lg font-semibold;
 }
 
+.fc .fc-multimonth-month {
+  @apply mt-2 rounded-md;
+}
+
 /* Custom scrollbar for the calendar */
 .fc-scroller {
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: hsl(var(--primary) / 0.1) transparent; /* Firefox */
-}
-
-/* Webkit browsers (Chrome, Safari, etc.) */
-.fc-scroller::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.fc-scroller::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.fc-scroller::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--primary) / 0.1);
-  border-radius: 3px;
-}
-
-.fc-scroller::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(var(--primary) / 0.2);
+  /* @apply scrollbar-thin scrollbar-thumb-primary/10 scrollbar-track-transparent; */
 }
 
 /* List view styles */

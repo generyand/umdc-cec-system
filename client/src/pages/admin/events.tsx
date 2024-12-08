@@ -286,7 +286,7 @@ export default function EventsPage() {
               },
               multiMonthYear: {
                 multiMonthMaxColumns: 3,
-                multiMonthMinWidth: 350,
+                multiMonthMinWidth: 300,
               },
             }}
           />

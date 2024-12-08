@@ -28,7 +28,7 @@ import NewProposalPage from "./pages/admin/proposals/new";
 import BannerProgramsPage from "./pages/admin/banner-programs";
 import ProposalsPage from "./pages/admin/proposals";
 import ProposalDetailsPage from "./pages/admin/proposals/proposal-details";
-import MockDepartmentPage from "./pages/admin/academic-departments/mockDepartment";
+// import MockDepartmentPage from "./pages/admin/academic-departments/mockDepartment";
 const App = () => {
   return (
     <>
@@ -98,10 +98,10 @@ const App = () => {
               path="/admin/community-engagement/proposals/:id"
               element={<ProposalDetailsPage />}
             />
-            <Route
+            {/* <Route
               path="/admin/academic-departments/mock-department"
               element={<MockDepartmentPage />}
-            />
+            /> */}
           </Route>
 
           {/* Catch all route - redirect to login */}

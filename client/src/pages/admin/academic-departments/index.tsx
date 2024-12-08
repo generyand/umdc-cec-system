@@ -11,7 +11,6 @@ import {
   Trash2,
   Plus,
 } from "lucide-react";
-// import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -33,7 +32,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
-// import { toast } from "sonner";
 
 import {
   Select,
@@ -158,8 +156,6 @@ function DepartmentCard({
 }: DepartmentCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  // const navigate = useNavigate();
-  // const queryClient = useQueryClient();
 
   const handleDelete = async () => {
     try {
@@ -180,22 +176,6 @@ function DepartmentCard({
       setIsDeleting(false);
     }
   };
-
-  // const handleDepartmentClick = async () => {
-  //   try {
-  //     // Prefetch the department data
-  //     await queryClient.prefetchQuery({
-  //       queryKey: ["department", id],
-  //       queryFn: () => departmentsApi.getById(id),
-  //     });
-
-  //     // Navigate to department page
-  //     navigate(`/admin/academic-departments/${id}`);
-  //   } catch (error) {
-  //     toast.error("Failed to load department details");
-  //     console.error(error);
-  //   }
-  // };
 
   return (
     <motion.div

@@ -4,23 +4,13 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import multiMonthPlugin from "@fullcalendar/multimonth";
-import { format } from "date-fns";
-import {
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
-  Filter,
-  Plus,
-  Search,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { cn } from "@/lib/utils";
 import "./calendar.css";
 
 // Define event type
 interface Event {
-  id: number;
+  id: string;
   title: string;
   start: Date;
   end: Date;
@@ -32,7 +22,7 @@ interface Event {
 
 const sampleEvents: Event[] = [
   {
-    id: 1,
+    id: "1",
     title: "Community Health Workshop",
     start: new Date(2024, 1, 15, 9, 0),
     end: new Date(2024, 1, 15, 12, 0),
@@ -40,7 +30,7 @@ const sampleEvents: Event[] = [
       "Health awareness and basic medical screening for Barangay San Jose residents",
   },
   {
-    id: 2,
+    id: "2",
     title: "Literacy Program Planning",
     start: new Date(2024, 1, 16, 14, 0),
     end: new Date(2024, 1, 16, 16, 0),
@@ -48,7 +38,7 @@ const sampleEvents: Event[] = [
       "Planning meeting for adult literacy program implementation in partner communities",
   },
   {
-    id: 3,
+    id: "3",
     title: "Environmental Awareness Drive",
     start: new Date(2024, 1, 20, 8, 0),
     end: new Date(2024, 1, 20, 17, 0),
@@ -56,7 +46,7 @@ const sampleEvents: Event[] = [
       "Tree planting and environmental education activity with local youth organizations",
   },
   {
-    id: 4,
+    id: "4",
     title: "Skills Training Workshop",
     start: new Date(2024, 1, 18, 13, 0),
     end: new Date(2024, 1, 18, 17, 0),
@@ -64,7 +54,7 @@ const sampleEvents: Event[] = [
       "Vocational skills training for out-of-school youth: Basic Electronics",
   },
   {
-    id: 5,
+    id: "5",
     title: "CEC Board Meeting",
     start: new Date(2024, 1, 22, 10, 0),
     end: new Date(2024, 1, 22, 12, 0),
@@ -72,14 +62,14 @@ const sampleEvents: Event[] = [
       "Monthly review of community extension programs and initiatives",
   },
   {
-    id: 6,
+    id: "6",
     title: "Impact Assessment",
     start: new Date(2024, 1, 17, 14, 0),
     end: new Date(2024, 1, 17, 16, 0),
     description: "Evaluation of recent community programs' impact and outcomes",
   },
   {
-    id: 7,
+    id: "7",
     title: "Stakeholders Meeting",
     start: new Date(2024, 1, 25, 9, 0),
     end: new Date(2024, 1, 25, 11, 0),
@@ -87,7 +77,7 @@ const sampleEvents: Event[] = [
       "Coordination meeting with community leaders and partner organizations",
   },
   {
-    id: 8,
+    id: "8",
     title: "Program Planning Session",
     start: new Date(2024, 1, 19, 9, 0),
     end: new Date(2024, 1, 19, 12, 0),
@@ -95,14 +85,14 @@ const sampleEvents: Event[] = [
       "Strategic planning for upcoming community development initiatives",
   },
   {
-    id: 9,
+    id: "9",
     title: "Community Workshop",
     start: new Date(2024, 1, 23, 13, 0),
     end: new Date(2024, 1, 23, 17, 0),
     description: "Sustainable livelihood workshop for local community members",
   },
   {
-    id: 10,
+    id: "10",
     title: "Volunteer Orientation",
     start: new Date(2024, 1, 21, 14, 0),
     end: new Date(2024, 1, 21, 16, 0),
@@ -110,7 +100,7 @@ const sampleEvents: Event[] = [
   },
   // Multi-day event
   {
-    id: 11,
+    id: "11",
     title: "Community Development Summit",
     start: new Date(2024, 1, 27, 8, 0),
     end: new Date(2024, 1, 29, 17, 0),
@@ -119,7 +109,7 @@ const sampleEvents: Event[] = [
   },
   // Weekly recurring events
   ...Array.from({ length: 4 }, (_, i) => ({
-    id: 12 + i,
+    id: String(12 + i),
     title: "Project Monitoring",
     start: new Date(2024, 1, 15 + i, 9, 0),
     end: new Date(2024, 1, 15 + i, 10, 30),
@@ -131,7 +121,7 @@ const sampleEvents: Event[] = [
 const generateRecurringEvents = (baseEvent: Event, count: number): Event[] => {
   return Array.from({ length: count }, (_, i) => ({
     ...baseEvent,
-    id: baseEvent.id + i,
+    id: String(baseEvent.id) + i,
     start: new Date(baseEvent.start.getTime() + i * 24 * 60 * 60 * 1000),
     end: new Date(baseEvent.end.getTime() + i * 24 * 60 * 60 * 1000),
   }));
@@ -140,7 +130,7 @@ const generateRecurringEvents = (baseEvent: Event, count: number): Event[] => {
 // Add recurring weekly community programs
 const weeklyPrograms = generateRecurringEvents(
   {
-    id: 20,
+    id: "20",
     title: "Adult Education Program",
     start: new Date(2024, 1, 15, 15, 0),
     end: new Date(2024, 1, 15, 17, 0),
@@ -223,6 +213,7 @@ export default function EventsPage() {
             }}
             events={events.map((event) => ({
               ...event,
+              id: String(event.id),
               extendedProps: {
                 description: event.description,
               },
@@ -286,7 +277,10 @@ export default function EventsPage() {
               },
               multiMonthYear: {
                 multiMonthMaxColumns: 3,
-                multiMonthMinWidth: 300,
+                duration: { years: 1 },
+                dayMaxEventRows: 2,
+                showNonCurrentDates: false,
+                dayHeaderFormat: { weekday: "short" },
               },
             }}
           />

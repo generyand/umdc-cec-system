@@ -14,7 +14,7 @@
 
 /* Header toolbar buttons */
 .fc .fc-button {
-  @apply shadow-none rounded-md border px-3 py-2 text-sm font-medium transition-colors;
+  @apply shadow-none rounded-md border px-3 py-2 text-sm font-medium transition-colors outline-none;
   background: var(--fc-button-bg-color);
 }
 
@@ -89,21 +89,18 @@
 
 /* Year view specific styles */
 .fc .fc-multimonth-header {
-  @apply bg-muted/50 py-2;
+  @apply bg-muted/50 mt-4 rounded-xl;
 }
 
 .fc .fc-multimonth-title {
   @apply text-lg font-semibold;
 }
 
-.fc .fc-multimonth-month {
-  @apply mt-2 rounded-md;
+.fc-multimonth-month {
+  @apply mt-2 rounded-xl;
 }
 
 /* Custom scrollbar for the calendar */
-.fc-scroller {
-  /* @apply scrollbar-thin scrollbar-thumb-primary/10 scrollbar-track-transparent; */
-}
 
 /* List view styles */
 .fc-list-day-cushion {
@@ -119,4 +116,22 @@
   .fc .fc-toolbar-title {
     @apply text-lg;
   }
+}
+
+.fc .fc-button:focus {
+  @apply outline-none ring-0;
+}
+
+.fc .fc-button-primary {
+  @apply outline-none ring-0;
+}
+
+.fc .fc-button-primary:focus {
+  @apply outline-none ring-0 shadow-none;
+  box-shadow: none !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  @apply bg-primary/90 shadow-none outline-none ring-0;
+  box-shadow: none !important;
 }

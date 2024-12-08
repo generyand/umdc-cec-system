@@ -36,3 +36,8 @@ export const addUser = async (data: User) => {
   const response = await api.post("/api/users", data);
   return response.data;
 };
+
+export const deleteUser = async (userId: string) => {
+  const response = await api.delete(`/api/users/${userId}`);
+  return response.data;
+};

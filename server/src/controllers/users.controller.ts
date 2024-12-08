@@ -79,25 +79,39 @@ export const getUsers = async (
   res: Response,
   next: NextFunction
 ) => {
-  const users = await prisma.user.findMany({
-    select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      role: true,
-      position: true,
-      department: {
+  try {
+    const [users, departments] = await Promise.all([
+      prisma.user.findMany({
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          position: true,
+          department: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          contactNumber: true,
+          status: true,
+        },
+      }),
+      prisma.department.findMany({
         select: {
           id: true,
           name: true,
+          abbreviation: true,
         },
-      },
-      contactNumber: true,
-      status: true,
-    },
-  });
-  res.json(users);
+      }),
+    ]);
+
+    res.json({ users, departments });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const addUser = async (
@@ -105,6 +119,75 @@ export const addUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const user = await authService.register(req.body);
-  res.status(201).json(user);
+  try {
+    const { departmentId, ...userData } = req.body;
+
+    // Convert departmentId 0 to null, otherwise keep the original value
+    const userDataWithDepartment = {
+      ...userData,
+      departmentId: departmentId === 0 ? null : departmentId,
+    };
+
+    const user = await authService.register(userDataWithDepartment);
+    res.status(201).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.params;
+
+    // Check if user exists before deletion
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        error: "User not found",
+      });
+    }
+
+    // Perform the deletion
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    res.status(200).json({
+      message: "User deleted successfully",
+    });
+
+    return;
+  } catch (error) {
+    // Handle specific Prisma errors
+    if (typeof error === "object" && error !== null && "code" in error) {
+      switch (error.code) {
+        case "P2025":
+          res.status(404).json({
+            error: "User not found",
+          });
+          return;
+        case "P2003":
+          res.status(400).json({
+            error: "Cannot delete user due to existing references",
+          });
+          return;
+        default:
+          console.error("Delete user error:", error);
+          res.status(500).json({
+            error: "Failed to delete user",
+          });
+          return;
+      }
+    }
+
+    next(error);
+  }
 };

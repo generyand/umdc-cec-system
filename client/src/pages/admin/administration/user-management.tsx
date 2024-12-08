@@ -32,6 +32,7 @@ import {
   Shield,
   Eye,
   EyeOff,
+  Loader2,
 } from "lucide-react";
 import {
   Form,
@@ -52,24 +53,33 @@ import { DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { addUser, getUsers } from "@/services/api/users.service";
-import { useQuery } from "@tanstack/react-query";
+import { addUser, getUsers, deleteUser } from "@/services/api/users.service";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import { UserPosition, UserRole } from "@/types/user.types";
 
 interface Department {
   id: number;
   name: string;
+  abbreviation: string;
 }
 
 interface User {
-  id: number;
+  id: number | null;
   email: string;
   firstName: string;
   lastName: string;
-  role: "SUPER_ADMIN" | "ADMIN" | "STAFF" | "FOCAL_PERSON";
-  position: string | null;
+  role: UserRole;
+  position: UserPosition | null;
   department: Department | null;
   contactNumber: string | null;
   status: "ACTIVE" | "INACTIVE";
+}
+
+interface UsersResponse {
+  users: User[];
+  departments: Department[];
 }
 
 const userFormSchema = z.object({
@@ -77,16 +87,14 @@ const userFormSchema = z.object({
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["SUPER_ADMIN", "ADMIN", "STAFF"]),
+  role: z.enum(["SUPER_ADMIN", "ADMIN", "STAFF"] as [UserRole, ...UserRole[]]),
   position: z.enum([
     "CEC_HEAD",
     "DEAN",
-    "VP_BRANCH_OPERATOR",
-    "DEPARTMENT_HEAD",
+    "VP_DIRECTOR",
     "PROGRAM_HEAD",
-    "FACULTY",
     "FOCAL_PERSON",
-  ]),
+  ] as [UserPosition, ...UserPosition[]]),
   departmentId: z.number(),
   contactNumber: z.string().optional(),
 });
@@ -95,14 +103,11 @@ export default function UserManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isRolesDialogOpen, setIsRolesDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   type UserFormValues = z.infer<typeof userFormSchema>;
-
-  const [departments] = useState<Department[]>([
-    { id: 1, name: "Computer Engineering" },
-    { id: 2, name: "Civil Engineering" },
-    { id: 3, name: "Electrical Engineering" },
-  ]);
 
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
@@ -110,27 +115,113 @@ export default function UserManagementPage() {
       firstName: "",
       lastName: "",
       email: "",
-      password: "UMDC@CEC@2024",
-      role: "STAFF",
-      position: "FOCAL_PERSON",
-      departmentId: 1,
+      password: "UMDC@cec@2024",
+      role: UserRole.STAFF,
+      position: UserPosition.FOCAL_PERSON,
+      departmentId: 0,
       contactNumber: "",
     },
   });
 
-  const {
-    data: users = [],
-    isLoading,
-    error,
-  } = useQuery({
+  const { data, isLoading, error } = useQuery<UsersResponse>({
     queryKey: ["users"],
     queryFn: getUsers,
   });
 
+  const users = data?.users ?? [];
+  const departments = data?.departments ?? [];
+
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: (userId: string) => deleteUser(userId),
+    onSuccess: () => {
+      toast.success("User deleted successfully");
+      setIsDeleteDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete user. Please try again."
+      );
+    },
+  });
+
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (userToDelete?.id) {
+      deleteMutation.mutate(userToDelete.id.toString());
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center p-6">
-        <div className="w-8 h-8 rounded-full border-b-2 border-gray-900 animate-spin" />
+      <div className="p-6 space-y-6">
+        <div className="flex justify-between items-center">
+          <div className="flex gap-2 items-center">
+            <Skeleton className="w-6 h-6 rounded-full" />
+            <Skeleton className="w-48 h-8" />
+          </div>
+          <Skeleton className="w-32 h-10" />
+        </div>
+
+        <div className="flex gap-4 items-center">
+          <Skeleton className="flex-1 h-10" />
+          <Skeleton className="w-28 h-10" />
+        </div>
+
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead>Position</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-[60px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(5)].map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[140px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[180px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[160px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[120px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[100px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[120px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[80px] rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="w-8 h-8 rounded-md" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     );
   }
@@ -145,12 +236,23 @@ export default function UserManagementPage() {
 
   const onSubmit = async (data: UserFormValues) => {
     try {
-      // Add your API call here to create user
-      await addUser(data);
-      console.log(data);
+      const { departmentId, ...restData } = data;
+
+      await addUser({
+        ...restData,
+        departmentId: departmentId ?? 0,
+      });
+
       setIsDialogOpen(false);
       form.reset();
+      await queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("User created successfully");
     } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to create user. Please try again."
+      );
       console.error("Error creating user:", error);
     }
   };
@@ -279,6 +381,23 @@ export default function UserManagementPage() {
                       <FormLabel>Department</FormLabel>
                       <FormControl>
                         <div className="grid grid-cols-2 gap-4">
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="radio"
+                              id="dept-none"
+                              {...field}
+                              value="0"
+                              checked={field.value === 0}
+                              onChange={() => field.onChange(0)}
+                              className="w-4 h-4 border-gray-300 text-primary focus:ring-primary"
+                            />
+                            <label
+                              htmlFor="dept-none"
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              None
+                            </label>
+                          </div>
                           {departments.map((department) => (
                             <div
                               key={department.id}
@@ -299,7 +418,7 @@ export default function UserManagementPage() {
                                 htmlFor={`dept-${department.id}`}
                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                               >
-                                {department.name}
+                                {department.abbreviation}
                               </label>
                             </div>
                           ))}
@@ -395,11 +514,133 @@ export default function UserManagementPage() {
             className="pl-10"
           />
         </div>
-        <Button variant="outline">
+        <Button variant="outline" onClick={() => setIsRolesDialogOpen(true)}>
           <Shield className="mr-2 w-4 h-4" />
           Roles
         </Button>
       </div>
+
+      <Dialog open={isRolesDialogOpen} onOpenChange={setIsRolesDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex gap-2 items-center text-xl">
+              <Shield className="w-5 h-5" />
+              CEC System Roles & Privileges
+            </DialogTitle>
+            <DialogDescription>
+              Detailed overview of user roles and their access levels in the
+              Community Extension Center system.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4 space-y-6">
+            {/* Super Admin */}
+            <div className="p-4 rounded-lg border transition-colors bg-card hover:bg-accent/50">
+              <div className="flex gap-2 items-center mb-2">
+                <div className="rounded-full bg-red-100 p-1.5">
+                  <Shield className="w-4 h-4 text-red-600" />
+                </div>
+                <h4 className="text-lg font-semibold text-red-600">
+                  Super Admin
+                </h4>
+              </div>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Highest level of system access with complete oversight:
+              </p>
+              <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-red-600 rounded-full" />
+                  Manage all extension programs and projects across departments
+                </li>
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-red-600 rounded-full" />
+                  Full user management and role assignment capabilities
+                </li>
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-red-600 rounded-full" />
+                  Access comprehensive analytics and generate institutional
+                  reports
+                </li>
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-red-600 rounded-full" />
+                  Configure system settings and approval workflows
+                </li>
+              </ul>
+            </div>
+
+            {/* Admin */}
+            <div className="p-4 rounded-lg border transition-colors bg-card hover:bg-accent/50">
+              <div className="flex gap-2 items-center mb-2">
+                <div className="rounded-full bg-blue-100 p-1.5">
+                  <Shield className="w-4 h-4 text-blue-600" />
+                </div>
+                <h4 className="text-lg font-semibold text-blue-600">Admin</h4>
+              </div>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Department-level management and oversight:
+              </p>
+              <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-blue-600 rounded-full" />
+                  Manage extension programs within assigned department
+                </li>
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-blue-600 rounded-full" />
+                  Review and approve project proposals and reports
+                </li>
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-blue-600 rounded-full" />
+                  Monitor department KPIs and generate departmental reports
+                </li>
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-blue-600 rounded-full" />
+                  Manage department staff and focal persons
+                </li>
+              </ul>
+            </div>
+
+            {/* Staff */}
+            <div className="p-4 rounded-lg border transition-colors bg-card hover:bg-accent/50">
+              <div className="flex gap-2 items-center mb-2">
+                <div className="rounded-full bg-green-100 p-1.5">
+                  <Shield className="w-4 h-4 text-green-600" />
+                </div>
+                <h4 className="text-lg font-semibold text-green-600">Staff</h4>
+              </div>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Basic access for program implementation:
+              </p>
+              <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-green-600 rounded-full" />
+                  Submit and track extension program proposals
+                </li>
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-green-600 rounded-full" />
+                  Document community engagement activities
+                </li>
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-green-600 rounded-full" />
+                  Upload activity photos and supporting documents
+                </li>
+                <li className="flex gap-2 items-center">
+                  <span className="w-1 h-1 bg-green-600 rounded-full" />
+                  Generate basic activity reports
+                </li>
+              </ul>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsRolesDialogOpen(false)}
+              className="w-full sm:w-auto"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="rounded-md border">
         <Table>
@@ -449,7 +690,10 @@ export default function UserManagementPage() {
                         <Edit className="mr-2 w-4 h-4" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem
+                        className="text-red-600"
+                        onClick={() => handleDeleteClick(user)}
+                      >
                         <Trash2 className="mr-2 w-4 h-4" />
                         Delete
                       </DropdownMenuItem>
@@ -461,6 +705,40 @@ export default function UserManagementPage() {
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {userToDelete?.firstName}{" "}
+              {userToDelete?.lastName}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete User"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

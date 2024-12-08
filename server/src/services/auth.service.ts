@@ -67,7 +67,7 @@ export const authService = {
     });
 
     const accessToken = this.generateAccessToken(user.id);
-
+    console.log("User successfully registered", user);
     return { user, accessToken };
   },
 

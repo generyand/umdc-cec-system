@@ -4,6 +4,7 @@ import {
   updateUserProfile,
   getUsers,
   addUser,
+  deleteUser,
 } from "../../controllers/users.controller.js";
 
 const router = Router();
@@ -12,4 +13,6 @@ const router = Router();
 router.get("/", authenticateToken, getUsers);
 router.patch("/:userId/profile", authenticateToken, updateUserProfile);
 router.post("/", authenticateToken, addUser);
+router.delete("/:userId", authenticateToken, deleteUser);
+
 export default router;

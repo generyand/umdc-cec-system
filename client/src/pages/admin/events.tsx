@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import multiMonthPlugin from "@fullcalendar/multimonth";
 import listPlugin from "@fullcalendar/list";
-
+import { parseISO } from 'date-fns';
 import { cn } from "@/lib/utils";
+import { activitiesApi } from "@/services/api/activities.service";
 import "./calendar.css";
 
-// Define event type
 interface Event {
   id: string;
   title: string;
@@ -17,144 +18,53 @@ interface Event {
   end: Date;
   description?: string;
   extendedProps?: {
+    proposalId: number;
     description: string;
   };
 }
 
-const sampleEvents: Event[] = [
-  {
-    id: "1",
-    title: "Community Health Workshop",
-    start: new Date(2024, 1, 15, 9, 0),
-    end: new Date(2024, 1, 15, 12, 0),
-    description:
-      "Health awareness and basic medical screening for Barangay San Jose residents",
-  },
-  {
-    id: "2",
-    title: "Literacy Program Planning",
-    start: new Date(2024, 1, 16, 14, 0),
-    end: new Date(2024, 1, 16, 16, 0),
-    description:
-      "Planning meeting for adult literacy program implementation in partner communities",
-  },
-  {
-    id: "3",
-    title: "Environmental Awareness Drive",
-    start: new Date(2024, 1, 20, 8, 0),
-    end: new Date(2024, 1, 20, 17, 0),
-    description:
-      "Tree planting and environmental education activity with local youth organizations",
-  },
-  {
-    id: "4",
-    title: "Skills Training Workshop",
-    start: new Date(2024, 1, 18, 13, 0),
-    end: new Date(2024, 1, 18, 17, 0),
-    description:
-      "Vocational skills training for out-of-school youth: Basic Electronics",
-  },
-  {
-    id: "5",
-    title: "CEC Board Meeting",
-    start: new Date(2024, 1, 22, 10, 0),
-    end: new Date(2024, 1, 22, 12, 0),
-    description:
-      "Monthly review of community extension programs and initiatives",
-  },
-  {
-    id: "6",
-    title: "Impact Assessment",
-    start: new Date(2024, 1, 17, 14, 0),
-    end: new Date(2024, 1, 17, 16, 0),
-    description: "Evaluation of recent community programs' impact and outcomes",
-  },
-  {
-    id: "7",
-    title: "Stakeholders Meeting",
-    start: new Date(2024, 1, 25, 9, 0),
-    end: new Date(2024, 1, 25, 11, 0),
-    description:
-      "Coordination meeting with community leaders and partner organizations",
-  },
-  {
-    id: "8",
-    title: "Program Planning Session",
-    start: new Date(2024, 1, 19, 9, 0),
-    end: new Date(2024, 1, 19, 12, 0),
-    description:
-      "Strategic planning for upcoming community development initiatives",
-  },
-  {
-    id: "9",
-    title: "Community Workshop",
-    start: new Date(2024, 1, 23, 13, 0),
-    end: new Date(2024, 1, 23, 17, 0),
-    description: "Sustainable livelihood workshop for local community members",
-  },
-  {
-    id: "10",
-    title: "Volunteer Orientation",
-    start: new Date(2024, 1, 21, 14, 0),
-    end: new Date(2024, 1, 21, 16, 0),
-    description: "Orientation session for new community extension volunteers",
-  },
-  // Multi-day event
-  {
-    id: "11",
-    title: "Community Development Summit",
-    start: new Date(2024, 1, 27, 8, 0),
-    end: new Date(2024, 1, 29, 17, 0),
-    description:
-      "Annual summit for community development planning and stakeholder engagement",
-  },
-  // Weekly recurring events
-  ...Array.from({ length: 4 }, (_, i) => ({
-    id: String(12 + i),
-    title: "Project Monitoring",
-    start: new Date(2024, 1, 15 + i, 9, 0),
-    end: new Date(2024, 1, 15 + i, 10, 30),
-    description: "Regular monitoring of ongoing community extension projects",
-  })),
-];
-
-// Helper function to generate events for demo purposes
-const generateRecurringEvents = (baseEvent: Event, count: number): Event[] => {
-  return Array.from({ length: count }, (_, i) => ({
-    ...baseEvent,
-    id: String(baseEvent.id) + i,
-    start: new Date(baseEvent.start.getTime() + i * 24 * 60 * 60 * 1000),
-    end: new Date(baseEvent.end.getTime() + i * 24 * 60 * 60 * 1000),
-  }));
-};
-
-// Add recurring weekly community programs
-const weeklyPrograms = generateRecurringEvents(
-  {
-    id: "20",
-    title: "Adult Education Program",
-    start: new Date(2024, 1, 15, 15, 0),
-    end: new Date(2024, 1, 15, 17, 0),
-    description: "Weekly adult education sessions in partner communities",
-  },
-  4
-);
-
-// Combine all events
-const allEvents = [...sampleEvents, ...weeklyPrograms];
-
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>(allEvents);
-  const [date, setDate] = useState(new Date());
+  const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
-  // Handle event click
+  const { data: activitiesResponse, isLoading, error } = useQuery({
+    queryKey: ["activities"],
+    queryFn: activitiesApi.getActivities,
+  });
+
+  const { mutate: createActivity } = useMutation({
+    mutationFn: activitiesApi.createActivity,
+    onSuccess: () => {
+      console.log("Activity created successfully");
+      // Optionally refetch activities or update state
+    },
+    onError: (error) => {
+      console.error("Error creating activity:", error);
+    },
+  });
+
+  useEffect(() => {
+    if (activitiesResponse && activitiesResponse.success) {
+      const formattedEvents = activitiesResponse.data.map((activity: any) => ({
+        id: String(activity.id),
+        title: activity.title,
+        start: parseISO(activity.targetDate),
+        end: new Date(parseISO(activity.targetDate).getTime() + 24 * 60 * 60 * 1000), // Add one day for end date
+        description: activity.description,
+        extendedProps: {
+          proposalId: activity.proposalId,
+          description: activity.description,
+        },
+      }));
+      setEvents(formattedEvents);
+    }
+  }, [activitiesResponse]);
+
   const handleEventClick = (info: any) => {
     setSelectedEvent(info.event);
     console.log(info.event);
   };
 
-  // Handle date selection
   const handleDateSelect = (selectInfo: any) => {
     console.log("Selected slot:", {
       start: selectInfo.start,
@@ -162,9 +72,21 @@ export default function EventsPage() {
     });
   };
 
+  const handleApprove = () => {
+    if (selectedEvent) {
+      const proposalId = selectedEvent.extendedProps?.proposalId;
+      if (proposalId !== undefined) {
+        createActivity(proposalId);
+      } else {
+        console.log("Proposal ID is missing");
+      }
+    } else {
+      console.log("No event selected");
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header Section */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Events Calendar</h1>
@@ -172,32 +94,14 @@ export default function EventsPage() {
             Manage and track all community extension activities
           </p>
         </div>
-        {/* <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Create Event
-        </Button> */}
+        <button
+          onClick={handleApprove}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Approve
+        </button>
       </div>
 
-      {/* Controls Section */}
-      <div className="grid gap-4 md:grid-cols-3">
-        {/* <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search events..." className="pl-8" />
-        </div> */}
-
-        {/* <div className="flex gap-2 justify-center items-center">
-          <span className="text-sm font-medium">
-            {format(date, "MMMM yyyy")}
-          </span>
-        </div> */}
-
-        {/* <Button variant="outline" className="gap-2">
-          <Filter className="w-4 h-4" />
-          Filter Events
-        </Button> */}
-      </div>
-
-      {/* Calendar Card */}
       <div className="rounded-xl border shadow bg-card text-card-foreground">
         <div className="p-6">
           <FullCalendar
@@ -220,6 +124,7 @@ export default function EventsPage() {
               id: String(event.id),
               extendedProps: {
                 description: event.description,
+                proposalId: event.extendedProps?.proposalId,
               },
             }))}
             height="calc(100vh - 320px)"
@@ -299,7 +204,6 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Legend */}
       <div className="flex flex-wrap gap-6 text-sm">
         <div className="flex gap-2 items-center">
           <div className="w-3 h-3 rounded-full bg-primary" />

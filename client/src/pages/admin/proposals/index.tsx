@@ -36,6 +36,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { activitiesApi } from "@/services/api/activities.service";
 
 interface Proposal {
   id: number;
@@ -135,13 +136,29 @@ export default function ProposalsPage() {
         newStatus,
         useAuth.getState().token as string
       ),
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       refetch();
       toast.success("Proposal status updated successfully");
+
+      // Call createActivity if the proposal is approved
+      if (variables.newStatus === "APPROVED") {
+        createActivityMutation.mutate(Number(variables.id));
+      }
     },
     onError: (error) => {
       toast.error("Failed to update proposal status. Please try again.");
       console.error("Error updating proposal status:", error);
+    },
+  });
+
+  const createActivityMutation = useMutation({
+    mutationFn: (proposalId: number) => activitiesApi.createActivity(proposalId),
+    onSuccess: () => {
+      toast.success("Activity created successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to create activity. Please try again.");
+      console.error("Error creating activity:", error);
     },
   });
 

@@ -7,7 +7,7 @@ export const activitiesApi = {
     },
   
   createActivity: async (proposalId: number) => {
-    const response = await api.post("/api/activities", proposalId);
+    const response = await api.post("/api/activities", { proposalId: Number(proposalId) });
     return response.data;
   },
 };

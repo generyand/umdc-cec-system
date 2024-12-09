@@ -33,16 +33,16 @@ export default function EventsPage() {
     queryFn: activitiesApi.getActivities,
   });
 
-  const { mutate: createActivity } = useMutation({
-    mutationFn: activitiesApi.createActivity,
-    onSuccess: () => {
-      console.log("Activity created successfully");
-      // Optionally refetch activities or update state
-    },
-    onError: (error) => {
-      console.error("Error creating activity:", error);
-    },
-  });
+  // const { mutate: createActivity } = useMutation({
+  //   mutationFn: activitiesApi.createActivity,
+  //   onSuccess: () => {
+  //     console.log("Activity created successfully");
+  //     // Optionally refetch activities or update state
+  //   },
+  //   onError: (error) => {
+  //     console.error("Error creating activity:", error);
+  //   },
+  // });
 
   useEffect(() => {
     if (activitiesResponse && activitiesResponse.success) {
@@ -74,18 +74,18 @@ export default function EventsPage() {
     });
   };
 
-  const handleApprove = () => {
-    if (selectedEvent) {
-      const proposalId = selectedEvent.extendedProps?.proposalId;
-      if (proposalId !== undefined) {
-        createActivity(proposalId);
-      } else {
-        console.log("Proposal ID is missing");
-      }
-    } else {
-      console.log("No event selected");
-    }
-  };
+  // const handleApprove = () => {
+  //   if (selectedEvent) {
+  //     const proposalId = selectedEvent.extendedProps?.proposalId;
+  //     if (proposalId !== undefined) {
+  //       createActivity(proposalId);
+  //     } else {
+  //       console.log("Proposal ID is missing");
+  //     }
+  //   } else {
+  //     console.log("No event selected");
+  //   }
+  // };
 
   return (
     <div className="space-y-6">
@@ -96,12 +96,12 @@ export default function EventsPage() {
             Manage and track all community extension activities
           </p>
         </div>
-        <button
+        {/* <button
           onClick={handleApprove}
           className="bg-blue-500 text-white px-4 py-2 rounded"
         >
           Approve
-        </button>
+        </button> */}
       </div>
 
       {isLoading ? (

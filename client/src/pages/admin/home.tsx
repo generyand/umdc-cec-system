@@ -99,13 +99,13 @@ export default function HomePage() {
     {
       title: "Extension Manual",
       description: "Guidelines and procedures",
-      href: "/documents/manual",
+      href: "/admin/documents/manual",
       icon: FileText,
     },
     {
       title: "Forms & Templates",
       description: "Downloadable resources",
-      href: "/documents/templates",
+      href: "/admin/documents/templates",
       icon: FolderPlus,
     },
     {

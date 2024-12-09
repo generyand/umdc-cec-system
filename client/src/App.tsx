@@ -30,6 +30,7 @@ import ProposalsPage from "./pages/admin/proposals";
 import ProposalDetailsPage from "./pages/admin/proposals/proposal-details";
 import UserManagementPage from "./pages/admin/administration/user-management";
 import BannerProgramDetailsPage from "./pages/admin/banner-programs/banner-program-details";
+import ExtensionManual from "./pages/extension-manual";
 
 const App = () => {
   return (
@@ -107,6 +108,10 @@ const App = () => {
             <Route
               path="/admin/administration/user-management"
               element={<UserManagementPage />}
+            />
+            <Route
+              path="/admin/documents/manual"
+              element={<ExtensionManual />}
             />
           </Route>
 

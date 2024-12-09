@@ -231,29 +231,35 @@ model ActivityDocument {
 }
 
 model PartnerCommunity {
-  id            Int         @id @default(autoincrement())
-  name          String
-  communityType String // Barangay, NGO, School, etc.
-  address       String
-  adoptionStart DateTime
-  adoptionEnd   DateTime? // Optional end date (for ongoing partnerships)
-  status        String    @default("ACTIVE") // ACTIVE, INACTIVE, COMPLETED
-
-  // Contact Information
-  contactPerson String
-  contactEmail  String? // Optional email
-  contactNumber String
-
-  // Additional Details
-  description String? // Brief description or notes about the partnership
+  id                Int         @id @default(autoincrement())
+  name              String
+  communityType     String      // Barangay, NGO, School, etc.
+  address           String
+  adoptionStart     DateTime
+  adoptionEnd       DateTime?   // Optional end date (for ongoing partnerships)
+  status            String      @default("ACTIVE") // ACTIVE, INACTIVE, COMPLETED
+  contactPerson     String
+  contactEmail      String?     // Optional email
+  contactNumber     String
+  description       String?     // Brief description or notes about the partnership
+  islandGroup       String      // Luzon, Visayas, Mindanao
+  region            String      // Region 1, Region 2, ..., Region 17
+  province          String
+  city              String
+  postalCode        String
+  coordinates       String      // Consider using a more structured type if needed
+  elevationLevel    Float?
+  population        Int?
+  povertyPopulation Int?
+  history           String?
 
   // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
   // Relationships
-  projectProposals ProjectProposal[]
-  activities       Activity[]
+  projectProposals  ProjectProposal[]
+  activities        Activity[]
 
   @@index([status])
   @@index([communityType])

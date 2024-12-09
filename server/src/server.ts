@@ -13,6 +13,7 @@ import academicProgramsRoutes from "./routes/academic-programs/academic-programs
 import projectProposalsRoutes from "./routes/project-proposals/project-proposals.route.js";
 import bannerProgramsRoutes from "./routes/banner-programs/banner-programs.route.js";
 import activitiesRoutes from "./routes/activities/activities.route.js";
+import partnerCommunitiesRoutes from "./routes/partner-communities/partner-communities.js";
 
 async function createServer() {
   const app = express();
@@ -36,6 +37,7 @@ async function createServer() {
   app.use("/api/banner-programs", bannerProgramsRoutes);
   app.use("/api/project-proposals", projectProposalsRoutes);
   app.use("/api/activities", activitiesRoutes);
+  app.use("/api/partner-communities", partnerCommunitiesRoutes);
 
   app.use(errorHandler);
 

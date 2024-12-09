@@ -116,7 +116,6 @@ CREATE TABLE "activities" (
     "status" "ActivityStatus" NOT NULL DEFAULT 'UPCOMING',
     "departmentId" INTEGER NOT NULL,
     "partnerCommunityId" INTEGER NOT NULL,
-    "proposalFileId" INTEGER NOT NULL,
     "proposalId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -153,6 +152,16 @@ CREATE TABLE "partner_communities" (
     "contactEmail" TEXT,
     "contactNumber" TEXT NOT NULL,
     "description" TEXT,
+    "islandGroup" TEXT NOT NULL,
+    "region" TEXT NOT NULL,
+    "province" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "postalCode" TEXT NOT NULL,
+    "coordinates" TEXT NOT NULL,
+    "elevationLevel" DOUBLE PRECISION,
+    "population" INTEGER,
+    "povertyPopulation" INTEGER,
+    "history" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -220,9 +229,6 @@ CREATE INDEX "project_proposals_bannerProgramId_idx" ON "project_proposals"("ban
 CREATE INDEX "project_attachments_proposalId_idx" ON "project_attachments"("proposalId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "activities_proposalFileId_key" ON "activities"("proposalFileId");
-
--- CreateIndex
 CREATE INDEX "activities_departmentId_idx" ON "activities"("departmentId");
 
 -- CreateIndex
@@ -281,9 +287,6 @@ ALTER TABLE "activities" ADD CONSTRAINT "activities_departmentId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "activities" ADD CONSTRAINT "activities_partnerCommunityId_fkey" FOREIGN KEY ("partnerCommunityId") REFERENCES "partner_communities"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "activities" ADD CONSTRAINT "activities_proposalFileId_fkey" FOREIGN KEY ("proposalFileId") REFERENCES "activity_documents"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "activities" ADD CONSTRAINT "activities_proposalId_fkey" FOREIGN KEY ("proposalId") REFERENCES "project_proposals"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

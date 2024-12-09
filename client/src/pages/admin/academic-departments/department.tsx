@@ -14,10 +14,11 @@ import {
   ArrowLeft,
   CalendarCheck,
   CalendarClock,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function DepartmentPage() {
   const { id } = useParams<{ id: string }>();
@@ -89,6 +90,24 @@ export default function DepartmentPage() {
 
   return (
     <div className="mx-auto space-y-8 w-full">
+      {/* Breadcrumb */}
+      <nav className="flex items-center text-sm text-muted-foreground">
+        <Link to="/admin" className="transition-colors hover:text-foreground">
+          Admin
+        </Link>
+        <ChevronRight className="mx-2 w-4 h-4" />
+        <Link
+          to="/admin/academic-departments"
+          className="transition-colors hover:text-foreground"
+        >
+          Academic Departments
+        </Link>
+        <ChevronRight className="mx-2 w-4 h-4" />
+        <span className="font-medium text-foreground">
+          {departmentData.department.name}
+        </span>
+      </nav>
+
       {/* Back Button */}
       <Button
         variant="ghost"

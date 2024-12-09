@@ -10,6 +10,7 @@ import {
   Pencil,
   Trash2,
   Plus,
+  ChevronRight,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
@@ -434,8 +435,17 @@ export default function DepartmentsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
       <div className="flex flex-col gap-6">
+        <nav className="flex items-center text-sm text-muted-foreground">
+          <Link to="/admin" className="transition-colors hover:text-foreground">
+            Admin
+          </Link>
+          <ChevronRight className="mx-2 w-4 h-4" />
+          <span className="font-medium text-foreground">
+            Academic Departments
+          </span>
+        </nav>
+
         <div className="flex justify-between items-center">
           <div className="space-y-1">
             <h2 className="text-2xl font-bold tracking-tight">

@@ -193,7 +193,10 @@ export default function BannerProgramDetailsPage() {
             Admin
           </Link>
           <ChevronRight className="w-4 h-4" />
-          <Link to="/admin/banner-programs" className="hover:text-foreground">
+          <Link
+            to="/admin/community-engagement/banner-programs"
+            className="hover:text-foreground"
+          >
             Banner Programs
           </Link>
           <ChevronRight className="w-4 h-4" />

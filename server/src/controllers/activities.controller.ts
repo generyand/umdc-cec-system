@@ -32,7 +32,7 @@ export const createActivity: RequestHandler = async (req: Request, res: Response
     }
 
     // Extract the first attachment ID if it exists
-    const proposalFileId = proposal.attachments.length > 0 ? proposal.attachments[0].id : null;
+    // const proposalFileId = proposal.attachments.length > 0 ? proposal.attachments[0].id : null;
 
     // Prepare data for new activity
     const activityData: any = {
@@ -47,10 +47,6 @@ export const createActivity: RequestHandler = async (req: Request, res: Response
     // Conditionally add optional fields
     if (proposal.communityId !== null) {
       activityData.partnerCommunity = { connect: { id: proposal.communityId } };
-    }
-
-    if (proposalFileId !== null) {
-      activityData.proposalFile = { connect: { id: proposalFileId } };
     }
 
     if (proposal.bannerProgramId !== null) {

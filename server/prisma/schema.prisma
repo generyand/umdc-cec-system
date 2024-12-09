@@ -188,10 +188,6 @@ model Activity {
   partnerCommunityId Int
   partnerCommunity   PartnerCommunity  @relation(fields: [partnerCommunityId], references: [id])
   
-  // Proposal Document (required)
-  proposalFile     ActivityDocument @relation("ProposalFile", fields: [proposalFileId], references: [id])
-  proposalFileId   Int              @unique // One-to-one relationship
-
   // Other documentation (optional, multiple)
   documents        ActivityDocument[] @relation("ActivityDocuments")
 
@@ -227,7 +223,7 @@ model ActivityDocument {
   // Relationships
   activityId  Int? // Make it optional since not all documents are regular attachments
   activity    Activity? @relation("ActivityDocuments", fields: [activityId], references: [id])
-  proposalFor Activity? @relation("ProposalFile") // For proposal files
+  // proposalFor Activity? @relation("ProposalFile") // For proposal files
 
   @@index([category])
   @@index([activityId])

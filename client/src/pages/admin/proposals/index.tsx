@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertCircle, Search } from "lucide-react";
+import { AlertCircle, Search, CheckCircle } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -25,6 +25,17 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Proposal {
   id: number;
@@ -402,31 +413,111 @@ export default function ProposalsPage() {
                             </Button>
                             {proposal.status === "PENDING" && (
                               <>
-                                <Button
-                                  variant="default"
-                                  size="sm"
-                                  className="bg-green-600 hover:bg-green-700"
-                                  onClick={() =>
-                                    handleStatusUpdate(
-                                      proposal.id.toString(),
-                                      "APPROVED"
-                                    )
-                                  }
-                                >
-                                  Approve
-                                </Button>
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleStatusUpdate(
-                                      proposal.id.toString(),
-                                      "RETURNED"
-                                    )
-                                  }
-                                >
-                                  Return
-                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      variant="default"
+                                      size="sm"
+                                      className="bg-green-600 hover:bg-green-700"
+                                    >
+                                      Approve
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent className="max-w-md">
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle className="flex gap-2 items-center text-xl">
+                                        <div className="p-2 bg-green-100 rounded-full">
+                                          <CheckCircle className="w-5 h-5 text-green-600" />
+                                        </div>
+                                        Approve Project Proposal
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription className="pt-3 space-y-2">
+                                        <p>
+                                          You are about to approve "
+                                          <span className="font-medium">
+                                            {proposal.title}
+                                          </span>
+                                          " submitted by{" "}
+                                          <span className="font-medium">
+                                            {proposal.user.firstName}{" "}
+                                            {proposal.user.lastName}
+                                          </span>
+                                          .
+                                        </p>
+                                        <p className="text-muted-foreground">
+                                          This action cannot be undone.
+                                        </p>
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter className="gap-2">
+                                      <AlertDialogCancel className="mt-0">
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() =>
+                                          handleStatusUpdate(
+                                            proposal.id.toString(),
+                                            "APPROVED"
+                                          )
+                                        }
+                                        className="bg-green-600 hover:bg-green-700"
+                                      >
+                                        Confirm Approval
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">
+                                      Return
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent className="max-w-md">
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle className="flex gap-2 items-center text-xl">
+                                        <div className="p-2 bg-red-100 rounded-full">
+                                          <AlertCircle className="w-5 h-5 text-red-600" />
+                                        </div>
+                                        Return Project Proposal
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription className="pt-3 space-y-2">
+                                        <p>
+                                          You are about to return "
+                                          <span className="font-medium">
+                                            {proposal.title}
+                                          </span>
+                                          " submitted by{" "}
+                                          <span className="font-medium">
+                                            {proposal.user.firstName}{" "}
+                                            {proposal.user.lastName}
+                                          </span>
+                                          .
+                                        </p>
+                                        <p className="text-muted-foreground">
+                                          This action cannot be undone.
+                                        </p>
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter className="gap-2">
+                                      <AlertDialogCancel className="mt-0">
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() =>
+                                          handleStatusUpdate(
+                                            proposal.id.toString(),
+                                            "RETURNED"
+                                          )
+                                        }
+                                        className="bg-destructive hover:bg-destructive/90"
+                                      >
+                                        Confirm Return
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               </>
                             )}
                           </div>

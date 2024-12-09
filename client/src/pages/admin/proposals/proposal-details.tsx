@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   AlertCircle,
@@ -22,6 +21,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 import { projectProposalsService } from "@/services/api/project-proposals.service";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface Proposal {
   id: number;
@@ -64,60 +65,50 @@ interface Proposal {
 }
 
 export default function ProposalDetailsPage() {
-  const [proposal, setProposal] = useState<Proposal | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchProposalDetails();
-  }, [id]);
-
-  const fetchProposalDetails = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const {
+    data: proposal,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["proposal", id],
+    queryFn: async () => {
       const response = await projectProposalsService.getProposalById(
         id as string,
         useAuth.getState().token as string
       );
-      if (!response.data.success)
+
+      if (!response.data.success) {
         throw new Error("Failed to fetch proposal details");
+      }
 
-      console.log("Proposal Data:", response.data.data);
+      return response.data.data;
+    },
+    enabled: !!id,
+  });
 
-      setProposal(response.data.data);
-    } catch (error) {
-      setError("Failed to load proposal details. Please try again later.");
-      console.error("Error fetching proposal details:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleStatusUpdate = async (newStatus: "APPROVED" | "RETURNED") => {
-    try {
-      setIsLoading(true);
-      const response = await projectProposalsService.updateProposalStatus(
+  const updateStatusMutation = useMutation({
+    mutationFn: (newStatus: "APPROVED" | "RETURNED") =>
+      projectProposalsService.updateProposalStatus(
         id as string,
         newStatus,
         useAuth.getState().token as string
-      );
-
-      if (!response.data.success) {
-        throw new Error(`Failed to ${newStatus.toLowerCase()} proposal`);
-      }
-
-      await fetchProposalDetails(); // Refresh the details
-    } catch (error) {
-      setError(
-        `Failed to ${newStatus.toLowerCase()} proposal. Please try again later.`
-      );
+      ),
+    onSuccess: () => {
+      refetch();
+      toast.success("Proposal status updated successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to update proposal status. Please try again.");
       console.error("Error updating proposal status:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    },
+  });
+
+  const handleStatusUpdate = (newStatus: "APPROVED" | "RETURNED") => {
+    updateStatusMutation.mutate(newStatus);
   };
 
   const getStatusBadgeVariant = (status: Proposal["status"]) => {
@@ -244,6 +235,23 @@ export default function ProposalDetailsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container py-8 mx-auto max-w-4xl">
+          <Alert variant="destructive">
+            <AlertCircle className="w-4 h-4" />
+            <AlertDescription>
+              {error instanceof Error
+                ? error.message
+                : "Failed to load proposal details"}
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container py-8 mx-auto max-w-4xl">
@@ -267,17 +275,10 @@ export default function ProposalDetailsPage() {
               {formatStatus(proposal?.status)}
             </span>
           </div>
-
-          {error && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertCircle className="w-4 h-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
         </div>
 
         {/* Main Content */}
-        {!error && proposal && (
+        {proposal && (
           <Card className="shadow-sm">
             <CardContent className="p-8 space-y-8">
               {/* Title Section */}

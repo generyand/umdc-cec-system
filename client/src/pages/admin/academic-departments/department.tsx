@@ -15,6 +15,7 @@ import {
   CalendarCheck,
   CalendarClock,
   ChevronRight,
+  Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -342,11 +343,20 @@ export default function DepartmentPage() {
       {/* Activities Section */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Upcoming Activities */}
-        <Card>
-          <div className="p-6 border-b">
+        <Card className="h-[600px] flex flex-col">
+          <div className="flex-shrink-0 p-6 border-b">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-semibold">Upcoming Activities</h2>
+                <div className="flex gap-2 items-center">
+                  <h2 className="text-xl font-semibold">Upcoming Activities</h2>
+                  <span className="px-2 py-0.5 text-xs font-medium text-muted-foreground bg-muted rounded-full">
+                    {
+                      departmentData.activities.filter(
+                        (activity) => new Date(activity.targetDate) > new Date()
+                      ).length
+                    }
+                  </span>
+                </div>
                 <p className="text-sm text-muted-foreground">
                   Scheduled activities and events
                 </p>
@@ -356,7 +366,7 @@ export default function DepartmentPage() {
               </Button>
             </div>
           </div>
-          <div className="p-6">
+          <div className="overflow-y-auto flex-1 p-6 scrollbar-thin">
             {departmentData.activities.filter(
               (activity) => new Date(activity.targetDate) > new Date()
             ).length > 0 ? (
@@ -378,7 +388,10 @@ export default function DepartmentPage() {
                           </p>
                           {activity.bannerProgram && (
                             <div className="flex gap-2 items-center mt-2">
-                              <Badge variant="outline" className="text-xs">
+                              <Badge
+                                variant="outline"
+                                className="max-w-min text-xs"
+                              >
                                 {activity.bannerProgram.abbreviation}
                               </Badge>
                               <span className="text-sm text-muted-foreground">
@@ -387,9 +400,19 @@ export default function DepartmentPage() {
                             </div>
                           )}
                         </div>
-                        <Badge variant="outline">
-                          {new Date(activity.targetDate).toLocaleDateString()}
-                        </Badge>
+                        <div className="flex gap-2 items-center text-muted-foreground shrink-0">
+                          <Calendar className="w-4 h-4" />
+                          <time className="text-sm">
+                            {new Date(activity.targetDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              }
+                            )}
+                          </time>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -409,11 +432,23 @@ export default function DepartmentPage() {
         </Card>
 
         {/* Completed Activities */}
-        <Card>
-          <div className="p-6 border-b">
+        <Card className="h-[600px] flex flex-col">
+          <div className="flex-shrink-0 p-6 border-b">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-semibold">Completed Activities</h2>
+                <div className="flex gap-2 items-center">
+                  <h2 className="text-xl font-semibold">
+                    Completed Activities
+                  </h2>
+                  <span className="px-2 py-0.5 text-xs font-medium text-muted-foreground bg-muted rounded-full">
+                    {
+                      departmentData.activities.filter(
+                        (activity) =>
+                          new Date(activity.targetDate) <= new Date()
+                      ).length
+                    }
+                  </span>
+                </div>
                 <p className="text-sm text-muted-foreground">
                   Past activities and events
                 </p>
@@ -423,7 +458,7 @@ export default function DepartmentPage() {
               </Button>
             </div>
           </div>
-          <div className="p-6">
+          <div className="overflow-y-auto flex-1 p-6 scrollbar-thin">
             {departmentData.activities.filter(
               (activity) => new Date(activity.targetDate) <= new Date()
             ).length > 0 ? (
@@ -463,9 +498,19 @@ export default function DepartmentPage() {
                             </div>
                           )}
                         </div>
-                        <Badge variant="outline">
-                          {new Date(activity.targetDate).toLocaleDateString()}
-                        </Badge>
+                        <div className="flex gap-2 items-center text-muted-foreground shrink-0">
+                          <Calendar className="w-4 h-4" />
+                          <time className="text-sm">
+                            {new Date(activity.targetDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              }
+                            )}
+                          </time>
+                        </div>
                       </div>
                     </div>
                   ))}

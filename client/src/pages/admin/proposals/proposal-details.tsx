@@ -473,6 +473,8 @@ export default function ProposalDetailsPage() {
                     <h3 className="text-lg font-semibold">Attachments</h3>
                   </div>
                   <div className="space-y-2">
+                    {/* TODO: Add a type to the file argument */}
+                    {/* @ts-expect-error File has no type */}
                     {proposal.attachments.map((file) => (
                       <a
                         key={file.fileUrl}

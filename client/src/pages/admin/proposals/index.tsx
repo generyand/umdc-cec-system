@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle, Search } from "lucide-react";
 import {
@@ -24,6 +24,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 interface Proposal {
   id: number;
@@ -44,10 +45,6 @@ interface Proposal {
 }
 
 export default function ProposalsPage() {
-  const [proposals, setProposals] = useState<Proposal[]>([]);
-  const [filteredProposals, setFilteredProposals] = useState<Proposal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [sortBy, setSortBy] = useState<"date" | "title">("date");
@@ -56,31 +53,26 @@ export default function ProposalsPage() {
   const [itemsPerPage] = useState(10);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // TODO: Replace with actual API call
-    fetchProposals();
-  }, []);
-
-  const fetchProposals = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await projectProposalsService.getProposals(
+  const {
+    data: response,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["proposals"],
+    queryFn: async () => {
+      const result = await projectProposalsService.getProposals(
         useAuth.getState().token as string
       );
-      if (!response.data.success) throw new Error("Failed to fetch proposals");
-      setProposals(response.data.data);
-    } catch (error) {
-      setError("Failed to load proposals. Please try again later.");
-      console.error("Error fetching proposals:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      if (!result.data.success) throw new Error("Failed to fetch proposals");
+      return result.data.data;
+    },
+  });
 
-  // Add search and filter functionality
-  useEffect(() => {
-    let result = [...proposals];
+  const filteredProposals = useMemo(() => {
+    if (!response) return [];
+
+    let result = [...response];
 
     // Search filter
     if (searchQuery) {
@@ -109,32 +101,59 @@ export default function ProposalsPage() {
       return sortOrder === "desc" ? compareValue : -compareValue;
     });
 
-    setFilteredProposals(result);
-  }, [searchQuery, statusFilter, proposals, sortBy, sortOrder]);
+    return result;
+  }, [response, searchQuery, statusFilter, sortBy, sortOrder]);
+
+  const paginatedProposals = useMemo(() => {
+    return filteredProposals.slice(
+      (page - 1) * itemsPerPage,
+      page * itemsPerPage
+    );
+  }, [filteredProposals, page, itemsPerPage]);
+
+  const updateStatusMutation = useMutation({
+    mutationFn: ({
+      id,
+      newStatus,
+    }: {
+      id: string;
+      newStatus: "APPROVED" | "RETURNED";
+    }) =>
+      projectProposalsService.updateProposalStatus(
+        id,
+        newStatus,
+        useAuth.getState().token as string
+      ),
+    onSuccess: () => {
+      refetch();
+      toast.success("Proposal status updated successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to update proposal status. Please try again.");
+      console.error("Error updating proposal status:", error);
+    },
+  });
 
   const handleViewDetails = (id: string) => {
     navigate(`/admin/community-engagement/proposals/${id}`);
   };
 
-  const handleStatusUpdate = async (
+  const handleStatusUpdate = (
     id: string,
     newStatus: "APPROVED" | "RETURNED"
   ) => {
-    try {
-      setIsLoading(true);
-      await projectProposalsService.updateProposalStatus(
-        id,
-        newStatus,
-        useAuth.getState().token as string
-      );
-      await fetchProposals();
-      toast.success(`Proposal ${newStatus.toLowerCase()} successfully`);
-    } catch (error) {
-      toast.error("Failed to update proposal status. Please try again.");
-      console.error("Error updating proposal status:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    updateStatusMutation.mutate(
+      { id, newStatus },
+      {
+        onSuccess: () => {
+          toast.success(`Proposal ${newStatus.toLowerCase()} successfully`);
+        },
+        onError: (error) => {
+          toast.error("Failed to update proposal status. Please try again.");
+          console.error("Error updating proposal status:", error);
+        },
+      }
+    );
   };
 
   const getStatusBadgeVariant = (status: Proposal["status"]) => {
@@ -213,10 +232,6 @@ export default function ProposalsPage() {
   );
 
   const totalPages = Math.ceil(filteredProposals.length / itemsPerPage);
-  const paginatedProposals = filteredProposals.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
 
   return (
     <div className="container py-6 mx-auto space-y-6">
@@ -232,12 +247,14 @@ export default function ProposalsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-6">
+          {error ? (
+            <Alert variant="destructive">
               <AlertCircle className="w-4 h-4" />
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>
+                {(error as Error).message || "Failed to load proposals"}
+              </AlertDescription>
             </Alert>
-          )}
+          ) : null}
 
           {/* Search and Filter Section */}
           <div className="flex gap-4 items-center mb-6">

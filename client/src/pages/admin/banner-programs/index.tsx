@@ -369,7 +369,9 @@ const BannerProgramsPage = () => {
                   className="w-full font-medium group-hover:bg-primary/5"
                   aria-label={`View details for ${program.name}`}
                   onClick={() => {
-                    navigate(`/admin/banner-programs/${program.id}`);
+                    navigate(
+                      `/admin/community-engagement/banner-programs/${program.id}`
+                    );
                   }}
                 >
                   View Program Details

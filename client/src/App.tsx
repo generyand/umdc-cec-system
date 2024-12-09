@@ -28,8 +28,9 @@ import NewProposalPage from "./pages/admin/proposals/new";
 import BannerProgramsPage from "./pages/admin/banner-programs";
 import ProposalsPage from "./pages/admin/proposals";
 import ProposalDetailsPage from "./pages/admin/proposals/proposal-details";
-// import MockDepartmentPage from "./pages/admin/academic-departments/mockDepartment";
 import UserManagementPage from "./pages/admin/administration/user-management";
+import BannerProgramDetailsPage from "./pages/admin/banner-programs/banner-program-details";
+
 const App = () => {
   return (
     <>
@@ -90,6 +91,10 @@ const App = () => {
             <Route
               path="/admin/community-engagement/banner-programs"
               element={<BannerProgramsPage />}
+            />
+            <Route
+              path="/admin/community-engagement/banner-programs/:id"
+              element={<BannerProgramDetailsPage />}
             />
             <Route
               path="/admin/community-engagement/projects-proposals"

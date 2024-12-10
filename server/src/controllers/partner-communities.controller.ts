@@ -13,18 +13,40 @@ export const getAllCommunities: RequestHandler = async (req, res) => {
         communityType: true,
         address: true,
         status: true,
-        createdAt: true,
+        _count: {
+          select: {
+            activities: {
+              where: {
+                status: {
+                  in: ["UPCOMING", "ONGOING", "COMPLETED"],
+                },
+              },
+            },
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
     });
 
-    console.log(`✅ Successfully fetched ${communities.length} communities`);
+    // Transform the response
+    const transformedCommunities = communities.map((community) => ({
+      id: community.id,
+      name: community.name,
+      communityType: community.communityType,
+      address: community.address,
+      status: community.status,
+      activitiesCount: community._count.activities,
+    }));
+
+    console.log(
+      `✅ Successfully fetched ${transformedCommunities.length} communities`
+    );
     res.status(200).json({
       success: true,
       message: "Communities fetched successfully",
-      data: communities,
+      data: transformedCommunities,
     });
   } catch (error) {
     console.error("❌ Error fetching communities:", error);
@@ -67,7 +89,7 @@ export const getCommunityById: RequestHandler = async (req, res) => {
 // Create new partner community
 export const createCommunity: RequestHandler = async (req, res) => {
   try {
-    console.log("📝 Creating new community...");
+    console.log("��� Creating new community...");
     console.log("🔍 Processing community data:", req.body);
 
     const newCommunity = await prisma.partnerCommunity.create({

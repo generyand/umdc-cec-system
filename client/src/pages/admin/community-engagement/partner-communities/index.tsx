@@ -1,27 +1,23 @@
-import { MapPin, ChevronRight, Users } from "lucide-react";
+import { MapPin, ChevronRight, CalendarCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import DefaultBarangayImage from "@/assets/images/partner-communities/default-barangay.webp";
+import { partnerCommunitiesApi } from "@/services/api/partner-communities.service";
+import { useQuery } from "@tanstack/react-query";
+import { PartnerCommunity } from "@/types/partner-community.type";
 
-interface PartnerCommunityCardProps {
-  name: string;
-  slug: string;
-  beneficiaries?: number;
-  location?: string;
+interface PartnerCommunityCardProps extends PartnerCommunity {
   imageUrl?: string;
-  description?: string;
-  activePrograms?: number;
 }
 
 function PartnerCommunityCard({
   name,
-  slug,
-  beneficiaries = 0,
-  location = "",
+  id,
+  address,
+  status,
+  activitiesCount,
   imageUrl = DefaultBarangayImage,
-  // description = "",
-  activePrograms = 0,
 }: PartnerCommunityCardProps) {
   return (
     <Card className="overflow-hidden transition-all group hover:shadow-md">
@@ -36,7 +32,7 @@ function PartnerCommunityCard({
           variant="secondary"
           className="absolute top-4 right-4 text-white backdrop-blur-sm bg-black/50"
         >
-          {activePrograms} Active Programs
+          {status}
         </Badge>
       </div>
 
@@ -45,17 +41,17 @@ function PartnerCommunityCard({
           <h2 className="text-xl font-semibold">{name}</h2>
           <p className="flex gap-2 items-center text-sm text-muted-foreground">
             <MapPin className="w-4 h-4" />
-            {location}
+            {address}
           </p>
         </div>
 
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center text-sm text-muted-foreground">
-            <Users className="w-4 h-4" />
-            <span>{beneficiaries.toLocaleString()} Beneficiaries</span>
+            <CalendarCheck className="w-4 h-4" />
+            <span>{activitiesCount} Projects</span>
           </div>
           <Link
-            to={`/admin/community-engagement/partner-communities/${slug}`}
+            to={`/admin/community-engagement/partner-communities/${id}`}
             className="inline-flex items-center text-sm text-primary hover:underline"
           >
             View Details
@@ -68,6 +64,18 @@ function PartnerCommunityCard({
 }
 
 export default function PartnerCommunitiesPage() {
+  const {
+    data: communities,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["partner-communities"],
+    queryFn: partnerCommunitiesApi.getAllPartnerCommunities,
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {(error as Error).message}</div>;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -78,41 +86,18 @@ export default function PartnerCommunitiesPage() {
           </p>
         </div>
         <Badge variant="outline" className="text-base">
-          Total Communities: 3
+          Total Communities: {communities?.data.length || 0}
         </Badge>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <PartnerCommunityCard
-          name="Barangay San Miguel"
-          slug="san-miguel"
-          beneficiaries={150}
-          location="San Miguel, Digos City"
-          // imageUrl="https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=1200&auto=format&fit=crop"
-          imageUrl={DefaultBarangayImage}
-          description="A vibrant community known for its agricultural heritage"
-          activePrograms={3}
-        />
-        <PartnerCommunityCard
-          name="Barangay Dawis"
-          slug="dawis"
-          beneficiaries={200}
-          location="Dawis, Digos City"
-          // imageUrl="https://images.unsplash.com/photo-1526958097901-5e6d742d3371?q=80&w=1200&auto=format&fit=crop"
-          imageUrl={DefaultBarangayImage}
-          description="A coastal community focusing on sustainable fishing practices"
-          activePrograms={4}
-        />
-        <PartnerCommunityCard
-          name="Barangay Ruparan"
-          slug="ruparan"
-          beneficiaries={175}
-          location="Ruparan, Digos City"
-          // imageUrl="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?q=80&w=1200&auto=format&fit=crop"
-          imageUrl={DefaultBarangayImage}
-          description="An emerging hub for local entrepreneurship"
-          activePrograms={3}
-        />
+        {communities?.data.map((community) => (
+          <PartnerCommunityCard
+            key={community.id}
+            {...community}
+            imageUrl={DefaultBarangayImage}
+          />
+        ))}
       </div>
     </div>
   );

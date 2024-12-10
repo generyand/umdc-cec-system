@@ -23,6 +23,7 @@ import { Link } from "react-router-dom";
 import { User, LogOut, Settings } from "lucide-react";
 import umdcLogo from "@/assets/images/umdc-logo.png";
 import cecLogo from "@/assets/images/cec-logo.png";
+import { Notifications } from "@/components/layouts/common/notifications";
 
 const DEFAULT_AVATAR =
   "https://api.dicebear.com/7.x/avataaars/svg?seed=default";
@@ -85,18 +86,16 @@ export function Header() {
           </div>
         </Link>
 
-        {/* User Menu */}
-        <div className="flex items-center">
+        {/* User Menu and Notifications */}
+        <div className="flex gap-4 items-center">
+          <Notifications />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex gap-3 items-center">
-                <div className="hidden text-sm text-right md:block">
-                  <span className="block font-medium">{name}</span>
-                  <span className="block text-xs capitalize text-muted-foreground">
-                    {formatPosition(user?.position || user?.role || "Unknown")}
-                  </span>
-                </div>
-                <button className="p-1.5 rounded-full hover:bg-accent/50 transition-colors">
+                <button
+                  className="p-1.5 rounded-full hover:bg-accent/50 transition-colors"
+                  aria-label="User menu"
+                >
                   <Avatar className="w-8 h-8 border-2 shadow-sm border-background">
                     <AvatarImage src={DEFAULT_AVATAR} alt={name || "User"} />
                     <AvatarFallback className="bg-primary/10">
@@ -104,6 +103,12 @@ export function Header() {
                     </AvatarFallback>
                   </Avatar>
                 </button>
+                <div className="hidden flex-col text-sm md:flex">
+                  <span className="font-medium">{name}</span>
+                  <span className="text-xs capitalize text-muted-foreground">
+                    {formatPosition(user?.position || user?.role || "Unknown")}
+                  </span>
+                </div>
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">

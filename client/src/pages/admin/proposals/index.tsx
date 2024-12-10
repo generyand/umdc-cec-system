@@ -152,7 +152,8 @@ export default function ProposalsPage() {
   });
 
   const createActivityMutation = useMutation({
-    mutationFn: (proposalId: number) => activitiesApi.createActivity(proposalId),
+    mutationFn: (proposalId: number) =>
+      activitiesApi.createActivity(proposalId),
     onSuccess: () => {
       toast.success("Activity created successfully");
     },
@@ -163,7 +164,7 @@ export default function ProposalsPage() {
   });
 
   const handleViewDetails = (id: string) => {
-    navigate(`/admin/community-engagement/proposals/${id}`);
+    navigate(`/admin/community-engagement/project-proposals/${id}`);
   };
 
   const handleStatusUpdate = (
@@ -269,7 +270,11 @@ export default function ProposalsPage() {
             <CardTitle className="text-2xl font-bold">
               Project Proposals
             </CardTitle>
-            <Button onClick={() => navigate("/admin/proposals/new")}>
+            <Button
+              onClick={() =>
+                navigate("/admin/community-engagement/project-proposals/new")
+              }
+            >
               Create New Proposal
             </Button>
           </div>

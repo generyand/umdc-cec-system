@@ -51,7 +51,7 @@ const navigationItems: NavItem[] = [
         icon: FileText,
       },
       { title: "Proposals", href: "/staff/proposals", icon: FileText },
-      { title: "Reports", href: "/staff/reports", icon: FileText },
+      // { title: "Reports", href: "/staff/reports", icon: FileText },
     ],
   },
   {
@@ -61,31 +61,31 @@ const navigationItems: NavItem[] = [
     children: [
       { title: "Calendar", href: "/staff/events/calendar", icon: Calendar },
       { title: "My Events", href: "/staff/events/my-events", icon: Calendar },
-      {
-        title: "Register for Events",
-        href: "/staff/events/register",
-        icon: Calendar,
-      },
+      // {
+      //   title: "Register for Events",
+      //   href: "/staff/events/register",
+      //   icon: Calendar,
+      // },
     ],
   },
-  {
-    title: "Documents",
-    href: "#",
-    icon: FileText,
-    children: [
-      {
-        title: "My Proposals",
-        href: "/staff/documents/my-proposals",
-        icon: FileText,
-      },
-      { title: "Reports", href: "/staff/documents/reports", icon: FileText },
-      {
-        title: "Templates",
-        href: "/staff/documents/templates",
-        icon: FileText,
-      },
-    ],
-  },
+  // {
+  //   title: "Documents",
+  //   href: "#",
+  //   icon: FileText,
+  //   children: [
+  //     {
+  //       title: "My Proposals",
+  //       href: "/staff/documents/my-proposals",
+  //       icon: FileText,
+  //     },
+  //     { title: "Reports", href: "/staff/documents/reports", icon: FileText },
+  //     {
+  //       title: "Templates",
+  //       href: "/staff/documents/templates",
+  //       icon: FileText,
+  //     },
+  //   ],
+  // },
   { title: "Profile Settings", href: "/staff/profile-settings", icon: User },
 ];
 

@@ -31,7 +31,7 @@ export default function HomePage() {
     {
       title: "Create Proposal",
       description: "Start a new extension proposal",
-      href: "/admin/proposals/new",
+      href: "/admin/community-engagement/project-proposals/new",
       icon: FilePlus,
     },
     {

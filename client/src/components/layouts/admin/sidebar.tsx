@@ -63,7 +63,7 @@ const navigationItems: NavItem[] = [
     children: [
       {
         title: "Project Proposals",
-        href: "/admin/community-engagement/projects-proposals",
+        href: "/admin/community-engagement/project-proposals",
         icon: FileText,
       },
       {

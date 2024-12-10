@@ -1,35 +1,56 @@
+// React Router
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "sonner";
+
+// Styles and Utils
 import "./styles/toast.css";
+import { Toaster } from "sonner";
+
+// Stores and Hooks
 import { useThemeStore } from "@/store/use-theme-store";
 import { useAuth } from "@/hooks/use-auth";
 
+// Layouts
 import MainLayout from "@/components/layouts/main-layout";
-import RegisterPage from "@/pages/auth/register";
 import AuthLayout from "@/components/layouts/auth/auth-layout";
-import LoginPage from "@/pages/auth/login";
-import HomePage from "@/pages/admin/home";
 import AdminLayout from "./components/layouts/admin/admin-layout";
-import DashboardPage from "./pages/admin/dashboard";
-import SettingsPage from "./pages/admin/settings";
-import AdminProfile from "./pages/admin/profile";
-import PartnershipsAndLinkagesPage from "./pages/admin/community-engagement/partnerships-and-linkages";
-import PartnerCommunitiesPage from "./pages/admin/community-engagement/partner-communities";
-import EventsPage from "./pages/admin/events";
-
-import CommunityDetailsPage from "./pages/admin/community-engagement/partner-communities/community-details";
-import AcademicDepartmentsPage from "./pages/admin/academic-departments";
-import DepartmentPage from "./pages/admin/academic-departments/department";
-import NotFound from "./pages/not-found";
-import NewProposalPage from "./pages/admin/proposals/new";
-import BannerProgramsPage from "./pages/admin/banner-programs";
-import ProposalsPage from "./pages/admin/proposals";
-import ProposalDetailsPage from "./pages/admin/proposals/proposal-details";
-import UserManagementPage from "./pages/admin/administration/user-management";
-import BannerProgramDetailsPage from "./pages/admin/banner-programs/banner-program-details";
-import ExtensionManual from "./pages/extension-manual";
-import UnauthorizedPage from "./pages/unauth-page";
 import StaffLayout from "./components/layouts/staff/staff-layout";
+
+// Auth Pages
+import LoginPage from "@/pages/auth/login";
+import RegisterPage from "@/pages/auth/register";
+
+// Admin Pages
+import HomePage from "@/pages/admin/home";
+import DashboardPage from "@/pages/admin/dashboard";
+import AdminProfile from "@/pages/admin/profile";
+import SettingsPage from "@/pages/admin/settings";
+
+// Academic Department Pages
+import AcademicDepartmentsPage from "@/pages/admin/academic-departments";
+import DepartmentPage from "@/pages/admin/academic-departments/department";
+
+// Community Engagement Pages
+import PartnershipsAndLinkagesPage from "@/pages/admin/community-engagement/partnerships-and-linkages";
+import PartnerCommunitiesPage from "@/pages/admin/community-engagement/partner-communities";
+import CommunityDetailsPage from "./pages/admin/community-engagement/partner-communities/community-details";
+import ProposalsPage from "@/pages/admin/proposals";
+import NewProposalPage from "@/pages/admin/proposals/new";
+import ProposalDetailsPage from "@/pages/admin/proposals/proposal-details";
+import BannerProgramsPage from "@/pages/admin/banner-programs";
+import BannerProgramDetailsPage from "@/pages/admin/banner-programs/banner-program-details";
+
+// Events Pages
+import EventsPage from "@/pages/admin/events";
+
+// Administration Pages
+import UserManagementPage from "@/pages/admin/administration/user-management";
+
+// Document Pages
+import ExtensionManual from "@/pages/extension-manual";
+
+// Error Pages
+import UnauthorizedPage from "@/pages/unauth-page";
+import NotFound from "@/pages/not-found";
 
 const App = () => {
   const { user, initialized } = useAuth();
@@ -47,7 +68,10 @@ const App = () => {
             index
             element={
               user ? (
-                <Navigate to={user.role === "ADMIN" ? "/admin" : "/"} replace />
+                <Navigate
+                  to={user.role === "ADMIN" ? "/admin" : "/staff"}
+                  replace
+                />
               ) : (
                 <Navigate to="/auth/login" replace />
               )
@@ -61,7 +85,7 @@ const App = () => {
               element={
                 user ? (
                   <Navigate
-                    to={user.role === "ADMIN" ? "/admin" : "/"}
+                    to={user.role === "ADMIN" ? "/admin" : "/staff"}
                     replace
                   />
                 ) : (
@@ -74,7 +98,7 @@ const App = () => {
               element={
                 user ? (
                   <Navigate
-                    to={user.role === "ADMIN" ? "/admin" : "/"}
+                    to={user.role === "ADMIN" ? "/admin" : "/staff"}
                     replace
                   />
                 ) : (
@@ -110,7 +134,7 @@ const App = () => {
 
             {/* Community Engagement */}
             <Route path="community-engagement">
-              <Route path="projects-proposals">
+              <Route path="project-proposals">
                 <Route index element={<ProposalsPage />} />
                 <Route path="new" element={<NewProposalPage />} />
                 <Route path=":id" element={<ProposalDetailsPage />} />
@@ -135,18 +159,6 @@ const App = () => {
             {/* Events & Activities */}
             <Route path="events-and-activities" element={<EventsPage />} />
 
-            {/* Service Programs */}
-            {/* <Route path="service-programs">
-              <Route path="rotc" element={<ROTCPage />} />
-              <Route path="nstp" element={<NSTPPage />} />
-            </Route> */}
-
-            {/* Analytics and Reports */}
-            {/* <Route path="analytics-and-reports">
-              <Route path="reports" element={<ReportsPage />} />
-              <Route path="impact-metrics" element={<ImpactMetricsPage />} />
-            </Route> */}
-
             {/* Administration */}
             <Route path="administration">
               <Route path="user-management" element={<UserManagementPage />} />
@@ -170,7 +182,7 @@ const App = () => {
 
           {/* Staff routes */}
           <Route
-            path="/"
+            path="/staff"
             element={
               user?.role === "STAFF" ? (
                 <StaffLayout />
@@ -180,7 +192,15 @@ const App = () => {
                 <Navigate to="/auth/login" replace />
               )
             }
-          />
+          >
+            {/* Staff Home */}
+            <Route index element={<div>Staff Home</div>} />
+
+            {/* Add other staff routes here */}
+            <Route path="profile" element={<div>Staff Profile</div>} />
+            <Route path="projects" element={<div>Staff Projects</div>} />
+            {/* ... more staff routes ... */}
+          </Route>
 
           {/* Public routes */}
           <Route path="/unauthorized" element={<UnauthorizedPage />} />

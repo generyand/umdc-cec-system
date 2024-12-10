@@ -64,7 +64,18 @@ export const getCommunityById: RequestHandler = async (req, res) => {
     const community = await prisma.partnerCommunity.findUnique({
       where: { id: parseInt(id) },
       include: {
-        projectProposals: true,
+        activities: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+            targetDate: true,
+          },
+          orderBy: {
+            targetDate: "asc",
+          },
+        },
       },
     });
 
@@ -73,11 +84,45 @@ export const getCommunityById: RequestHandler = async (req, res) => {
       throw new ApiError(404, "Community not found");
     }
 
+    // Transform the response to match the expected format
+    const transformedCommunity = {
+      id: community.id,
+      name: community.name,
+      communityType: community.communityType,
+      address: community.address,
+      adoptionStart: community.adoptionStart,
+      adoptionEnd: community.adoptionEnd,
+      status: community.status,
+      contactPerson: community.contactPerson,
+      contactEmail: community.contactEmail,
+      contactNumber: community.contactNumber,
+      description: community.description,
+      islandGroup: community.islandGroup,
+      region: community.region,
+      province: community.province,
+      city: community.city,
+      postalCode: community.postalCode,
+      coordinates: community.coordinates,
+      elevationLevel: community.elevationLevel,
+      population: community.population,
+      povertyPopulation: community.povertyPopulation,
+      history: community.history,
+      createdAt: community.createdAt,
+      updatedAt: community.updatedAt,
+      activities: community.activities.map((activity) => ({
+        id: activity.id,
+        title: activity.title,
+        description: activity.description,
+        status: activity.status,
+        targetDate: activity.targetDate,
+      })),
+    };
+
     console.log(`✅ Successfully fetched community: ${community.name}`);
     res.status(200).json({
       success: true,
       message: "Community fetched successfully",
-      data: community,
+      data: transformedCommunity,
     });
   } catch (error) {
     console.error("❌ Error fetching community:", error);

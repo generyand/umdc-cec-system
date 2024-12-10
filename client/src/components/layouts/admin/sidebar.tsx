@@ -63,22 +63,22 @@ const navigationItems: NavItem[] = [
     children: [
       {
         title: "Project Proposals",
-        href: "/admin/projects-proposals",
+        href: "/admin/community-engagement/projects-proposals",
         icon: FileText,
       },
       {
         title: "Banner Programs",
-        href: "/admin/banner-programs",
+        href: "/admin/community-engagement/banner-programs",
         icon: Flag,
       },
       {
         title: "Partner Communities",
-        href: "/admin/partner-communities",
+        href: "/admin/community-engagement/partner-communities",
         icon: Users,
       },
       {
         title: "Partnerships & Linkages",
-        href: "/admin/partnerships-and-linkages",
+        href: "/admin/community-engagement/partnerships-and-linkages",
         icon: Building2,
       },
     ],

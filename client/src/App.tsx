@@ -99,6 +99,8 @@ const App = () => {
           >
             {/* Home */}
             <Route index element={<HomePage />} />
+            <Route path="profile" element={<AdminProfile />} />
+            <Route path="dashboard" element={<DashboardPage />} />
 
             {/* Academic Departments */}
             <Route path="academic-departments">
@@ -107,29 +109,43 @@ const App = () => {
             </Route>
 
             {/* Community Engagement */}
-            <Route path="projects-proposals">
-              <Route index element={<ProposalsPage />} />
-              <Route path="new" element={<NewProposalPage />} />
-              <Route path=":id" element={<ProposalDetailsPage />} />
-            </Route>
+            <Route path="community-engagement">
+              <Route path="projects-proposals">
+                <Route index element={<ProposalsPage />} />
+                <Route path="new" element={<NewProposalPage />} />
+                <Route path=":id" element={<ProposalDetailsPage />} />
+              </Route>
 
-            <Route path="banner-programs">
-              <Route index element={<BannerProgramsPage />} />
-              <Route path=":id" element={<BannerProgramDetailsPage />} />
-            </Route>
+              <Route path="banner-programs">
+                <Route index element={<BannerProgramsPage />} />
+                <Route path=":id" element={<BannerProgramDetailsPage />} />
+              </Route>
 
-            <Route path="partner-communities">
-              <Route index element={<PartnerCommunitiesPage />} />
-              <Route path=":id" element={<CommunityDetailsPage />} />
-            </Route>
+              <Route path="partner-communities">
+                <Route index element={<PartnerCommunitiesPage />} />
+                <Route path=":id" element={<CommunityDetailsPage />} />
+              </Route>
 
-            <Route
-              path="partnerships-and-linkages"
-              element={<PartnershipsAndLinkagesPage />}
-            />
+              <Route
+                path="partnerships-and-linkages"
+                element={<PartnershipsAndLinkagesPage />}
+              />
+            </Route>
 
             {/* Events & Activities */}
             <Route path="events-and-activities" element={<EventsPage />} />
+
+            {/* Service Programs */}
+            {/* <Route path="service-programs">
+              <Route path="rotc" element={<ROTCPage />} />
+              <Route path="nstp" element={<NSTPPage />} />
+            </Route> */}
+
+            {/* Analytics and Reports */}
+            {/* <Route path="analytics-and-reports">
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="impact-metrics" element={<ImpactMetricsPage />} />
+            </Route> */}
 
             {/* Administration */}
             <Route path="administration">
@@ -144,6 +160,11 @@ const App = () => {
                 path="announcements"
                 element={<div>Announcements Page</div>}
               />
+            </Route>
+
+            {/* Documents */}
+            <Route path="documents">
+              <Route path="manual" element={<ExtensionManual />} />
             </Route>
           </Route>
 

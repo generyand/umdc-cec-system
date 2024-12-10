@@ -36,14 +36,24 @@ export function Header() {
     await logout();
   };
 
-  const formatRole = (role: string) => {
-    switch (role) {
-      case "ADMIN":
-        return "Administrator";
+  const formatPosition = (position: string) => {
+    switch (position) {
+      case "CEC_HEAD":
+        return "CEC Head";
+      case "CEC_OFFICE_ASSISTANT":
+        return "CEC Office Assistant";
+      case "CEC_COORDINATOR":
+        return "CEC Coordinator";
+      case "VP_DIRECTOR":
+        return "VP Director";
+      case "DEAN":
+        return "Dean";
+      case "PROGRAM_HEAD":
+        return "Program Head";
       case "FOCAL_PERSON":
         return "Focal Person";
       default:
-        return "Unknown";
+        return user?.role || "Unknown";
     }
   };
 
@@ -52,7 +62,7 @@ export function Header() {
       <div className="container flex justify-between items-center px-4 mx-auto h-16">
         {/* Logo Section */}
         <Link
-          to="/admin"
+          to="/staff"
           className="flex gap-3 items-center transition-opacity hover:opacity-90"
         >
           <div className="flex gap-2 items-center">
@@ -83,7 +93,7 @@ export function Header() {
                 <div className="hidden text-sm text-right md:block">
                   <span className="block font-medium">{name}</span>
                   <span className="block text-xs capitalize text-muted-foreground">
-                    {formatRole(user?.role || "Unknown")}
+                    {formatPosition(user?.position || user?.role || "Unknown")}
                   </span>
                 </div>
                 <button className="p-1.5 rounded-full hover:bg-accent/50 transition-colors">
@@ -100,13 +110,13 @@ export function Header() {
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/admin/profile" className="cursor-pointer">
+                <Link to="/staff/profile" className="cursor-pointer">
                   <User className="mr-2 w-4 h-4" />
                   Profile
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/admin/settings" className="cursor-pointer">
+                <Link to="/staff/settings" className="cursor-pointer">
                   <Settings className="mr-2 w-4 h-4" />
                   Settings
                 </Link>

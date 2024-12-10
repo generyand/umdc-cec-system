@@ -31,6 +31,8 @@ import ProposalDetailsPage from "./pages/admin/proposals/proposal-details";
 import UserManagementPage from "./pages/admin/administration/user-management";
 import BannerProgramDetailsPage from "./pages/admin/banner-programs/banner-program-details";
 import ExtensionManual from "./pages/extension-manual";
+import UnauthorizedPage from "./pages/unauth-page";
+import StaffLayout from "./components/layouts/staff/staff-layout";
 
 const App = () => {
   return (
@@ -114,6 +116,12 @@ const App = () => {
               element={<ExtensionManual />}
             />
           </Route>
+
+          <Route path="/" element={<StaffLayout />}>
+            <Route index element={<div>Staff</div>} />
+          </Route>
+
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           {/* Catch all route - redirect to login */}
           <Route path="*" element={<NotFound />} />

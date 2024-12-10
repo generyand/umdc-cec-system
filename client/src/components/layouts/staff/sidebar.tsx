@@ -5,26 +5,11 @@ import { useState } from "react";
 import {
   LucideIcon,
   Home,
-  // LayoutDashboard,
-  Building2,
-  Users,
-  // BarChart3,
-  ChevronDown,
-  Handshake,
-  School,
-  // BookOpen,
-  FileText,
-  // TrendingUp,
-  Flag,
-  Settings,
-  UserCog,
   Building,
-  CheckSquare,
-  History,
-  Bell,
-  // FileBox,
-  // Wrench,
+  FileText,
   Calendar,
+  User,
+  ChevronDown,
 } from "lucide-react";
 
 // Types
@@ -49,118 +34,59 @@ interface CollapsibleSectionProps {
 
 // Navigation Configuration
 const navigationItems: NavItem[] = [
-  { title: "Home", href: "/admin", icon: Home },
-  // { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  { title: "Home", href: "/staff", icon: Home },
   {
-    title: "Academic Departments",
-    href: "/admin/academic-departments",
-    icon: School,
-  },
-  {
-    title: "Community Engagement",
+    title: "My Department",
     href: "#",
-    icon: Handshake,
+    icon: Building,
     children: [
       {
-        title: "Project Proposals",
-        href: "/admin/community-engagement/projects-proposals",
+        title: "Department Overview",
+        href: "/staff/department-overview",
         icon: FileText,
       },
       {
-        title: "Banner Programs",
-        href: "/admin/community-engagement/banner-programs",
-        icon: Flag,
+        title: "Programs & Projects",
+        href: "/staff/programs-projects",
+        icon: FileText,
       },
-      {
-        title: "Partner Communities",
-        href: "/admin/community-engagement/partner-communities",
-        icon: Users,
-      },
-      {
-        title: "Partnerships & Linkages",
-        href: "/admin/community-engagement/partnerships-and-linkages",
-        icon: Building2,
-      },
+      { title: "Proposals", href: "/staff/proposals", icon: FileText },
+      { title: "Reports", href: "/staff/reports", icon: FileText },
     ],
   },
-  // {
-  //   title: "Service Programs",
-  //   href: "#",
-  //   icon: BookOpen,
-  //   children: [
-  //     { title: "ROTC", href: "/admin/service-programs/rotc", icon: Users },
-  //     { title: "NSTP", href: "/admin/service-programs/nstp", icon: Users },
-  //   ],
-  // },
   {
     title: "Events & Activities",
-    href: "/admin/events-and-activities",
-    icon: Calendar,
-  },
-  // {
-  //   title: "Analytics & Reports",
-  //   href: "#",
-  //   icon: BarChart3,
-  //   children: [
-  //     {
-  //       title: "Reports",
-  //       href: "/admin/analytics-and-reports/reports",
-  //       icon: FileText,
-  //     },
-  //     {
-  //       title: "Impact Metrics",
-  //       href: "/admin/analytics-and-reports/impact-metrics",
-  //       icon: TrendingUp,
-  //     },
-  //   ],
-  // },
-  {
-    title: "Administration",
     href: "#",
-    icon: Settings,
+    icon: Calendar,
     children: [
+      { title: "Calendar", href: "/staff/events/calendar", icon: Calendar },
+      { title: "My Events", href: "/staff/events/my-events", icon: Calendar },
       {
-        title: "User Management",
-        href: "/admin/administration/user-management",
-        icon: UserCog,
+        title: "Register for Events",
+        href: "/staff/events/register",
+        icon: Calendar,
       },
-      {
-        title: "Department Settings",
-        href: "/admin/administration/department-settings",
-        icon: Building,
-      },
-      // {
-      //   title: "System Settings",
-      //   href: "/admin/administration/system-settings",
-      //   icon: Settings,
-      // },
-      {
-        title: "Approvals",
-        href: "/admin/administration/approvals",
-        icon: CheckSquare,
-      },
-      {
-        title: "Activity Logs",
-        href: "/admin/administration/activity-logs",
-        icon: History,
-      },
-      {
-        title: "Announcements",
-        href: "/admin/administration/announcements",
-        icon: Bell,
-      },
-      // {
-      //   title: "Documents",
-      //   href: "/admin/administration/documents",
-      //   icon: FileBox,
-      // },
-      // {
-      //   title: "Maintenance",
-      //   href: "/admin/administration/maintenance",
-      //   icon: Wrench,
-      // },
     ],
   },
+  {
+    title: "Documents",
+    href: "#",
+    icon: FileText,
+    children: [
+      {
+        title: "My Proposals",
+        href: "/staff/documents/my-proposals",
+        icon: FileText,
+      },
+      { title: "Reports", href: "/staff/documents/reports", icon: FileText },
+      {
+        title: "Templates",
+        href: "/staff/documents/templates",
+        icon: FileText,
+      },
+    ],
+  },
+  { title: "Profile Settings", href: "/staff/profile-settings", icon: User },
 ];
 
 // Reusable Components

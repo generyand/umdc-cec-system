@@ -2,14 +2,23 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Clock, Home } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function NotFoundPage() {
+  const { user } = useAuth();
+
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(10);
 
   useEffect(() => {
     const redirectTimeout = setTimeout(() => {
-      navigate("/");
+      if (user?.role === "ADMIN") {
+        navigate("/admin");
+      } else if (user?.role === "STAFF") {
+        navigate("/");
+      } else {
+        navigate("/unauthorized");
+      }
     }, 10000);
 
     const countdownInterval = setInterval(() => {

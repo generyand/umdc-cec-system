@@ -21,6 +21,7 @@ import { cn, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -145,6 +146,34 @@ export default function HomePage() {
               day: "numeric",
             })}
           </p>
+        </div>
+
+        {/* Quick Stats on the right */}
+        <div className="flex gap-6 items-center">
+          <div className="flex flex-col items-center">
+            <div className="text-2xl font-bold text-primary">4</div>
+            <div className="text-sm text-muted-foreground">Banner Programs</div>
+          </div>
+          <Separator orientation="vertical" className="h-12" />
+          <div className="flex flex-col items-center">
+            <div className="text-2xl font-bold text-primary">5</div>
+            <div className="text-sm text-muted-foreground">
+              Partner Communities
+            </div>
+          </div>
+          <Separator orientation="vertical" className="h-12" />
+          <div className="flex flex-col items-center">
+            <div className="text-2xl font-bold text-primary">12</div>
+            <div className="text-sm text-muted-foreground">Active Projects</div>
+          </div>
+          <Separator orientation="vertical" className="h-12" />
+          <div className="flex flex-col items-center">
+            <div className="text-2xl font-bold text-primary">8</div>
+            <div className="text-sm text-muted-foreground">
+              Upcoming Activities
+            </div>
+          </div>
+          <Separator orientation="vertical" className="h-12" />
         </div>
       </div>
 

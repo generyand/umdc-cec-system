@@ -283,7 +283,7 @@ export default function CommunityDetailsPage() {
         {/* Quick Info Cards */}
         <div className="grid gap-4 md:grid-cols-4">
           <StatsCard
-            title="Partnership Duration"
+            title="Adoption Start"
             icon={<Calendar className="w-4 h-4 text-blue-500" />}
             value={format(new Date(community.adoptionStart), "MMM yyyy")}
             subtitle={

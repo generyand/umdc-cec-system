@@ -7,17 +7,17 @@ import {
 } from "@/components/ui/card";
 import {
   Activity,
-  FileText,
   Target,
   FolderPlus,
-  FileBarChart,
   Calendar,
   Building2,
   AlertCircle,
+  FilePlus,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
@@ -26,26 +26,30 @@ export default function HomePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const quickActions = [
+  const quickLinks = [
     {
-      label: "Create Proposal",
+      title: "Create Proposal",
+      description: "Start a new extension proposal",
       href: "/admin/proposals/new",
-      icon: FileText,
+      icon: FilePlus,
     },
     {
-      label: "Submit Report",
-      href: "/admin/reports/new",
-      icon: FileBarChart,
+      title: "Extension Manual",
+      description: "Guidelines and procedures",
+      href: "/admin/documents/manual",
+      icon: BookOpen,
     },
-    // {
-    //   label: "Schedule Event",
-    //   href: "/admin/calendar",
-    //   icon: Calendar,
-    // },
     {
-      label: "View Guidelines",
-      href: "/admin/guidelines",
+      title: "Forms & Templates",
+      description: "Downloadable resources",
+      href: "/admin/documents/templates",
       icon: FolderPlus,
+    },
+    {
+      title: "Calendar",
+      description: "Extension activities schedule",
+      href: "/admin/events-and-activities",
+      icon: Calendar,
     },
   ];
 
@@ -95,33 +99,6 @@ export default function HomePage() {
     },
   ];
 
-  const quickLinks = [
-    {
-      title: "Extension Manual",
-      description: "Guidelines and procedures",
-      href: "/admin/documents/manual",
-      icon: FileText,
-    },
-    {
-      title: "Forms & Templates",
-      description: "Downloadable resources",
-      href: "/admin/documents/templates",
-      icon: FolderPlus,
-    },
-    {
-      title: "Calendar",
-      description: "Extension activities schedule",
-      href: "/admin/events-and-activities",
-      icon: Calendar,
-    },
-    // {
-    //   title: "Reports Dashboard",
-    //   description: "View and generate reports",
-    //   href: "/reports",
-    //   icon: FileBarChart,
-    // },
-  ];
-
   const departmentPerformance = [
     {
       name: "DAE",
@@ -151,14 +128,14 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto space-y-8 w-full">
-      {/* Welcome Section - Enhanced with better visual hierarchy */}
+      {/* Welcome Section */}
       <div className="flex flex-col gap-4 justify-between items-start p-6 bg-gradient-to-r to-transparent rounded-lg md:flex-row md:items-center from-primary/10">
         <div className="space-y-2">
           <h1 className="text-4xl font-bold tracking-tight">
             Welcome back, {user?.firstName}! 👋
           </h1>
           <p className="text-lg text-muted-foreground">
-            {user?.department?.abbreviation} | Community Extension Center
+            {user?.department?.abbreviation || "Community Extension Center"}
           </p>
           <p className="text-sm text-muted-foreground">
             {new Date().toLocaleDateString("en-US", {
@@ -169,25 +146,33 @@ export default function HomePage() {
             })}
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          {quickActions.map((action) => (
-            <Button
-              key={action.label}
-              variant={
-                action.label === "Create Proposal" ? "default" : "secondary"
-              }
-              className="transition-all hover:scale-105"
-              onClick={() => navigate(action.href)}
-            >
-              <action.icon className="mr-2 w-4 h-4" />
-              {action.label}
-            </Button>
-          ))}
-        </div>
       </div>
 
+      {/* Quick Links - Moved to top */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {quickLinks.map((link) => (
+          <Button
+            key={link.title}
+            variant="outline"
+            className="flex flex-col items-start p-6 space-y-3 h-auto transition-colors hover:bg-primary/5 hover:border-primary"
+            onClick={() => navigate(link.href)}
+          >
+            <div className="p-2 rounded-lg bg-primary/10">
+              <link.icon className="w-5 h-5 text-primary" />
+            </div>
+            <div className="text-left">
+              <div className="font-medium">{link.title}</div>
+              <div className="mt-1 text-sm text-muted-foreground">
+                {link.description}
+              </div>
+            </div>
+          </Button>
+        ))}
+      </div>
+
+      {/* Rest of your dashboard content */}
       <div className="grid gap-8 md:grid-cols-2">
-        {/* Recent Activity - Enhanced with better scrolling and interaction */}
+        {/* Recent Activity Card */}
         <Card className="md:col-span-1">
           <CardHeader className="flex flex-row justify-between items-center">
             <div>
@@ -236,7 +221,7 @@ export default function HomePage() {
           </CardContent>
         </Card>
 
-        {/* Announcements - Enhanced with better priority visualization */}
+        {/* Announcements Card */}
         <Card className="md:col-span-1">
           <CardHeader className="flex flex-row justify-between items-center">
             <div>
@@ -300,7 +285,7 @@ export default function HomePage() {
           </CardContent>
         </Card>
 
-        {/* Add Department Performance */}
+        {/* Department Performance Card */}
         <Card className="md:col-span-1">
           <CardHeader>
             <div className="flex justify-between items-center">
@@ -370,7 +355,7 @@ export default function HomePage() {
           </CardContent>
         </Card>
 
-        {/* Add Status Overview */}
+        {/* Pending Approvals Card */}
         <Card className="md:col-span-1">
           <CardHeader>
             <div className="flex justify-between items-center">
@@ -408,46 +393,12 @@ export default function HomePage() {
                       <Badge variant="secondary">Pending Review</Badge>
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground">
-                      Submitted on{" "}
-                      {new Date(item.submitDate).toLocaleDateString()}
+                      Submitted on {formatDate(item.submitDate)}
                     </p>
                   </div>
                 ))}
               </div>
             </ScrollArea>
-          </CardContent>
-        </Card>
-
-        {/* Quick Links - Enhanced with better interaction and visual feedback */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex gap-2 items-center">
-              <FileText className="w-5 h-5 text-primary" />
-              Quick Links
-            </CardTitle>
-            <CardDescription>Frequently accessed resources</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {quickLinks.map((link) => (
-                <Button
-                  key={link.title}
-                  variant="outline"
-                  className="flex flex-col items-start p-6 space-y-3 h-auto transition-colors hover:bg-primary/5 hover:border-primary"
-                  onClick={() => navigate(link.href)}
-                >
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <link.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-medium">{link.title}</div>
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      {link.description}
-                    </div>
-                  </div>
-                </Button>
-              ))}
-            </div>
           </CardContent>
         </Card>
       </div>

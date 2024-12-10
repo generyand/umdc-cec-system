@@ -1,0 +1,58 @@
+export const mockCommunity = {
+  id: 1,
+  name: "Barangay San Miguel",
+  communityType: "Barangay",
+  address: "San Miguel, Digos City, Davao del Sur",
+  adoptionStart: "2023-01-15T00:00:00Z",
+  adoptionEnd: null,
+  status: "ACTIVE",
+  contactPerson: "Juan Dela Cruz",
+  contactEmail: "sanmiguel@digoscity.gov.ph",
+  contactNumber: "+63 912 345 6789",
+  description:
+    "Barangay San Miguel is a vibrant community located in the heart of Digos City. Known for its agricultural heritage and strong community ties, the barangay has been an active partner in various development programs.",
+  islandGroup: "Mindanao",
+  region: "Region XI",
+  province: "Davao del Sur",
+  city: "Digos City",
+  postalCode: "8002",
+  coordinates: "6°45'N 125°21'E",
+  elevationLevel: 120.5,
+  population: 5000,
+  povertyPopulation: 750,
+  history:
+    "Established in 1948, Barangay San Miguel was originally a small farming settlement. Over the years, it has grown into a progressive community while maintaining its agricultural roots.",
+  createdAt: "2023-01-15T00:00:00Z",
+  updatedAt: "2024-03-15T00:00:00Z",
+  activities: [
+    {
+      id: 1,
+      title: "Monthly Farmers Meeting",
+      description:
+        "Regular gathering of local farmers to discuss agricultural practices",
+      status: "UPCOMING",
+      date: "2024-04-20T00:00:00Z",
+    },
+    {
+      id: 2,
+      title: "Community Health Screening",
+      description: "Free health check-up and consultation for residents",
+      status: "UPCOMING",
+      date: "2024-04-15T00:00:00Z",
+    },
+    {
+      id: 3,
+      title: "Agricultural Training Workshop",
+      description: "Training on modern farming techniques",
+      status: "COMPLETED",
+      date: "2024-03-01T00:00:00Z",
+    },
+    {
+      id: 4,
+      title: "Youth Leadership Seminar",
+      description: "Leadership development program for young residents",
+      status: "COMPLETED",
+      date: "2024-02-15T00:00:00Z",
+    },
+  ],
+};

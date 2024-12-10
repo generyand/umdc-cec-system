@@ -20,7 +20,7 @@ import NSTPPage from "./pages/admin/service-programs/nstp";
 import ReportsPage from "./pages/admin/analytics-and-reports/reports";
 import ImpactMetricsPage from "./pages/admin/analytics-and-reports/impact-metrics";
 
-import BarangayPage from "./pages/admin/community-engagement/partner-communities/barangay-details";
+import CommunityDetailsPage from "./pages/admin/community-engagement/partner-communities/community-details";
 import AcademicDepartmentsPage from "./pages/admin/academic-departments";
 import DepartmentPage from "./pages/admin/academic-departments/department";
 import NotFound from "./pages/not-found";
@@ -62,8 +62,8 @@ const App = () => {
               element={<PartnerCommunitiesPage />}
             />
             <Route
-              path="/admin/community-engagement/partner-communities/:slug"
-              element={<BarangayPage />}
+              path="/admin/community-engagement/partner-communities/:id"
+              element={<CommunityDetailsPage />}
             />
             <Route
               path="/admin/community-engagement/partnerships-and-linkages"

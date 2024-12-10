@@ -2,6 +2,7 @@ import { MapPin, ChevronRight, CalendarCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import DefaultBarangayImage from "@/assets/images/partner-communities/default-barangay.webp";
 import { partnerCommunitiesApi } from "@/services/api/partner-communities.service";
 import { useQuery } from "@tanstack/react-query";
@@ -20,43 +21,74 @@ function PartnerCommunityCard({
   imageUrl = DefaultBarangayImage,
 }: PartnerCommunityCardProps) {
   return (
-    <Card className="overflow-hidden transition-all group hover:shadow-md">
+    <Card className="overflow-hidden transition-all group hover:shadow-lg hover:scale-[1.01] duration-300">
       <div className="overflow-hidden relative h-48">
         <img
           src={imageUrl}
           alt={name}
-          className="object-cover w-full h-full transition-transform group-hover:scale-105"
+          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t to-transparent from-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-t to-transparent from-black/80 via-black/40" />
         <Badge
-          variant="secondary"
-          className="absolute top-4 right-4 text-white backdrop-blur-sm bg-black/50"
+          variant={status === "ACTIVE" ? "default" : "secondary"}
+          className="absolute top-4 right-4 font-medium"
         >
-          {status}
+          {status === "ACTIVE" ? "Active" : "Inactive"}
         </Badge>
       </div>
 
-      <CardContent className="pt-4 space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold">{name}</h2>
+      <CardContent className="px-6 pt-6 pb-4 space-y-6">
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold transition-colors line-clamp-1 group-hover:text-primary">
+            {name}
+          </h2>
           <p className="flex gap-2 items-center text-sm text-muted-foreground">
-            <MapPin className="w-4 h-4" />
-            {address}
+            <MapPin className="flex-shrink-0 w-4 h-4 text-blue-500" />
+            <span className="line-clamp-1">{address}</span>
           </p>
         </div>
 
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2 items-center text-sm text-muted-foreground">
-            <CalendarCheck className="w-4 h-4" />
-            <span>{activitiesCount} Projects</span>
+        <div className="flex justify-between items-center pt-2 border-t">
+          <div className="flex gap-2 items-center text-sm">
+            <Badge
+              variant="outline"
+              className="flex gap-1.5 items-center py-1.5"
+            >
+              <CalendarCheck className="w-4 h-4 text-emerald-500" />
+              <span>{activitiesCount} Projects</span>
+            </Badge>
           </div>
           <Link
             to={`/admin/community-engagement/partner-communities/${id}`}
-            className="inline-flex items-center text-sm text-primary hover:underline"
+            className="inline-flex items-center text-sm font-medium transition-colors text-primary hover:text-primary/80"
           >
             View Details
             <ChevronRight className="ml-1 w-4 h-4" />
           </Link>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PartnerCommunityCardSkeleton() {
+  return (
+    <Card className="overflow-hidden">
+      <div className="relative h-48">
+        <Skeleton className="absolute inset-0" />
+      </div>
+      <CardContent className="px-6 pt-6 pb-4 space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="w-3/4 h-7" />
+          <div className="flex gap-2 items-center">
+            <Skeleton className="w-4 h-4" />
+            <Skeleton className="w-full h-4" />
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center pt-2 border-t">
+          <Skeleton className="w-28 h-7" />
+          <Skeleton className="w-24 h-4" />
         </div>
       </CardContent>
     </Card>
@@ -73,7 +105,6 @@ export default function PartnerCommunitiesPage() {
     queryFn: partnerCommunitiesApi.getAllPartnerCommunities,
   });
 
-  if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {(error as Error).message}</div>;
 
   return (
@@ -86,18 +117,26 @@ export default function PartnerCommunitiesPage() {
           </p>
         </div>
         <Badge variant="outline" className="text-base">
-          Total Communities: {communities?.data.length || 0}
+          Total Communities: {isLoading ? "..." : communities?.data.length || 0}
         </Badge>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {communities?.data.map((community) => (
-          <PartnerCommunityCard
-            key={community.id}
-            {...community}
-            imageUrl={DefaultBarangayImage}
-          />
-        ))}
+        {isLoading ? (
+          <>
+            <PartnerCommunityCardSkeleton />
+            <PartnerCommunityCardSkeleton />
+            <PartnerCommunityCardSkeleton />
+          </>
+        ) : (
+          communities?.data.map((community) => (
+            <PartnerCommunityCard
+              key={community.id}
+              {...community}
+              imageUrl={DefaultBarangayImage}
+            />
+          ))
+        )}
       </div>
     </div>
   );

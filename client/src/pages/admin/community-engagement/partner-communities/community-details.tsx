@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
   MapPin,
@@ -8,6 +8,7 @@ import {
   History,
   Users,
   GanttChart,
+  ChevronRight,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -125,6 +126,29 @@ export default function CommunityDetailsPage() {
 
   return (
     <div className="mx-auto space-y-6 w-full max-w-7xl">
+      {/* Simple Breadcrumb */}
+      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+        {/* <Link to="/admin" className="hover:text-foreground">
+          Admin
+        </Link> */}
+        {/* <ChevronRight className="w-4 h-4" /> */}
+        <Link
+          to="/admin/community-engagement"
+          className="hover:text-foreground"
+        >
+          Community Engagement
+        </Link>
+        <ChevronRight className="w-4 h-4" />
+        <Link
+          to="/admin/community-engagement/partner-communities"
+          className="hover:text-foreground"
+        >
+          Partner Communities
+        </Link>
+        <ChevronRight className="w-4 h-4" />
+        <span className="text-foreground">{community.name}</span>
+      </div>
+
       {/* Header Section */}
       <div className="flex flex-col gap-6">
         <Button

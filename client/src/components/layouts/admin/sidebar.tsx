@@ -63,57 +63,33 @@ const navigationItems: NavItem[] = [
     children: [
       {
         title: "Project Proposals",
-        href: "/admin/community-engagement/projects-proposals",
+        href: "/admin/projects-proposals",
         icon: FileText,
       },
       {
         title: "Banner Programs",
-        href: "/admin/community-engagement/banner-programs",
+        href: "/admin/banner-programs",
         icon: Flag,
       },
       {
         title: "Partner Communities",
-        href: "/admin/community-engagement/partner-communities",
+        href: "/admin/partner-communities",
         icon: Users,
       },
       {
         title: "Partnerships & Linkages",
-        href: "/admin/community-engagement/partnerships-and-linkages",
+        href: "/admin/partnerships-and-linkages",
         icon: Building2,
       },
     ],
   },
-  // {
-  //   title: "Service Programs",
-  //   href: "#",
-  //   icon: BookOpen,
-  //   children: [
-  //     { title: "ROTC", href: "/admin/service-programs/rotc", icon: Users },
-  //     { title: "NSTP", href: "/admin/service-programs/nstp", icon: Users },
-  //   ],
-  // },
+
   {
     title: "Events & Activities",
     href: "/admin/events-and-activities",
     icon: Calendar,
   },
-  // {
-  //   title: "Analytics & Reports",
-  //   href: "#",
-  //   icon: BarChart3,
-  //   children: [
-  //     {
-  //       title: "Reports",
-  //       href: "/admin/analytics-and-reports/reports",
-  //       icon: FileText,
-  //     },
-  //     {
-  //       title: "Impact Metrics",
-  //       href: "/admin/analytics-and-reports/impact-metrics",
-  //       icon: TrendingUp,
-  //     },
-  //   ],
-  // },
+
   {
     title: "Administration",
     href: "#",
@@ -129,11 +105,7 @@ const navigationItems: NavItem[] = [
         href: "/admin/administration/department-settings",
         icon: Building,
       },
-      // {
-      //   title: "System Settings",
-      //   href: "/admin/administration/system-settings",
-      //   icon: Settings,
-      // },
+
       {
         title: "Approvals",
         href: "/admin/administration/approvals",
@@ -149,16 +121,6 @@ const navigationItems: NavItem[] = [
         href: "/admin/administration/announcements",
         icon: Bell,
       },
-      // {
-      //   title: "Documents",
-      //   href: "/admin/administration/documents",
-      //   icon: FileBox,
-      // },
-      // {
-      //   title: "Maintenance",
-      //   href: "/admin/administration/maintenance",
-      //   icon: Wrench,
-      // },
     ],
   },
 ];

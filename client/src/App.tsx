@@ -16,10 +16,6 @@ import AdminProfile from "./pages/admin/profile";
 import PartnershipsAndLinkagesPage from "./pages/admin/community-engagement/partnerships-and-linkages";
 import PartnerCommunitiesPage from "./pages/admin/community-engagement/partner-communities";
 import EventsPage from "./pages/admin/events";
-import ROTCPage from "./pages/admin/service-programs/rotc";
-import NSTPPage from "./pages/admin/service-programs/nstp";
-import ReportsPage from "./pages/admin/analytics-and-reports/reports";
-import ImpactMetricsPage from "./pages/admin/analytics-and-reports/impact-metrics";
 
 import CommunityDetailsPage from "./pages/admin/community-engagement/partner-communities/community-details";
 import AcademicDepartmentsPage from "./pages/admin/academic-departments";
@@ -38,9 +34,8 @@ import StaffLayout from "./components/layouts/staff/staff-layout";
 const App = () => {
   const { user, initialized } = useAuth();
 
-  // Show loading state while auth is initializing
   if (!initialized) {
-    return <div>Loading...</div>; // Or your loading component
+    return <div>Loading...</div>;
   }
 
   return (
@@ -59,19 +54,34 @@ const App = () => {
             }
           />
 
-          {/* Auth routes - redirect if already logged in */}
-          <Route
-            path="/auth"
-            element={
-              user ? (
-                <Navigate to={user.role === "ADMIN" ? "/admin" : "/"} replace />
-              ) : (
-                <AuthLayout />
-              )
-            }
-          >
-            <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<RegisterPage />} />
+          {/* Auth routes */}
+          <Route path="/auth" element={<AuthLayout />}>
+            <Route
+              path="login"
+              element={
+                user ? (
+                  <Navigate
+                    to={user.role === "ADMIN" ? "/admin" : "/"}
+                    replace
+                  />
+                ) : (
+                  <LoginPage />
+                )
+              }
+            />
+            <Route
+              path="register"
+              element={
+                user ? (
+                  <Navigate
+                    to={user.role === "ADMIN" ? "/admin" : "/"}
+                    replace
+                  />
+                ) : (
+                  <RegisterPage />
+                )
+              }
+            />
           </Route>
 
           {/* Admin routes */}
@@ -80,75 +90,61 @@ const App = () => {
             element={
               user?.role === "ADMIN" ? (
                 <AdminLayout />
-              ) : (
+              ) : user ? (
                 <Navigate to="/unauthorized" replace />
+              ) : (
+                <Navigate to="/auth/login" replace />
               )
             }
           >
+            {/* Home */}
             <Route index element={<HomePage />} />
-            <Route path="/admin/profile" element={<AdminProfile />} />
-            <Route path="/admin/settings" element={<SettingsPage />} />
-            <Route path="/admin/dashboard" element={<DashboardPage />} />
-            <Route
-              path="/admin/academic-departments"
-              element={<AcademicDepartmentsPage />}
-            />
-            <Route
-              path="/admin/community-engagement/partner-communities"
-              element={<PartnerCommunitiesPage />}
-            />
-            <Route
-              path="/admin/community-engagement/partner-communities/:id"
-              element={<CommunityDetailsPage />}
-            />
-            <Route
-              path="/admin/community-engagement/partnerships-and-linkages"
-              element={<PartnershipsAndLinkagesPage />}
-            />
-            <Route
-              path="/admin/events-and-activities"
-              element={<EventsPage />}
-            />
-            <Route path="/admin/service-programs/rotc" element={<ROTCPage />} />
-            <Route path="/admin/service-programs/nstp" element={<NSTPPage />} />
-            <Route
-              path="/admin/analytics-and-reports/reports"
-              element={<ReportsPage />}
-            />
-            <Route
-              path="/admin/analytics-and-reports/impact-metrics"
-              element={<ImpactMetricsPage />}
-            />
+
+            {/* Academic Departments */}
+            <Route path="academic-departments">
+              <Route index element={<AcademicDepartmentsPage />} />
+              <Route path=":id" element={<DepartmentPage />} />
+            </Route>
+
+            {/* Community Engagement */}
+            <Route path="projects-proposals">
+              <Route index element={<ProposalsPage />} />
+              <Route path="new" element={<NewProposalPage />} />
+              <Route path=":id" element={<ProposalDetailsPage />} />
+            </Route>
+
+            <Route path="banner-programs">
+              <Route index element={<BannerProgramsPage />} />
+              <Route path=":id" element={<BannerProgramDetailsPage />} />
+            </Route>
+
+            <Route path="partner-communities">
+              <Route index element={<PartnerCommunitiesPage />} />
+              <Route path=":id" element={<CommunityDetailsPage />} />
+            </Route>
 
             <Route
-              path="/admin/academic-departments/:id"
-              element={<DepartmentPage />}
+              path="partnerships-and-linkages"
+              element={<PartnershipsAndLinkagesPage />}
             />
-            <Route path="/admin/proposals/new" element={<NewProposalPage />} />
-            <Route
-              path="/admin/community-engagement/banner-programs"
-              element={<BannerProgramsPage />}
-            />
-            <Route
-              path="/admin/community-engagement/banner-programs/:id"
-              element={<BannerProgramDetailsPage />}
-            />
-            <Route
-              path="/admin/community-engagement/projects-proposals"
-              element={<ProposalsPage />}
-            />
-            <Route
-              path="/admin/community-engagement/proposals/:id"
-              element={<ProposalDetailsPage />}
-            />
-            <Route
-              path="/admin/administration/user-management"
-              element={<UserManagementPage />}
-            />
-            <Route
-              path="/admin/documents/manual"
-              element={<ExtensionManual />}
-            />
+
+            {/* Events & Activities */}
+            <Route path="events-and-activities" element={<EventsPage />} />
+
+            {/* Administration */}
+            <Route path="administration">
+              <Route path="user-management" element={<UserManagementPage />} />
+              <Route path="department-settings" element={<SettingsPage />} />
+              <Route path="approvals" element={<div>Approvals Page</div>} />
+              <Route
+                path="activity-logs"
+                element={<div>Activity Logs Page</div>}
+              />
+              <Route
+                path="announcements"
+                element={<div>Announcements Page</div>}
+              />
+            </Route>
           </Route>
 
           {/* Staff routes */}
@@ -157,13 +153,13 @@ const App = () => {
             element={
               user?.role === "STAFF" ? (
                 <StaffLayout />
-              ) : (
+              ) : user ? (
                 <Navigate to="/unauthorized" replace />
+              ) : (
+                <Navigate to="/auth/login" replace />
               )
             }
-          >
-            <Route index element={<div>Staff</div>} />
-          </Route>
+          />
 
           {/* Public routes */}
           <Route path="/unauthorized" element={<UnauthorizedPage />} />

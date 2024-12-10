@@ -265,3 +265,23 @@ model PartnerCommunity {
   @@index([communityType])
   @@map("partner_communities")
 }
+
+model Announcement {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  priority    String   // e.g., "high", "medium", "low"
+  author      String
+  status      String   @default("active") // e.g., "active", "archived", "scheduled"
+  category    String   // e.g., "event", "update", "alert"
+  expirationDate DateTime?
+
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([priority])
+  @@index([status])
+  @@index([category])
+  @@map("announcements")
+}

@@ -1,4 +1,4 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   MapPin,
@@ -14,17 +14,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { mockCommunity } from "./mock-data";
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useQuery } from "@tanstack/react-query";
+import { partnerCommunitiesApi } from "@/services/api/partner-communities.service";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Activity {
   id: number;
   title: string;
   description: string;
   status: string;
-  date: string;
+  targetDate: string;
 }
 
 interface ActivitiesListProps {
@@ -67,7 +69,7 @@ export function ActivitiesList({ title, activities }: ActivitiesListProps) {
                     activity.status === "UPCOMING" ? "default" : "secondary"
                   }
                 >
-                  {format(new Date(activity.date), "MMM d, yyyy")}
+                  {format(new Date(activity.targetDate), "MMM d, yyyy")}
                 </Badge>
               </div>
             </CardContent>
@@ -119,10 +121,108 @@ export function StatsCard({ title, value, icon, subtitle }: StatsCardProps) {
 }
 
 export default function CommunityDetailsPage() {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const community = mockCommunity;
 
-  if (!community) return <div>Community not found</div>;
+  const { data, isLoading } = useQuery({
+    queryKey: ["partner-community", id],
+    queryFn: () => partnerCommunitiesApi.getPartnerCommunityById(Number(id)),
+  });
+
+  const community = data?.data;
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto space-y-6 w-full max-w-7xl">
+        {/* Breadcrumb Skeleton */}
+        <div className="flex items-center space-x-2 text-sm">
+          <Skeleton className="w-32 h-4" />
+          <Skeleton className="w-4 h-4 rounded-full" />
+          <Skeleton className="w-40 h-4" />
+          <Skeleton className="w-4 h-4 rounded-full" />
+          <Skeleton className="w-48 h-4" />
+        </div>
+        {/* Header Section Skeleton */}
+        <div className="flex flex-col gap-6">
+          <Skeleton className="w-40 h-10" /> {/* Back button */}
+          <div className="space-y-2">
+            <div className="flex gap-2 items-center">
+              <Skeleton className="w-64 h-10" /> {/* Title */}
+              <Skeleton className="w-24 h-6" /> {/* Status badge */}
+            </div>
+            <Skeleton className="w-72 h-5" /> {/* Address */}
+          </div>
+          {/* Stats Cards Skeleton */}
+          <div className="grid gap-4 md:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <div className="flex gap-4 items-center">
+                    <Skeleton className="w-12 h-12 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="w-24 h-4" />
+                      <Skeleton className="w-32 h-6" />
+                      <Skeleton className="w-20 h-4" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+        <Skeleton className="w-full h-px" /> {/* Separator */}
+        {/* Tabs Skeleton */}
+        <div className="space-y-6">
+          <div className="flex gap-4 border-b">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="w-28 h-12" />
+            ))}
+          </div>
+
+          {/* Content Skeleton */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <Skeleton className="w-48 h-6" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Skeleton className="w-full h-4" />
+                <Skeleton className="w-full h-4" />
+                <Skeleton className="w-3/4 h-4" />
+              </CardContent>
+            </Card>
+
+            {[...Array(2)].map((_, i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="w-40 h-6" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {[...Array(4)].map((_, j) => (
+                    <div key={j} className="space-y-1">
+                      <Skeleton className="w-24 h-4" />
+                      <Skeleton className="w-32 h-4" />
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!community) {
+    return (
+      <div className="flex flex-col justify-center items-center p-8 space-y-4">
+        <p className="text-lg text-muted-foreground">Community not found</p>
+        <Button variant="outline" onClick={() => navigate(-1)}>
+          Go Back
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto space-y-6 w-full max-w-7xl">
@@ -203,18 +303,19 @@ export default function CommunityDetailsPage() {
             }
           />
           <StatsCard
-            title="Contact Person"
-            icon={<Phone className="w-4 h-4 text-violet-500" />}
-            value={community.contactPerson}
-            subtitle={community.contactNumber}
+            title="Total Projects"
+            icon={<GanttChart className="w-4 h-4 text-violet-500" />}
+            value={community.activities?.length ?? 0}
+            subtitle="All time"
           />
           <StatsCard
-            title="Active Activities"
+            title="Completed Projects"
             icon={<GanttChart className="w-4 h-4 text-orange-500" />}
             value={
-              community.activities.filter((a) => a.status === "UPCOMING").length
+              community.activities?.filter((p) => p.status === "COMPLETED")
+                .length ?? 0
             }
-            subtitle="Upcoming activities"
+            subtitle="All time"
           />
         </div>
       </div>

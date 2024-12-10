@@ -13,8 +13,9 @@ interface AuthState {
   token: string | null;
   isLoading: boolean;
   error: string | null;
-  setToken: (token: string) => void;
-
+  initialized: boolean;
+  setToken: (token: string | null) => void;
+  initialize: () => void;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<boolean>;
   register: (email: string, password: string, name: string) => Promise<void>;
@@ -27,244 +28,184 @@ interface AuthState {
   updatePassword: (data: PasswordUpdateData) => Promise<void>;
 }
 
-export const useAuth = create<AuthState>()(
+const useAuth = create<AuthState>()(
   persist(
-    (set, get) => ({
-      user: null,
-      token: localStorage.getItem("token"),
-      isLoading: false,
-      error: null,
+    (set, get) => {
+      return {
+        user: null,
+        token: null,
+        isLoading: false,
+        error: null,
+        initialized: false,
 
-      setToken: (token: string) => {
-        console.log("Setting token:", token);
-        set({ token });
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        console.log(
-          "Current Authorization header:",
-          api.defaults.headers.common["Authorization"]
-        );
-        localStorage.setItem("token", token);
-      },
+        setToken: (token: string | null) => {
+          if (token) {
+            api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+            localStorage.setItem("token", token);
+          } else {
+            delete api.defaults.headers.common["Authorization"];
+            localStorage.removeItem("token");
+          }
+          set({ token });
+        },
 
-      login: async (email: string, password: string) => {
-        try {
-          set({ isLoading: true, error: null });
+        initialize: () => {
+          const token = localStorage.getItem("token");
+          if (token) {
+            api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+            set({ token, initialized: true });
+          } else {
+            set({ initialized: true });
+          }
+        },
 
-          const { data } = await api.post("/api/auth/login", {
-            email,
-            password,
-          });
+        login: async (email: string, password: string) => {
+          try {
+            set({ isLoading: true, error: null });
+            const { data } = await api.post("/api/auth/login", {
+              email,
+              password,
+            });
 
-          console.log("Login response data:", {
-            user: data.user,
-            token: data.token,
-          });
+            if (data.token) {
+              get().setToken(data.token);
+            }
 
-          set({
-            user: data.user,
-            token: data.token,
-            isLoading: false,
-          });
+            set({
+              user: data.user,
+              isLoading: false,
+              error: null,
+            });
+          } catch (error) {
+            set({
+              error: axios.isAxiosError(error)
+                ? error.response?.data?.message || "Failed to login"
+                : "An error occurred",
+              isLoading: false,
+            });
+            throw error;
+          }
+        },
 
-          api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
-          console.log("Auth state after login:", {
-            token: get().token,
-            authHeader: api.defaults.headers.common["Authorization"],
-          });
-        } catch (error) {
-          console.error("Login error:", error);
-          set({
-            error: axios.isAxiosError(error)
-              ? error.response?.data?.message || "Failed to login"
-              : "An error occurred",
-            isLoading: false,
-          });
-          throw error;
-        }
-      },
-
-      logout: async () => {
-        try {
-          const currentState = get();
-          console.log("Current state before logout:", {
-            user: currentState.user,
-            token: currentState.token,
-            authHeader: api.defaults.headers.common["Authorization"],
-          });
-
-          if (currentState.isLoading || !currentState.user) {
+        logout: async () => {
+          try {
+            set({ isLoading: true, error: null });
+            await api.post("/api/auth/logout", {});
+            get().setToken(null);
+            set({
+              user: null,
+              isLoading: false,
+              error: null,
+            });
+            return true;
+          } catch (error) {
+            set({
+              error: axios.isAxiosError(error)
+                ? error.response?.data?.message || "Failed to logout"
+                : "An error occurred",
+              isLoading: false,
+            });
             return false;
           }
+        },
 
-          set({ isLoading: true, error: null });
+        register: async (email: string, password: string, name: string) => {
+          try {
+            set({ isLoading: true, error: null });
+            const { data } = await api.post("/api/auth/register", {
+              email,
+              password,
+              name,
+            });
+            get().setToken(data.token);
+            set({
+              user: data.user,
+              isLoading: false,
+            });
+          } catch (error) {
+            set({
+              error: axios.isAxiosError(error)
+                ? error.response?.data?.message || "Failed to register"
+                : "An error occurred",
+              isLoading: false,
+            });
+            throw error;
+          }
+        },
 
-          // Send empty object instead of null
-          await api.post(
-            "/api/auth/logout",
-            {},
-            {
-              headers: {
-                Authorization: `Bearer ${currentState.token}`,
-              },
-            }
-          );
+        resetPassword: async (
+          email: string,
+          token: string,
+          newPassword: string
+        ) => {
+          try {
+            set({ isLoading: true, error: null });
+            await api.post("/api/auth/reset-password", {
+              email,
+              token,
+              newPassword,
+            });
+            set({ isLoading: false });
+          } catch (error) {
+            set({
+              error: axios.isAxiosError(error)
+                ? error.response?.data?.message || "Failed to reset password"
+                : "An error occurred",
+              isLoading: false,
+            });
+          }
+        },
 
-          // Clear state and headers after successful logout
-          set({
-            user: null,
-            token: null,
-            isLoading: false,
-            error: null,
-          });
+        updateProfile: async (data: ProfileUpdateData) => {
+          try {
+            set({ isLoading: true, error: null });
+            const { data: updatedUser } = await api.patch(
+              `/api/users/${get().user?.id}/profile`,
+              data
+            );
+            set({
+              user: updatedUser,
+              isLoading: false,
+            });
+          } catch (error) {
+            set({
+              error: axios.isAxiosError(error)
+                ? error.response?.data?.message || "Failed to update profile"
+                : "An error occurred",
+              isLoading: false,
+            });
+          }
+        },
 
-          delete api.defaults.headers.common["Authorization"];
-
-          console.log("Logout successful, cleared auth state:", {
-            currentUser: get().user,
-            currentToken: get().token,
-            authHeader: api.defaults.headers.common["Authorization"],
-          });
-
-          localStorage.removeItem("token");
-
-          return true;
-        } catch (error) {
-          console.error("Logout error:", error);
-          set({
-            error: axios.isAxiosError(error)
-              ? error.response?.data?.message || "Failed to logout"
-              : "An error occurred",
-            isLoading: false,
-          });
-          return false;
-        }
-      },
-
-      register: async (email: string, password: string, name: string) => {
-        try {
-          set({ isLoading: true, error: null });
-
-          const { data } = await api.post("/api/auth/register", {
-            email,
-            password,
-            name,
-          });
-
-          console.log("Register response data:", {
-            user: data.user,
-            token: data.token,
-          });
-
-          set({
-            user: data.user,
-            token: data.token,
-            isLoading: false,
-          });
-
-          api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
-          console.log("Auth state after register:", {
-            token: get().token,
-            authHeader: api.defaults.headers.common["Authorization"],
-          });
-        } catch (error) {
-          console.error("Register error:", error);
-          set({
-            error: axios.isAxiosError(error)
-              ? error.response?.data?.message || "Failed to register"
-              : "An error occurred",
-            isLoading: false,
-          });
-          throw error;
-        }
-      },
-
-      resetPassword: async (
-        email: string,
-        token: string,
-        newPassword: string
-      ) => {
-        try {
-          set({ isLoading: true, error: null });
-
-          await api.post("/api/auth/reset-password", {
-            email,
-            token,
-            newPassword,
-          });
-
-          set({ isLoading: false });
-        } catch (error) {
-          set({
-            error: axios.isAxiosError(error)
-              ? error.response?.data?.message || "Failed to reset password"
-              : "An error occurred",
-            isLoading: false,
-          });
-        }
-      },
-
-      updateProfile: async (data: ProfileUpdateData) => {
-        try {
-          set({ isLoading: true, error: null });
-
-          const { data: updatedUser } = await api.patch(
-            `/api/users/${get().user?.id}/profile`,
-            data,
-            {
-              headers: {
-                Authorization: `Bearer ${get().token}`,
-              },
-            }
-          );
-
-          set({
-            user: updatedUser,
-            isLoading: false,
-          });
-        } catch (error) {
-          set({
-            error: axios.isAxiosError(error)
-              ? error.response?.data?.message || "Failed to update profile"
-              : "An error occurred",
-            isLoading: false,
-          });
-        }
-      },
-
-      updatePassword: async (data: PasswordUpdateData) => {
-        try {
-          set({ isLoading: true, error: null });
-
-          await api.post("/api/auth/update-password", data);
-
-          set({ isLoading: false });
-        } catch (error) {
-          set({
-            error: axios.isAxiosError(error)
-              ? error.response?.data?.message || "Failed to update password"
-              : "An error occurred",
-            isLoading: false,
-          });
-        }
-      },
-    }),
+        updatePassword: async (data: PasswordUpdateData) => {
+          try {
+            set({ isLoading: true, error: null });
+            await api.post("/api/auth/update-password", data);
+            set({ isLoading: false });
+          } catch (error) {
+            set({
+              error: axios.isAxiosError(error)
+                ? error.response?.data?.message || "Failed to update password"
+                : "An error occurred",
+              isLoading: false,
+            });
+          }
+        },
+      };
+    },
     {
       name: "auth-storage",
-      partialize: (state) => {
-        console.log("Persisting auth state:", {
-          user: state.user,
-          token: state.token,
-        });
-        return {
-          user: state.user,
-          token: state.token,
-        };
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.initialize();
+        }
       },
     }
   )
 );
 
-// Log initial state when the store is created
-console.log("Initial auth state:", useAuth.getState());
-
-export default api;
+export { useAuth };

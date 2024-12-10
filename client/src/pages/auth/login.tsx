@@ -31,7 +31,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, isLoading, error, user } = useAuth();
+  const { login, isLoading, error, user, initialized } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,17 +41,26 @@ export default function LoginPage() {
     },
   });
 
-  // Redirect if already logged in
   useEffect(() => {
-    if (user?.role === "ADMIN") {
-      navigate("/admin");
-    } else if (user?.role === "STAFF") {
-      navigate("/");
+    if (!initialized || isLoading) return;
+
+    if (user) {
+      const destination = user.role === "ADMIN" ? "/admin" : "/";
+      navigate(destination, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, isLoading, initialized, navigate]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await login(values.email, values.password);
+    try {
+      await login(values.email, values.password);
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+  }
+
+  // If user is already logged in and we're not loading, show loading state
+  if (user && !isLoading) {
+    return <div>Redirecting...</div>;
   }
 
   return (

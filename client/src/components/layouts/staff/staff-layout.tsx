@@ -15,6 +15,10 @@ export default function StaffLayout() {
     return <Navigate to="/auth/login" replace />;
   }
 
+  if (user.role !== "STAFF") {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
   return (
     <div className="flex relative flex-col w-full h-screen">
       <Header />

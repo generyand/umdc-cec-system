@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import "./styles/toast.css";
 import { useThemeStore } from "@/store/use-theme-store";
+import { useAuth } from "@/hooks/use-auth";
 
 import MainLayout from "@/components/layouts/main-layout";
 import RegisterPage from "@/pages/auth/register";
@@ -35,22 +36,55 @@ import UnauthorizedPage from "./pages/unauth-page";
 import StaffLayout from "./components/layouts/staff/staff-layout";
 
 const App = () => {
+  const { user, initialized } = useAuth();
+
+  // Show loading state while auth is initializing
+  if (!initialized) {
+    return <div>Loading...</div>; // Or your loading component
+  }
+
   return (
     <>
       <MainLayout>
         <Routes>
-          {/* Root route - redirect to login */}
-          <Route index element={<Navigate to="/auth/login" replace />} />
-          <Route path="/" element={<Navigate to="/auth/login" replace />} />
+          {/* Root route - redirect based on auth state */}
+          <Route
+            index
+            element={
+              user ? (
+                <Navigate to={user.role === "ADMIN" ? "/admin" : "/"} replace />
+              ) : (
+                <Navigate to="/auth/login" replace />
+              )
+            }
+          />
 
-          {/* Auth routes */}
-          <Route path="/auth" element={<AuthLayout />}>
+          {/* Auth routes - redirect if already logged in */}
+          <Route
+            path="/auth"
+            element={
+              user ? (
+                <Navigate to={user.role === "ADMIN" ? "/admin" : "/"} replace />
+              ) : (
+                <AuthLayout />
+              )
+            }
+          >
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
           </Route>
 
-          {/* Protected routes */}
-          <Route path="/admin" element={<AdminLayout />}>
+          {/* Admin routes */}
+          <Route
+            path="/admin"
+            element={
+              user?.role === "ADMIN" ? (
+                <AdminLayout />
+              ) : (
+                <Navigate to="/unauthorized" replace />
+              )
+            }
+          >
             <Route index element={<HomePage />} />
             <Route path="/admin/profile" element={<AdminProfile />} />
             <Route path="/admin/settings" element={<SettingsPage />} />
@@ -117,13 +151,22 @@ const App = () => {
             />
           </Route>
 
-          <Route path="/" element={<StaffLayout />}>
+          {/* Staff routes */}
+          <Route
+            path="/"
+            element={
+              user?.role === "STAFF" ? (
+                <StaffLayout />
+              ) : (
+                <Navigate to="/unauthorized" replace />
+              )
+            }
+          >
             <Route index element={<div>Staff</div>} />
           </Route>
 
+          {/* Public routes */}
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-          {/* Catch all route - redirect to login */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </MainLayout>

@@ -6,7 +6,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import multiMonthPlugin from "@fullcalendar/multimonth";
 import listPlugin from "@fullcalendar/list";
-import { parseISO } from 'date-fns';
+import { parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { activitiesApi } from "@/services/api/activities.service";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,11 +24,15 @@ interface Event {
   };
 }
 
-export default function EventsPage() {
+export default function CalendarPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
-  const { data: activitiesResponse, isLoading, error } = useQuery({
+  const {
+    data: activitiesResponse,
+    isLoading,
+    // error,
+  } = useQuery({
     queryKey: ["activities"],
     queryFn: activitiesApi.getActivities,
   });
@@ -50,7 +54,9 @@ export default function EventsPage() {
         id: String(activity.id),
         title: activity.title,
         start: parseISO(activity.targetDate),
-        end: new Date(parseISO(activity.targetDate).getTime() + 24 * 60 * 60 * 1000), // Add one day for end date
+        end: new Date(
+          parseISO(activity.targetDate).getTime() + 24 * 60 * 60 * 1000
+        ), // Add one day for end date
         description: activity.description,
         allDay: true, // Set this to true for all-day events
         extendedProps: {
@@ -98,7 +104,7 @@ export default function EventsPage() {
         </div>
         {/* <button
           onClick={handleApprove}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="px-4 py-2 text-white bg-blue-500 rounded"
         >
           Approve
         </button> */}
@@ -106,8 +112,10 @@ export default function EventsPage() {
 
       {isLoading ? (
         <div className="p-6">
-          <Skeleton className="h-10 w-48 mb-4" />
-          <Skeleton className="h-4 mb-2" count={3} />
+          <Skeleton className="mb-4 w-48 h-10" />
+          {[...Array(1)].map((_, index) => (
+            <Skeleton key={index} className="mb-2 h-12" />
+          ))}
           <Skeleton className="h-96" />
         </div>
       ) : (

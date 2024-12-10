@@ -3,7 +3,10 @@ import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../utils/errors.js";
 
 // Create a new activity
-export const createActivity: RequestHandler = async (req: Request, res: Response) => {
+export const createActivity: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const { proposalId } = req.body;
 
@@ -50,7 +53,9 @@ export const createActivity: RequestHandler = async (req: Request, res: Response
     }
 
     if (proposal.bannerProgramId !== null) {
-      activityData.bannerProgram = { connect: { id: proposal.bannerProgramId } };
+      activityData.bannerProgram = {
+        connect: { id: proposal.bannerProgramId },
+      };
     }
 
     // Create the new activity
@@ -71,11 +76,15 @@ export const createActivity: RequestHandler = async (req: Request, res: Response
 };
 
 // Get all activities
-export const getAllActivities: RequestHandler = async (req: Request, res: Response) => {
+export const getAllActivities: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const activities = await prisma.activity.findMany();
     res.status(200).json({
       success: true,
+      message: "Activities fetched successfully",
       data: activities,
     });
   } catch (error) {
@@ -85,7 +94,10 @@ export const getAllActivities: RequestHandler = async (req: Request, res: Respon
 };
 
 // Get a single activity by ID
-export const getActivityById: RequestHandler = async (req: Request, res: Response) => {
+export const getActivityById: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const { id } = req.params;
     const activity = await prisma.activity.findUnique({
@@ -98,6 +110,7 @@ export const getActivityById: RequestHandler = async (req: Request, res: Respons
 
     res.status(200).json({
       success: true,
+      message: "Activity fetched successfully",
       data: activity,
     });
   } catch (error) {
@@ -108,7 +121,10 @@ export const getActivityById: RequestHandler = async (req: Request, res: Respons
 };
 
 // Update an activity
-export const updateActivity: RequestHandler = async (req: Request, res: Response) => {
+export const updateActivity: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const { id } = req.params;
     const { title, description, targetDate, status } = req.body;

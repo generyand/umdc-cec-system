@@ -83,13 +83,33 @@ const navigationItems: NavItem[] = [
       },
     ],
   },
-
   {
     title: "Events & Activities",
-    href: "/admin/events-and-activities",
+    href: "#",
     icon: Calendar,
+    children: [
+      {
+        title: "Calendar View",
+        href: "/admin/events-and-activities/calendar",
+        icon: Calendar,
+      },
+      {
+        title: "Activity Management",
+        href: "/admin/events-and-activities/management",
+        icon: CheckSquare,
+      },
+      {
+        title: "Activity Reports",
+        href: "/admin/events-and-activities/reports",
+        icon: FileText,
+      },
+      {
+        title: "Activity History",
+        href: "/admin/events-and-activities/history",
+        icon: History,
+      },
+    ],
   },
-
   {
     title: "Administration",
     href: "#",
@@ -105,7 +125,6 @@ const navigationItems: NavItem[] = [
         href: "/admin/administration/department-settings",
         icon: Building,
       },
-
       {
         title: "Approvals",
         href: "/admin/administration/approvals",

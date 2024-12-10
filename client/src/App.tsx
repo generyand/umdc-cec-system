@@ -40,7 +40,7 @@ import BannerProgramsPage from "@/pages/admin/banner-programs";
 import BannerProgramDetailsPage from "@/pages/admin/banner-programs/banner-program-details";
 
 // Events Pages
-import EventsPage from "@/pages/admin/events";
+// import EventsPage from "@/pages/admin/events-and-activities/calendar";
 
 // Administration Pages
 import UserManagementPage from "@/pages/admin/administration/user-management";
@@ -51,6 +51,14 @@ import ExtensionManual from "@/pages/extension-manual";
 // Error Pages
 import UnauthorizedPage from "@/pages/unauth-page";
 import NotFound from "@/pages/not-found";
+
+// Events & Activities Pages
+import CalendarPage from "@/pages/admin/events-and-activities/calendar-view/calendar";
+import ActivityManagementPage from "./pages/admin/events-and-activities/activity-management";
+// import ActivityManagementPage from "@/pages/admin/events-and-activities/management";
+// import ActivityDetailsPage from "@/pages/admin/events-and-activities/details";
+// import ActivityReportsPage from "@/pages/admin/events-and-activities/reports";
+// import ActivityHistoryPage from "@/pages/admin/events-and-activities/history";
 
 const App = () => {
   const { user, initialized } = useAuth();
@@ -157,7 +165,13 @@ const App = () => {
             </Route>
 
             {/* Events & Activities */}
-            <Route path="events-and-activities" element={<EventsPage />} />
+            <Route path="events-and-activities">
+              <Route path="calendar" element={<CalendarPage />} />
+              <Route path="management" element={<ActivityManagementPage />} />
+              {/* <Route path="management/:id" element={<ActivityDetailsPage />} />
+              <Route path="reports" element={<ActivityReportsPage />} />
+              <Route path="history" element={<ActivityHistoryPage />} />  */}
+            </Route>
 
             {/* Administration */}
             <Route path="administration">

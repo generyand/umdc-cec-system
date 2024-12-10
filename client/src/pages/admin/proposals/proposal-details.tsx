@@ -261,7 +261,7 @@ export default function ProposalDetailsPage() {
             <Button
               variant="ghost"
               onClick={() =>
-                navigate("/admin/community-engagement/projects-proposals")
+                navigate("/admin/community-engagement/project-proposals")
               }
               className="hover:bg-gray-100"
             >

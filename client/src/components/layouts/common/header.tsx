@@ -1,9 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -25,13 +24,21 @@ import umdcLogo from "@/assets/images/umdc-logo.png";
 import cecLogo from "@/assets/images/cec-logo.png";
 import { Notifications } from "@/components/layouts/common/notifications";
 
-const DEFAULT_AVATAR =
-  "https://api.dicebear.com/7.x/avataaars/svg?seed=default";
-
 export function Header() {
   const { user, logout } = useAuth();
 
   const name = `${user?.firstName} ${user?.lastName}`;
+
+  // Get initials from name
+  const getInitials = (name: string | undefined) => {
+    if (!name) return "";
+
+    return name
+      .split(" ")
+      .map((word) => word?.[0] || "")
+      .join("")
+      .toUpperCase();
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -91,28 +98,32 @@ export function Header() {
           <Notifications />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex gap-3 items-center">
-                <button
-                  className="p-1.5 rounded-full hover:bg-accent/50 transition-colors"
-                  aria-label="User menu"
-                >
-                  <Avatar className="w-8 h-8 border-2 shadow-sm border-background">
-                    <AvatarImage src={DEFAULT_AVATAR} alt={name || "User"} />
-                    <AvatarFallback className="bg-primary/10">
-                      {name?.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-                <div className="hidden flex-col text-sm md:flex">
-                  <span className="font-medium">{name}</span>
+              <button
+                className="p-1 rounded-full transition-colors hover:bg-accent/50"
+                aria-label="User menu"
+              >
+                <div className="flex relative justify-center items-center w-8 h-8 rounded-full border-2 shadow-sm bg-primary/10 border-background">
+                  <span className="text-sm font-medium text-primary">
+                    {name ? getInitials(name) : ""}
+                  </span>
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              {/* User Info Section */}
+              <div className="flex gap-3 items-center p-2">
+                <Avatar className="w-10 h-10">
+                  <AvatarFallback className="font-medium bg-primary/10 text-primary">
+                    {name ? getInitials(name) : ""}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">{name}</span>
                   <span className="text-xs capitalize text-muted-foreground">
                     {formatPosition(user?.position || user?.role || "Unknown")}
                   </span>
                 </div>
               </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link to="/staff/profile" className="cursor-pointer">

@@ -183,14 +183,14 @@ export default function HomePage() {
           <Button
             key={link.title}
             variant="outline"
-            className="flex flex-col items-start p-6 space-y-3 h-auto transition-colors hover:bg-primary/5 hover:border-primary"
+            className="flex flex-col items-start p-6 space-y-3 h-auto rounded-lg transition-transform transform hover:scale-105 hover:shadow-lg hover:bg-primary/10 hover:border-primary"
             onClick={() => navigate(link.href)}
           >
-            <div className="p-2 rounded-lg bg-primary/10">
-              <link.icon className="w-5 h-5 text-primary" />
+            <div className="p-3 rounded-full bg-primary/20">
+              <link.icon className="w-6 h-6 text-primary" />
             </div>
             <div className="text-left">
-              <div className="font-medium">{link.title}</div>
+              <div className="font-semibold text-primary">{link.title}</div>
               <div className="mt-1 text-sm text-muted-foreground">
                 {link.description}
               </div>

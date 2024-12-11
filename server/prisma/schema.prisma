@@ -28,7 +28,7 @@ enum UserPosition {
 enum ApprovalStatus {
   PENDING
   APPROVED
-  REJECTED
+  RETURNED
 }
 
 model User {

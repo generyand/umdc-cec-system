@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { authService } from "@/services/auth.service.js";
+import { ApiError } from "@/utils/errors.js";
 
 // Validation schema for profile updates based on your Prisma schema
 const profileUpdateSchema = z.object({
@@ -71,6 +72,123 @@ export const updateUserProfile = async (
     }
     console.error("Profile update error:", error);
     res.status(500).json({ error: "Failed to update profile" });
+  }
+};
+
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.body;
+
+    // Explicitly define which fields can be updated
+    // Note: role is NOT included here
+    const {
+      firstName,
+      lastName,
+      email,
+      position,
+      departmentId,
+      contactNumber,
+      status,
+    } = req.body;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName,
+        lastName,
+        email,
+        position,
+        department: departmentId
+          ? {
+              connect: {
+                id: parseInt(departmentId),
+              },
+            }
+          : undefined,
+        contactNumber,
+        status,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        position: true,
+        department: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        contactNumber: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("❌ Error updating user:", error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(500, "Failed to update user");
+  }
+};
+
+export const updateUserRole = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId, role } = req.body;
+
+    // Verify that the current user has admin privileges
+    // const currentUser = await prisma.user.findUnique({
+    //   where: { id: userId },
+    // });
+    // if (currentUser?.role !== "ADMIN") {
+    //   throw new ApiError(403, "Not authorized to change user roles");
+    // }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { role },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        position: true,
+        department: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        status: true,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "User role updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("❌ Error updating user role:", error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(500, "Failed to update user role");
   }
 };
 

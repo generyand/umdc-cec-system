@@ -33,7 +33,12 @@ export const getUsers = async () => {
 };
 
 export const addUser = async (data: User) => {
-  const response = await api.post("/api/users", data);
+  const response = await api.post("/api/auth/register", data);
+  return response.data;
+};
+
+export const updateUser = async (data: User) => {
+  const response = await api.put("/api/users", data);
   return response.data;
 };
 

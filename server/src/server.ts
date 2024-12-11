@@ -14,6 +14,7 @@ import projectProposalsRoutes from "./routes/project-proposals/project-proposals
 import bannerProgramsRoutes from "./routes/banner-programs/banner-programs.route.js";
 import activitiesRoutes from "./routes/activities/activities.route.js";
 import partnerCommunitiesRoutes from "./routes/partner-communities/partner-communities.route.js";
+import { scheduleActivityStatusUpdates } from "./jobs/updateActivityStatus.js";
 
 async function createServer() {
   const app = express();
@@ -56,6 +57,7 @@ async function bootstrap() {
     });
 
     setupGracefulShutdown(server);
+    scheduleActivityStatusUpdates();
   } catch (error) {
     console.error("Failed to initialize server:", error);
     process.exit(1);

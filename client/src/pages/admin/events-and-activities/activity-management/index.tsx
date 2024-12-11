@@ -285,10 +285,17 @@ export default function ActivityManagementPage() {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>
-                            Update Status
+                          <DropdownMenuSubTrigger className="flex items-center">
+                            <div className="flex gap-2 items-center">
+                              <Circle
+                                className={`w-2 h-2 ${getStatusColor(
+                                  activity.status
+                                )}`}
+                              />
+                              <span>Update Status</span>
+                            </div>
                           </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent>
+                          <DropdownMenuSubContent className="w-[180px]">
                             <DropdownMenuItem
                               onClick={() =>
                                 updateStatusMutation.mutate({
@@ -296,15 +303,21 @@ export default function ActivityManagementPage() {
                                   status: "UPCOMING",
                                 })
                               }
-                              className="gap-2"
-                              disabled={updateStatusMutation.isPending}
+                              className="flex gap-2 items-center px-3 py-2 cursor-pointer"
+                              disabled={
+                                updateStatusMutation.isPending ||
+                                activity.status === "UPCOMING"
+                              }
                             >
-                              <Circle className="w-2 h-2 text-blue-500 fill-blue-500" />
-                              <span>Upcoming</span>
+                              <div className="flex flex-1 gap-2 items-center">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                                <span className="text-sm">Upcoming</span>
+                              </div>
                               {activity.status === "UPCOMING" && (
-                                <Check className="ml-auto w-4 h-4" />
+                                <Check className="w-4 h-4 text-blue-500" />
                               )}
                             </DropdownMenuItem>
+
                             <DropdownMenuItem
                               onClick={() =>
                                 updateStatusMutation.mutate({
@@ -312,15 +325,21 @@ export default function ActivityManagementPage() {
                                   status: "ONGOING",
                                 })
                               }
-                              className="gap-2"
-                              disabled={updateStatusMutation.isPending}
+                              className="flex gap-2 items-center px-3 py-2 cursor-pointer"
+                              disabled={
+                                updateStatusMutation.isPending ||
+                                activity.status === "ONGOING"
+                              }
                             >
-                              <Circle className="w-2 h-2 text-green-500 fill-green-500" />
-                              <span>Ongoing</span>
+                              <div className="flex flex-1 gap-2 items-center">
+                                <div className="w-2 h-2 bg-green-500 rounded-full" />
+                                <span className="text-sm">Ongoing</span>
+                              </div>
                               {activity.status === "ONGOING" && (
-                                <Check className="ml-auto w-4 h-4" />
+                                <Check className="w-4 h-4 text-green-500" />
                               )}
                             </DropdownMenuItem>
+
                             <DropdownMenuItem
                               onClick={() =>
                                 updateStatusMutation.mutate({
@@ -328,16 +347,23 @@ export default function ActivityManagementPage() {
                                   status: "COMPLETED",
                                 })
                               }
-                              className="gap-2"
-                              disabled={updateStatusMutation.isPending}
+                              className="flex gap-2 items-center px-3 py-2 cursor-pointer"
+                              disabled={
+                                updateStatusMutation.isPending ||
+                                activity.status === "COMPLETED"
+                              }
                             >
-                              <Circle className="w-2 h-2 text-gray-500 fill-gray-500" />
-                              <span>Completed</span>
+                              <div className="flex flex-1 gap-2 items-center">
+                                <div className="w-2 h-2 bg-gray-500 rounded-full" />
+                                <span className="text-sm">Completed</span>
+                              </div>
                               {activity.status === "COMPLETED" && (
-                                <Check className="ml-auto w-4 h-4" />
+                                <Check className="w-4 h-4 text-gray-500" />
                               )}
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator />
+
+                            <DropdownMenuSeparator className="my-1" />
+
                             <DropdownMenuItem
                               onClick={() =>
                                 updateStatusMutation.mutate({
@@ -345,13 +371,18 @@ export default function ActivityManagementPage() {
                                   status: "CANCELLED",
                                 })
                               }
-                              className="gap-2 text-destructive focus:text-destructive"
-                              disabled={updateStatusMutation.isPending}
+                              className="flex gap-2 items-center px-3 py-2 cursor-pointer text-destructive focus:text-destructive"
+                              disabled={
+                                updateStatusMutation.isPending ||
+                                activity.status === "CANCELLED"
+                              }
                             >
-                              <Circle className="w-2 h-2 text-red-500 fill-red-500" />
-                              <span>Cancel Activity</span>
+                              <div className="flex flex-1 gap-2 items-center">
+                                <div className="w-2 h-2 bg-red-500 rounded-full" />
+                                <span className="text-sm">Cancel Activity</span>
+                              </div>
                               {activity.status === "CANCELLED" && (
-                                <Check className="ml-auto w-4 h-4" />
+                                <Check className="w-4 h-4 text-red-500" />
                               )}
                             </DropdownMenuItem>
                           </DropdownMenuSubContent>

@@ -70,7 +70,13 @@ export function Header() {
       <div className="container flex justify-between items-center px-4 mx-auto h-16">
         {/* Logo Section */}
         <Link
-          to="/staff"
+          to={
+            user?.role === "ADMIN"
+              ? "/admin"
+              : user?.role === "STAFF"
+              ? "/staff"
+              : "/dashboard"
+          }
           className="flex gap-3 items-center transition-opacity hover:opacity-90"
         >
           <div className="flex gap-2 items-center">
@@ -126,13 +132,25 @@ export function Header() {
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/staff/profile" className="cursor-pointer">
+                <Link
+                  to={
+                    user?.role === "ADMIN" ? "/admin/profile" : "/staff/profile"
+                  }
+                  className="cursor-pointer"
+                >
                   <User className="mr-2 w-4 h-4" />
                   Profile
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/staff/settings" className="cursor-pointer">
+                <Link
+                  to={
+                    user?.role === "ADMIN"
+                      ? "/admin/settings"
+                      : "/staff/settings"
+                  }
+                  className="cursor-pointer"
+                >
                   <Settings className="mr-2 w-4 h-4" />
                   Settings
                 </Link>

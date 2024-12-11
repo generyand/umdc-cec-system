@@ -56,6 +56,7 @@ import NotFound from "@/pages/not-found";
 import CalendarPage from "@/pages/admin/events-and-activities/calendar-view/calendar";
 import ActivityManagementPage from "./pages/admin/events-and-activities/activity-management";
 import ActivityDetailsPage from "./pages/admin/events-and-activities/activity-management/activity-details";
+import ApprovalsPage from "./pages/admin/approvals";
 // import ActivityManagementPage from "@/pages/admin/events-and-activities/management";
 // import ActivityDetailsPage from "@/pages/admin/events-and-activities/details";
 // import ActivityReportsPage from "@/pages/admin/events-and-activities/reports";
@@ -184,7 +185,7 @@ const App = () => {
             <Route path="administration">
               <Route path="user-management" element={<UserManagementPage />} />
               <Route path="department-settings" element={<SettingsPage />} />
-              <Route path="approvals" element={<div>Approvals Page</div>} />
+              <Route path="approvals" element={<ApprovalsPage />} />
               <Route
                 path="activity-logs"
                 element={<div>Activity Logs Page</div>}

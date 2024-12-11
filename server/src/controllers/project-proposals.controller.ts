@@ -96,13 +96,73 @@ export const getProposalById: RequestHandler = async (req, res) => {
 
     const proposal = await prisma.projectProposal.findUnique({
       where: { id: parseInt(id) },
-      include: {
-        department: true,
-        program: true,
-        user: true,
-        community: true,
-        bannerProgram: true,
-        attachments: true,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        targetDate: true,
+        budget: true,
+        targetBeneficiaries: true,
+        targetArea: true,
+        venue: true,
+        createdAt: true,
+        department: {
+          select: {
+            name: true,
+          },
+        },
+        program: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        community: {
+          select: {
+            name: true,
+            communityType: true,
+            address: true,
+            contactPerson: true,
+            contactNumber: true,
+          },
+        },
+        bannerProgram: {
+          select: {
+            name: true,
+            description: true,
+          },
+        },
+        attachments: {
+          select: {
+            fileName: true,
+            fileUrl: true,
+            fileType: true,
+            uploadedAt: true,
+          },
+        },
+        approvals: {
+          select: {
+            approverPosition: true,
+            status: true,
+            comment: true,
+            approvedAt: true,
+            approver: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
       },
     });
 
@@ -111,11 +171,25 @@ export const getProposalById: RequestHandler = async (req, res) => {
       throw new ApiError(404, "Proposal not found");
     }
 
+    // Transform the data to include approval flow
+    const transformedProposal = {
+      ...proposal,
+      approvalFlow: proposal.approvals.map((approval) => ({
+        role: approval.approverPosition,
+        status: approval.status,
+        comment: approval.comment,
+        approvedAt: approval.approvedAt,
+        approvedBy: approval.approver
+          ? `${approval.approver.firstName} ${approval.approver.lastName}`
+          : null,
+      })),
+    };
+
     console.log(`✅ Successfully fetched proposal: ${proposal.title}`);
     res.status(200).json({
       success: true,
       message: "Proposal fetched successfully",
-      data: proposal,
+      data: transformedProposal,
     });
   } catch (error) {
     console.error("❌ Error fetching proposal:", error);

@@ -233,27 +233,27 @@ export const getUsers = async (
 };
 
 // ***** Adding User is handled in auth.service.ts *****
-// export const addUser = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { departmentId, ...userData } = req.body;
+export const addUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { departmentId, ...userData } = req.body;
 
-//     // Convert departmentId 0 to null, otherwise keep the original value
-//     const userDataWithDepartment = {
-//       ...userData,
-//       departmentId: departmentId === 0 ? null : departmentId,
-//       position: userData.position === undefined ? null : userData.position,
-//     };
+    // Convert departmentId 0 to null, otherwise keep the original value
+    const userDataWithDepartment = {
+      ...userData,
+      departmentId: departmentId === 0 ? null : departmentId,
+      position: userData.position === undefined ? null : userData.position,
+    };
 
-//     const user = await authService.register(userDataWithDepartment);
-//     res.status(201).json(user);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    const user = await authService.register(userDataWithDepartment);
+    res.status(201).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const deleteUser = async (
   req: Request,

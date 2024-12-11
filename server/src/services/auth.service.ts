@@ -20,7 +20,7 @@ interface RegisterParams {
   password: string;
   firstName: string;
   lastName: string;
-  departmentId: number;
+  departmentId: number | null;
   role: UserRole;
   position?: UserPosition;
   contactNumber?: string;
@@ -42,6 +42,8 @@ export const authService = {
     contactNumber,
   }: RegisterParams) {
     const hashedPassword = await bcrypt.hash(password, 12);
+
+    const normalizedDepartmentId = departmentId === 0 ? null : departmentId;
 
     const user = await prisma.user.create({
       data: {

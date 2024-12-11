@@ -19,6 +19,13 @@ export const register: Handler = async (req, res, next) => {
       contactNumber,
     } = req.body;
 
+    console.log("🔍 Registering user:", req.body);
+
+    console.log(role);
+
+    // Convert 'none' departmentId to null
+    const normalizedDepartmentId = departmentId === 0 ? null : departmentId;
+
     // Check if email exists first
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -41,7 +48,7 @@ export const register: Handler = async (req, res, next) => {
       password,
       firstName,
       lastName,
-      departmentId,
+      departmentId: normalizedDepartmentId,
       role,
       position,
       contactNumber,
@@ -52,6 +59,7 @@ export const register: Handler = async (req, res, next) => {
       token: accessToken,
     });
   } catch (error) {
+    console.error("🚨 Error registering user:", error);
     next(error);
     return;
   }

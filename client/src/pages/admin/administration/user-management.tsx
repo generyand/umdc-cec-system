@@ -53,7 +53,7 @@ import { DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { addUser, getUsers, deleteUser } from "@/services/api/users.service";
+import { getUsers, deleteUser, addUser } from "@/services/api/users.service";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -97,6 +97,7 @@ const userFormSchema = z.object({
       "DEAN",
       "PROGRAM_HEAD",
       "FOCAL_PERSON",
+      "CHIEF_OPERATION_OFFICER",
     ] as [UserPosition, ...UserPosition[]])
     .nullable(),
   departmentId: z.number(),
@@ -162,6 +163,44 @@ export default function UserManagementPage() {
     if (userToDelete?.id) {
       deleteMutation.mutate(userToDelete.id.toString());
     }
+  };
+
+  const addUserMutation = useMutation({
+    mutationFn: (userData: {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+      departmentId: number | null;
+      role: UserRole;
+      position?: UserPosition;
+      contactNumber?: string;
+    }) => addUser(userData),
+    onSuccess: () => {
+      setIsDialogOpen(false);
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("User created successfully");
+    },
+    onError: (error: Error) => {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to create user. Please try again."
+      );
+      console.error("Error creating user:", error);
+    },
+  });
+
+  const onSubmit = async (data: UserFormValues) => {
+    const { departmentId, ...restData } = data;
+
+    addUserMutation.mutate({
+      ...restData,
+      departmentId: departmentId === 0 ? null : departmentId,
+      position: restData.position ?? undefined,
+      password: data.password,
+    });
   };
 
   if (isLoading) {
@@ -238,30 +277,6 @@ export default function UserManagementPage() {
     );
   }
 
-  const onSubmit = async (data: UserFormValues) => {
-    try {
-      const { departmentId, ...restData } = data;
-
-      await addUser({
-        ...restData,
-        departmentId: departmentId ?? 0,
-        position: restData.position ?? undefined,
-      });
-
-      setIsDialogOpen(false);
-      form.reset();
-      await queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("User created successfully");
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to create user. Please try again."
-      );
-      console.error("Error creating user:", error);
-    }
-  };
-
   const formatPosition = (position: UserPosition): string => {
     const formats: Record<UserPosition, string> = {
       CEC_HEAD: "CEC Head",
@@ -271,6 +286,7 @@ export default function UserManagementPage() {
       DEAN: "Dean",
       PROGRAM_HEAD: "Program Head",
       FOCAL_PERSON: "Focal Person",
+      CHIEF_OPERATION_OFFICER: "Chief Operation Officer",
     };
     return formats[position] || position;
   };
@@ -404,7 +420,7 @@ export default function UserManagementPage() {
                               type="radio"
                               id="dept-none"
                               {...field}
-                              value="0"
+                              value={0}
                               checked={field.value === 0}
                               onChange={() => field.onChange(0)}
                               className="w-4 h-4 border-gray-300 text-primary focus:ring-primary"
@@ -522,7 +538,16 @@ export default function UserManagementPage() {
                 />
 
                 <DialogFooter>
-                  <Button type="submit">Create User</Button>
+                  <Button type="submit" disabled={addUserMutation.isPending}>
+                    {addUserMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      "Create User"
+                    )}
+                  </Button>
                 </DialogFooter>
               </form>
             </Form>

@@ -18,7 +18,12 @@ interface AuthState {
   initialize: () => void;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<boolean>;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    name: string,
+    departmentId: number
+  ) => Promise<void>;
   resetPassword: (
     email: string,
     token: string,

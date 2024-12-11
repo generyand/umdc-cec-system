@@ -12,6 +12,7 @@ export enum UserPosition {
   DEAN = "DEAN",
   PROGRAM_HEAD = "PROGRAM_HEAD",
   FOCAL_PERSON = "FOCAL_PERSON",
+  CHIEF_OPERATION_OFFICER = "CHIEF_OPERATION_OFFICER",
 }
 
 export interface User {

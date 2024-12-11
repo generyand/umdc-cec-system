@@ -177,11 +177,14 @@ export default function ProposalDetailsPage() {
                   <Users className="w-5 h-5 text-gray-500" />
                   <h3 className="text-lg font-semibold">Approval Progress</h3>
                 </div>
-                <div className="relative">
-                  {proposal.approvalFlow.map((step, index) => (
-                    <div key={step.role} className="flex gap-4 mb-8 last:mb-0">
+                <div className="relative bg-red-700">
+                  {proposal?.approvals.map((step, index) => (
+                    <div
+                      key={step.approverPosition}
+                      className="flex gap-4 mb-8 last:mb-0"
+                    >
                       {/* Timeline Line */}
-                      {index !== proposal.approvalFlow.length - 1 && (
+                      {index !== proposal?.approvals.length - 1 && (
                         <div className="absolute h-full w-0.5 bg-gray-200 left-4 top-8" />
                       )}
 
@@ -346,7 +349,7 @@ export default function ProposalDetailsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container py-8 mx-auto max-w-4xl">
+      <div className="container py-8 mx-auto max-w-7xl">
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
@@ -371,314 +374,330 @@ export default function ProposalDetailsPage() {
 
         {/* Main Content */}
         {proposal && (
-          <Card className="shadow-sm">
-            <CardContent className="p-8 space-y-8">
-              {/* Title Section */}
-              <div className="pb-6 border-b">
-                <h1 className="mb-2 text-2xl font-bold text-gray-900">
-                  {proposal.title}
-                </h1>
-                <div className="flex items-center text-sm text-gray-600">
-                  <span className="font-medium">
-                    {proposal.user.firstName} {proposal.user.lastName}
-                  </span>
-                  <span className="mx-2">•</span>
-                  <span>
-                    {new Date(proposal.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-
-              {/* Approval Progress Section */}
-              <div className="py-6 border-b">
-                <div className="flex gap-2 items-center mb-4">
-                  <Users className="w-5 h-5 text-gray-500" />
-                  <h3 className="text-lg font-semibold">Approval Progress</h3>
-                </div>
-                <div className="relative">
-                  {proposal.approvalFlow.map((step, index) => (
-                    <div key={step.role} className="flex gap-4 mb-8 last:mb-0">
-                      {/* Timeline Line */}
-                      {index !== proposal.approvalFlow.length - 1 && (
-                        <div className="absolute h-full w-0.5 bg-gray-200 left-4 top-8" />
-                      )}
-
-                      {/* Status Circle */}
-                      <div className="relative z-10">
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            step.status === "APPROVED"
-                              ? "bg-green-100 text-green-600 ring-2 ring-green-600"
-                              : step.status === "RETURNED"
-                              ? "bg-red-100 text-red-600 ring-2 ring-red-600"
-                              : "bg-gray-100 text-gray-600 ring-2 ring-gray-300"
-                          }`}
-                        >
-                          {index + 1}
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium text-gray-900">
-                              {step.role.split("_").join(" ")}
-                            </h4>
-                            {step.approvedBy && (
-                              <p className="text-sm text-gray-500">
-                                Approved by {step.approvedBy}
-                              </p>
-                            )}
-                          </div>
-                          <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              step.status === "APPROVED"
-                                ? "bg-green-100 text-green-600"
-                                : step.status === "RETURNED"
-                                ? "bg-red-100 text-red-600"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {step.status}
-                          </span>
-                        </div>
-                        {step.approvedAt && (
-                          <p className="mt-1 text-sm text-gray-500">
-                            {format(
-                              new Date(step.approvedAt),
-                              "MMM d, yyyy 'at' h:mm a"
-                            )}
-                          </p>
-                        )}
-                        {step.comment && (
-                          <p className="p-3 mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg">
-                            "{step.comment}"
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Key Details Section */}
-              <div className="grid grid-cols-2 gap-6 py-6 border-b">
-                <div className="flex gap-2 items-start">
-                  <Building2 className="w-5 h-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500">
-                      Department
-                    </h4>
-                    <p className="mt-1">{proposal.department.name}</p>
-                  </div>
-                </div>
-
-                {proposal.program && (
-                  <div className="flex gap-2 items-start">
-                    <GraduationCap className="w-5 h-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Academic Program
-                      </h4>
-                      <p className="mt-1">{proposal.program.name}</p>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-2">
+              <Card className="shadow-sm">
+                <CardContent className="p-8 space-y-8">
+                  {/* Title Section */}
+                  <div className="pb-6 border-b">
+                    <h1 className="mb-2 text-2xl font-bold text-gray-900">
+                      {proposal.title}
+                    </h1>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <span className="font-medium">
+                        {proposal.user.firstName} {proposal.user.lastName}
+                      </span>
+                      <span className="mx-2">•</span>
+                      <span>
+                        {format(new Date(proposal.createdAt), "MMM d, yyyy")}
+                      </span>
                     </div>
                   </div>
-                )}
 
-                {/* Banner Program Section */}
-                {proposal.bannerProgram && (
-                  <div className="flex col-span-2 gap-2 items-start">
-                    <Flag className="w-5 h-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Banner Program
-                      </h4>
-                      <p className="mt-1 font-medium">
-                        {proposal.bannerProgram.name}
-                      </p>
-                      {proposal.bannerProgram.description && (
-                        <p className="mt-1 text-sm text-gray-600">
-                          {proposal.bannerProgram.description}
+                  {/* Key Details Section */}
+                  <div className="grid grid-cols-2 gap-6 py-6 border-b">
+                    <div className="flex gap-2 items-start">
+                      <Building2 className="w-5 h-5 text-gray-500 mt-0.5" />
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-500">
+                          Department
+                        </h4>
+                        <p className="mt-1">{proposal.department.name}</p>
+                      </div>
+                    </div>
+
+                    {proposal.program && (
+                      <div className="flex gap-2 items-start">
+                        <GraduationCap className="w-5 h-5 text-gray-500 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">
+                            Academic Program
+                          </h4>
+                          <p className="mt-1">{proposal.program.name}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Banner Program Section */}
+                    {proposal.bannerProgram && (
+                      <div className="flex col-span-2 gap-2 items-start">
+                        <Flag className="w-5 h-5 text-gray-500 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">
+                            Banner Program
+                          </h4>
+                          <p className="mt-1 font-medium">
+                            {proposal.bannerProgram.name}
+                          </p>
+                          {proposal.bannerProgram.description && (
+                            <p className="mt-1 text-sm text-gray-600">
+                              {proposal.bannerProgram.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 items-start">
+                      <HandCoins className="w-5 h-5 text-gray-500 mt-0.5" />
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-500">
+                          Budget
+                        </h4>
+                        <p className="mt-1 font-semibold">
+                          {new Intl.NumberFormat("en-PH", {
+                            style: "currency",
+                            currency: "PHP",
+                          }).format(proposal.budget)}
                         </p>
-                      )}
+                      </div>
                     </div>
                   </div>
-                )}
 
-                <div className="flex gap-2 items-start">
-                  <HandCoins className="w-5 h-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500">
-                      Budget
-                    </h4>
-                    <p className="mt-1 font-semibold">
-                      {new Intl.NumberFormat("en-PH", {
-                        style: "currency",
-                        currency: "PHP",
-                      }).format(proposal.budget)}
+                  {/* Description Section */}
+                  <div className="py-6 border-b">
+                    <div className="flex gap-2 items-center mb-4">
+                      <FileText className="w-5 h-5 text-gray-500" />
+                      <h3 className="text-lg font-semibold">Description</h3>
+                    </div>
+                    <p className="leading-relaxed text-gray-700 whitespace-pre-wrap">
+                      {proposal.description}
                     </p>
                   </div>
-                </div>
-              </div>
 
-              {/* Description Section */}
-              <div className="py-6 border-b">
-                <div className="flex gap-2 items-center mb-4">
-                  <FileText className="w-5 h-5 text-gray-500" />
-                  <h3 className="text-lg font-semibold">Description</h3>
-                </div>
-                <p className="leading-relaxed text-gray-700 whitespace-pre-wrap">
-                  {proposal.description}
-                </p>
-              </div>
+                  {/* Implementation Details */}
+                  <div className="py-6 border-b">
+                    <h3 className="mb-4 text-lg font-semibold">
+                      Implementation Details
+                    </h3>
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <div className="flex gap-2 items-start">
+                        <Calendar className="w-5 h-5 text-gray-500 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">
+                            Target Date
+                          </h4>
+                          <p className="mt-1">
+                            {new Date(proposal.targetDate).toLocaleDateString(
+                              undefined,
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 items-start">
+                        <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">
+                            Venue
+                          </h4>
+                          <p className="mt-1">{proposal.venue}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 items-start">
+                        <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">
+                            Target Area
+                          </h4>
+                          <p className="mt-1">{proposal.targetArea}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 items-start">
+                        <Users className="w-5 h-5 text-gray-500 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">
+                            Target Beneficiaries
+                          </h4>
+                          <p className="mt-1">{proposal.targetBeneficiaries}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-              {/* Implementation Details */}
-              <div className="py-6 border-b">
-                <h3 className="mb-4 text-lg font-semibold">
-                  Implementation Details
-                </h3>
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <div className="flex gap-2 items-start">
-                    <Calendar className="w-5 h-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Target Date
-                      </h4>
-                      <p className="mt-1">
-                        {new Date(proposal.targetDate).toLocaleDateString(
-                          undefined,
-                          {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          }
-                        )}
-                      </p>
+                  {/* Community Partner Section */}
+                  {proposal.community && (
+                    <div className="py-6 border-b">
+                      <div className="flex gap-2 items-center mb-4">
+                        <Building className="w-5 h-5 text-gray-500" />
+                        <h3 className="text-lg font-semibold">
+                          Community Partner
+                        </h3>
+                      </div>
+                      <div className="grid gap-6 sm:grid-cols-2">
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">
+                            Name
+                          </h4>
+                          <p className="mt-1">{proposal.community.name}</p>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">
+                            Type
+                          </h4>
+                          <p className="mt-1">
+                            {proposal.community.communityType}
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">
+                            Address
+                          </h4>
+                          <p className="mt-1">{proposal.community.address}</p>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">
+                            Contact Details
+                          </h4>
+                          <p className="flex gap-2 items-center mt-1">
+                            <Mail className="w-4 h-4 text-gray-500" />
+                            {proposal.community.contactPerson}
+                          </p>
+                          <p className="flex gap-2 items-center mt-1">
+                            <Phone className="w-4 h-4 text-gray-500" />
+                            {proposal.community.contactNumber}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2 items-start">
-                    <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Venue
-                      </h4>
-                      <p className="mt-1">{proposal.venue}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 items-start">
-                    <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Target Area
-                      </h4>
-                      <p className="mt-1">{proposal.targetArea}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 items-start">
-                    <Users className="w-5 h-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Target Beneficiaries
-                      </h4>
-                      <p className="mt-1">{proposal.targetBeneficiaries}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  )}
 
-              {/* Community Partner Section */}
-              {proposal.community && (
-                <div className="py-6 border-b">
-                  <div className="flex gap-2 items-center mb-4">
-                    <Building className="w-5 h-5 text-gray-500" />
-                    <h3 className="text-lg font-semibold">Community Partner</h3>
-                  </div>
-                  <div className="grid gap-6 sm:grid-cols-2">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Name
-                      </h4>
-                      <p className="mt-1">{proposal.community.name}</p>
+                  {/* Attachments Section */}
+                  {proposal.attachments && proposal.attachments.length > 0 && (
+                    <div className="py-6 border-b">
+                      <div className="flex gap-2 items-center mb-4">
+                        <Paperclip className="w-5 h-5 text-gray-500" />
+                        <h3 className="text-lg font-semibold">Attachments</h3>
+                      </div>
+                      <div className="space-y-2">
+                        {/* TODO: Add a type to the file argument */}
+                        {/* @ts-expect-error File has no type */}
+                        {proposal.attachments.map((file) => (
+                          <a
+                            key={file.fileUrl}
+                            href={file.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center p-3 rounded-lg hover:bg-gray-50"
+                          >
+                            <span className="flex-1 text-blue-600 hover:underline">
+                              {file.fileName}
+                            </span>
+                            <span className="text-sm text-gray-500">
+                              {new Date(file.uploadedAt).toLocaleDateString()}
+                            </span>
+                          </a>
+                        ))}
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Type
-                      </h4>
-                      <p className="mt-1">{proposal.community.communityType}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Address
-                      </h4>
-                      <p className="mt-1">{proposal.community.address}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Contact Details
-                      </h4>
-                      <p className="flex gap-2 items-center mt-1">
-                        <Mail className="w-4 h-4 text-gray-500" />
-                        {proposal.community.contactPerson}
-                      </p>
-                      <p className="flex gap-2 items-center mt-1">
-                        <Phone className="w-4 h-4 text-gray-500" />
-                        {proposal.community.contactNumber}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {/* Attachments Section */}
-              {proposal.attachments && proposal.attachments.length > 0 && (
-                <div className="py-6 border-b">
-                  <div className="flex gap-2 items-center mb-4">
-                    <Paperclip className="w-5 h-5 text-gray-500" />
-                    <h3 className="text-lg font-semibold">Attachments</h3>
-                  </div>
-                  <div className="space-y-2">
-                    {/* TODO: Add a type to the file argument */}
-                    {/* @ts-expect-error File has no type */}
-                    {proposal.attachments.map((file) => (
-                      <a
-                        key={file.fileUrl}
-                        href={file.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center p-3 rounded-lg hover:bg-gray-50"
+                  {/* Action Buttons */}
+                  {proposal.status === "PENDING" && (
+                    <div className="flex gap-4 pt-6">
+                      <Button
+                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() => handleStatusUpdate("APPROVED")}
                       >
-                        <span className="flex-1 text-blue-600 hover:underline">
-                          {file.fileName}
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          {new Date(file.uploadedAt).toLocaleDateString()}
-                        </span>
-                      </a>
+                        Approve Proposal
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleStatusUpdate("RETURNED")}
+                      >
+                        Return Proposal
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Column - Approval Progress */}
+            <div className="lg:col-span-1">
+              <Card className="sticky top-8 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex gap-2 items-center mb-4">
+                    <Users className="w-5 h-5 text-gray-500" />
+                    <h3 className="text-lg font-semibold">Approval Progress</h3>
+                  </div>
+                  <div className="relative">
+                    {proposal.approvalFlow.map((step, index) => (
+                      <div
+                        key={step.role}
+                        className="flex gap-4 mb-8 last:mb-0"
+                      >
+                        {/* Timeline Line */}
+                        {index !== proposal.approvalFlow.length - 1 && (
+                          <div className="absolute h-full w-0.5 bg-gray-200 left-4 top-8" />
+                        )}
+
+                        {/* Status Circle */}
+                        <div className="relative z-10">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              step.status === "APPROVED"
+                                ? "bg-green-100 text-green-600 ring-2 ring-green-600"
+                                : step.status === "RETURNED"
+                                ? "bg-red-100 text-red-600 ring-2 ring-red-600"
+                                : "bg-gray-100 text-gray-600 ring-2 ring-gray-300"
+                            }`}
+                          >
+                            {index + 1}
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                          <div className="flex flex-wrap gap-2 justify-between items-start">
+                            <div>
+                              <h4 className="font-medium text-gray-900">
+                                {step.role.split("_").join(" ")}
+                              </h4>
+                              {step.approvedBy && (
+                                <p className="text-sm text-gray-500">
+                                  Approved by {step.approvedBy}
+                                </p>
+                              )}
+                            </div>
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                step.status === "APPROVED"
+                                  ? "bg-green-100 text-green-600"
+                                  : step.status === "RETURNED"
+                                  ? "bg-red-100 text-red-600"
+                                  : "bg-gray-100 text-gray-600"
+                              }`}
+                            >
+                              {step.status}
+                            </span>
+                          </div>
+                          {step.approvedAt && (
+                            <p className="mt-1 text-sm text-gray-500">
+                              {format(
+                                new Date(step.approvedAt),
+                                "MMM d, yyyy 'at' h:mm a"
+                              )}
+                            </p>
+                          )}
+                          {step.comment && (
+                            <p className="p-3 mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg">
+                              "{step.comment}"
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              {proposal.status === "PENDING" && (
-                <div className="flex gap-4 pt-6">
-                  <Button
-                    className="bg-green-600 hover:bg-green-700"
-                    onClick={() => handleStatusUpdate("APPROVED")}
-                  >
-                    Approve Proposal
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleStatusUpdate("RETURNED")}
-                  >
-                    Return Proposal
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         )}
       </div>
     </div>

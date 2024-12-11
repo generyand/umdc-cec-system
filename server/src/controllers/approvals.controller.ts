@@ -5,7 +5,7 @@ import { ApiError } from "../utils/errors.js";
 // Get all proposals that need the current user's approval
 export const getProposalsForApproval: RequestHandler = async (req, res) => {
   try {
-    const userId = req.user?.id; // From auth middleware
+    const userId = req.user?.id;
     console.log(`📃 Fetching proposals for approval by user: ${userId}`);
 
     const user = await prisma.user.findUnique({
@@ -13,56 +13,119 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
       select: { position: true },
     });
 
-    // First, check if user has a position
     if (!user?.position) {
       throw new ApiError(400, "User position not found");
     }
 
-    const proposals = await prisma.projectProposal.findMany({
-      where: {
-        OR: [
-          // Get proposals waiting for current user's approval
-          {
-            currentApprovalStep: user.position,
-            status: "PENDING",
-          },
-          // Get proposals where user has already taken action
-          {
-            approvals: {
-              some: {
-                approverRole: user.position,
-                approverUserId: userId,
-              },
+    // Different queries based on user position
+    let whereCondition = {};
+
+    switch (user.position) {
+      case "CEC_HEAD":
+        // CEC Head sees all new pending proposals
+        whereCondition = {
+          currentApprovalStep: "CEC_HEAD",
+          status: "PENDING",
+        };
+        break;
+
+      case "VP_DIRECTOR":
+        // VP Director only sees proposals approved by CEC Head
+        whereCondition = {
+          currentApprovalStep: "VP_DIRECTOR",
+          status: "PENDING",
+          approvals: {
+            some: {
+              approverRole: "CEC_HEAD",
+              status: "APPROVED",
             },
           },
-        ],
-      },
-      include: {
+        };
+        break;
+
+      case "CHIEF_OPERATION_OFFICER":
+        // Chief Operation Officer only sees proposals approved by VP Director
+        whereCondition = {
+          currentApprovalStep: "CHIEF_OPERATION_OFFICER",
+          status: "PENDING",
+          approvals: {
+            some: {
+              approverRole: "VP_DIRECTOR",
+              status: "APPROVED",
+            },
+          },
+        };
+        break;
+    }
+
+    const proposals = await prisma.projectProposal.findMany({
+      where: whereCondition,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        targetDate: true,
+        budget: true,
+        status: true,
+        currentApprovalStep: true,
+        createdAt: true,
         user: {
           select: {
             firstName: true,
             lastName: true,
             department: {
+              select: { name: true },
+            },
+          },
+        },
+        approvals: {
+          select: {
+            approverRole: true,
+            status: true,
+            comment: true,
+            approvedAt: true,
+            approver: {
               select: {
-                name: true,
+                firstName: true,
+                lastName: true,
               },
             },
           },
         },
-        approvals: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
 
-    console.log(
-      `✅ Successfully fetched ${proposals.length} proposals for approval`
-    );
+    // Transform the data for frontend use
+    const simplifiedProposals = proposals.map((proposal) => ({
+      id: proposal.id,
+      title: proposal.title,
+      description: proposal.description,
+      targetDate: proposal.targetDate,
+      budget: proposal.budget,
+      status: proposal.status,
+      currentStep: proposal.currentApprovalStep,
+      createdAt: proposal.createdAt,
+      submittedBy: {
+        name: `${proposal.user.firstName} ${proposal.user.lastName}`,
+        department: proposal.user.department?.name || "",
+      },
+      approvalFlow: proposal.approvals.map((approval) => ({
+        role: approval.approverRole,
+        status: approval.status,
+        comment: approval.comment,
+        approvedAt: approval.approvedAt,
+        approvedBy: approval.approver
+          ? `${approval.approver.firstName} ${approval.approver.lastName}`
+          : null,
+      })),
+    }));
+
+    console.log(`✅ Successfully fetched ${proposals.length} proposals`);
     res.status(200).json({
       success: true,
       message: "Proposals fetched successfully",
-      data: proposals,
+      data: simplifiedProposals,
     });
   } catch (error) {
     console.error("❌ Error fetching proposals:", error);
@@ -159,84 +222,129 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
 // };
 
 // // Approve a proposal
-// export const approveProposal: RequestHandler = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const userId = req.user.id;
-//     const { comment } = req.body;
-//     console.log(
-//       `📝 Processing approval for proposal ID: ${id} by user: ${userId}`
-//     );
+export const approveProposal: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params; // proposal ID
+    const userId = req.user?.id;
+    const { comment } = req.body;
 
-//     const proposal = await prisma.projectProposal.findUnique({
-//       where: { id: parseInt(id) },
-//       include: { approvals: true },
-//     });
+    console.log(
+      `📝 Processing approval for proposal ID: ${id} by user: ${userId}`
+    );
 
-//     if (!proposal) {
-//       console.log(`❌ Proposal with ID ${id} not found`);
-//       throw new ApiError(404, "Proposal not found");
-//     }
+    // 1. Get the proposal and check if it exists
+    const proposal = await prisma.projectProposal.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        approvals: true,
+      },
+    });
 
-//     const user = await prisma.user.findUnique({
-//       where: { id: userId },
-//       select: { position: true },
-//     });
+    if (!proposal) {
+      console.log(`❌ Proposal with ID ${id} not found`);
+      throw new ApiError(404, "Proposal not found");
+    }
 
-//     if (user?.position !== proposal.currentApprovalStep) {
-//       console.log("❌ User not authorized for this approval step");
-//       throw new ApiError(403, "Not authorized for this approval step");
-//     }
+    // 2. Get user's position and verify authorization
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { position: true },
+    });
 
-//     // Start a transaction for the approval process
-//     const updatedProposal = await prisma.$transaction(async (prisma) => {
-//       // Update the current approval
-//       await prisma.projectApproval.update({
-//         where: {
-//           proposalId_approverRole: {
-//             proposalId: proposal.id,
-//             approverRole: user.position!,
-//           },
-//         },
-//         data: {
-//           status: "APPROVED",
-//           approverUserId: userId,
-//           comment,
-//           approvedAt: new Date(),
-//         },
-//       });
+    if (user?.position !== proposal.currentApprovalStep) {
+      console.log("❌ User not authorized for this approval step");
+      throw new ApiError(403, "Not authorized for this approval step");
+    }
 
-//       // Determine and set next approval step
-//       const nextStep = getNextApprovalStep(user.position!);
+    // 3. Process the approval in a transaction
+    const updatedProposal = await prisma.$transaction(async (prisma) => {
+      // Update the current approval
+      await prisma.projectApproval.update({
+        where: {
+          proposalId_approverRole: {
+            proposalId: proposal.id,
+            approverRole: user.position!,
+          },
+        },
+        data: {
+          status: "APPROVED",
+          approverUserId: userId,
+          comment,
+          approvedAt: new Date(),
+        },
+      });
 
-//       if (nextStep) {
-//         return prisma.projectProposal.update({
-//           where: { id: proposal.id },
-//           data: { currentApprovalStep: nextStep },
-//         });
-//       } else {
-//         return prisma.projectProposal.update({
-//           where: { id: proposal.id },
-//           data: {
-//             status: "APPROVED",
-//             currentApprovalStep: user.position!,
-//           },
-//         });
-//       }
-//     });
+      // Determine and set next approval step
+      const nextStep = getNextApprovalStep(user.position!);
 
-//     console.log("✅ Successfully processed approval");
-//     res.status(200).json({
-//       success: true,
-//       message: "Proposal approved successfully",
-//       data: updatedProposal,
-//     });
-//   } catch (error) {
-//     console.error("❌ Error processing approval:", error);
-//     if (error instanceof ApiError) throw error;
-//     throw new ApiError(500, "Failed to process approval");
-//   }
-// };
+      if (nextStep) {
+        return prisma.projectProposal.update({
+          where: { id: proposal.id },
+          data: { currentApprovalStep: nextStep },
+        });
+      } else {
+        // If no next step, mark proposal as fully approved
+        return prisma.projectProposal.update({
+          where: { id: proposal.id },
+          data: {
+            status: "APPROVED",
+            currentApprovalStep: user.position!,
+          },
+        });
+      }
+    });
+
+    // 4. Get the updated proposal with all details
+    const finalProposal = await prisma.projectProposal.findUnique({
+      where: { id: proposal.id },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        currentApprovalStep: true,
+        approvals: {
+          select: {
+            approverRole: true,
+            status: true,
+            comment: true,
+            approvedAt: true,
+            approver: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    console.log("✅ Successfully processed approval");
+    res.status(200).json({
+      success: true,
+      message: "Proposal approved successfully",
+      data: {
+        id: finalProposal?.id,
+        title: finalProposal?.title,
+        status: finalProposal?.status,
+        currentStep: finalProposal?.currentApprovalStep,
+        approvalFlow: finalProposal?.approvals.map((approval) => ({
+          role: approval.approverRole,
+          status: approval.status,
+          comment: approval.comment,
+          approvedAt: approval.approvedAt,
+          approvedBy: approval.approver
+            ? `${approval.approver.firstName} ${approval.approver.lastName}`
+            : null,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("❌ Error processing approval:", error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(500, "Failed to process approval");
+  }
+};
 
 // // Reject a proposal
 // export const rejectProposal: RequestHandler = async (req, res) => {
@@ -308,9 +416,9 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
 // // Helper function to determine next approval step
 // function getNextApprovalStep(currentStep: string): string | null {
 //   const flow = {
-//     CEC_HEAD: "VP_DIRECTOR",
-//     VP_DIRECTOR: "CHIEF_OPERATION_OFFICER",
-//     CHIEF_OPERATION_OFFICER: null,
+//     'CEC_HEAD': 'VP_DIRECTOR',
+//     'VP_DIRECTOR': 'CHIEF_OPERATION_OFFICER',
+//     'CHIEF_OPERATION_OFFICER': null
 //   };
 //   return flow[currentStep] || null;
 // }

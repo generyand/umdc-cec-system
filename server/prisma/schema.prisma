@@ -22,6 +22,13 @@ enum UserPosition {
   DEAN
   PROGRAM_HEAD
   FOCAL_PERSON
+  CHIEF_OPERATION_OFFICER
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model User {
@@ -41,6 +48,7 @@ model User {
   departmentId       Int?
   department         Department?       @relation(fields: [departmentId], references: [id])
   projectProposals   ProjectProposal[]
+  approvals         ProjectApproval[]
 
   @@index([email])
   @@index([departmentId])
@@ -141,6 +149,8 @@ model ProjectProposal {
   communityId Int?
   community   PartnerCommunity? @relation(fields: [communityId], references: [id])
   activities  Activity[] // Add this relation field
+  approvals          ProjectApproval[]
+  currentApprovalStep UserPosition     @default(CEC_HEAD)
 
   @@index([departmentId])
   @@index([programId])
@@ -148,6 +158,7 @@ model ProjectProposal {
   @@index([status])
   @@index([communityId])
   @@index([bannerProgramId])
+  @@index([currentApprovalStep])
   @@map("project_proposals")
 }
 
@@ -284,4 +295,23 @@ model Announcement {
   @@index([status])
   @@index([category])
   @@map("announcements")
+}
+
+model ProjectApproval {
+  id              Int            @id @default(autoincrement())
+  proposalId      Int
+  proposal        ProjectProposal @relation(fields: [proposalId], references: [id])
+  approverRole    UserPosition
+  approverUserId  String?
+  approver        User?          @relation(fields: [approverUserId], references: [id])
+  status          ApprovalStatus @default(PENDING)
+  comment         String?
+  approvedAt      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([proposalId, approverRole])
+  @@index([proposalId])
+  @@index([approverUserId])
+  @@map("project_approvals")
 }

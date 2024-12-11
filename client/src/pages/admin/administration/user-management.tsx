@@ -511,6 +511,9 @@ export default function UserManagementPage() {
                           <SelectItem value="FOCAL_PERSON">
                             Focal Person
                           </SelectItem>
+                          <SelectItem value="CHIEF_OPERATION_OFFICER">
+                            Chief Operation Officer
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

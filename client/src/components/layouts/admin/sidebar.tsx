@@ -18,9 +18,9 @@ import {
   Flag,
   Settings,
   UserCog,
-  Building,
+  // Building,
   CheckSquare,
-  History,
+  // History,
   Bell,
   // FileBox,
   // Wrench,
@@ -98,16 +98,16 @@ const navigationItems: NavItem[] = [
         href: "/admin/events-and-activities/activity-management",
         icon: CheckSquare,
       },
-      {
-        title: "Activity Reports",
-        href: "/admin/events-and-activities/reports",
-        icon: FileText,
-      },
-      {
-        title: "Activity History",
-        href: "/admin/events-and-activities/history",
-        icon: History,
-      },
+      // {
+      //   title: "Activity Reports",
+      //   href: "/admin/events-and-activities/reports",
+      //   icon: FileText,
+      // },
+      // {
+      //   title: "Activity History",
+      //   href: "/admin/events-and-activities/history",
+      //   icon: History,
+      // },
     ],
   },
   {
@@ -120,21 +120,21 @@ const navigationItems: NavItem[] = [
         href: "/admin/administration/user-management",
         icon: UserCog,
       },
-      {
-        title: "Department Settings",
-        href: "/admin/administration/department-settings",
-        icon: Building,
-      },
+      // {
+      //   title: "Department Settings",
+      //   href: "/admin/administration/department-settings",
+      //   icon: Building,
+      // },
       {
         title: "Approvals",
         href: "/admin/administration/approvals",
         icon: CheckSquare,
       },
-      {
-        title: "Activity Logs",
-        href: "/admin/administration/activity-logs",
-        icon: History,
-      },
+      // {
+      //   title: "Activity Logs",
+      //   href: "/admin/administration/activity-logs",
+      //   icon: History,
+      // },
       {
         title: "Announcements",
         href: "/admin/administration/announcements",

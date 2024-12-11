@@ -177,19 +177,19 @@ export const createProposal: RequestHandler = async (req, res) => {
     const newProposal = await prisma.projectProposal.create({
       data: {
         ...data,
-        // Create the approval records for each role in the flow
+        // Create the approval records for each position in the flow
         approvals: {
           create: [
             {
-              approverRole: "CEC_HEAD",
+              approverPosition: "CEC_HEAD",
               status: "PENDING",
             },
             {
-              approverRole: "VP_DIRECTOR",
+              approverPosition: "VP_DIRECTOR",
               status: "PENDING",
             },
             {
-              approverRole: "CHIEF_OPERATION_OFFICER",
+              approverPosition: "CHIEF_OPERATION_OFFICER",
               status: "PENDING",
             },
           ],
@@ -201,7 +201,7 @@ export const createProposal: RequestHandler = async (req, res) => {
         user: true,
         community: true,
         bannerProgram: true,
-        approvals: true, // Include approvals in the response
+        approvals: true,
       },
     });
 

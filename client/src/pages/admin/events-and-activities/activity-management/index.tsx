@@ -63,6 +63,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+import { format } from "date-fns";
+
 export default function ActivityManagementPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -263,7 +265,7 @@ export default function ActivityManagementPage() {
                     <TableCell>
                       <div className="flex items-center">
                         <Calendar className="mr-2 w-4 h-4 text-muted-foreground" />
-                        {new Date(activity.targetDate).toLocaleDateString()}
+                        {format(new Date(activity.targetDate), "MMMM d, yyyy")}
                       </div>
                     </TableCell>
                     <TableCell>

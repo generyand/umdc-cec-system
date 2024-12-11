@@ -1,11 +1,11 @@
-import { useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { ChevronRight, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ChevronRight, ArrowLeft } from "lucide-react";
 import {
   Calendar,
   Building2,
@@ -16,7 +16,6 @@ import {
   Mail,
   Target,
   DollarSign,
-  Clock,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { activitiesApi } from "@/services/api/activities.service";
@@ -38,31 +37,20 @@ const ActivityDetailsPage = () => {
 
   const getStatusColor = (status: string) => {
     const colors = {
-      UPCOMING: "bg-blue-500",
-      ONGOING: "bg-green-500",
-      COMPLETED: "bg-gray-500",
-      CANCELLED: "bg-red-500",
+      UPCOMING: "bg-blue-100 text-blue-700 border-blue-200",
+      ONGOING: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      COMPLETED: "bg-gray-100 text-gray-700 border-gray-200",
+      CANCELLED: "bg-red-100 text-red-700 border-red-200",
     };
-    return colors[status as keyof typeof colors] || "bg-gray-500";
+    return (
+      colors[status as keyof typeof colors] ||
+      "bg-gray-100 text-gray-700 border-gray-200"
+    );
   };
 
   return (
     <div className="container p-6 mx-auto space-y-8">
       <nav className="flex items-center space-x-1 text-sm text-muted-foreground">
-        <Link
-          to="/admin/dashboard"
-          className="flex items-center transition-colors hover:text-primary"
-        >
-          <Home className="w-4 h-4" />
-        </Link>
-        <ChevronRight className="w-4 h-4" />
-        <Link
-          to="/admin/events-and-activities"
-          className="transition-colors hover:text-primary"
-        >
-          Events & Activities
-        </Link>
-        <ChevronRight className="w-4 h-4" />
         <Link
           to="/admin/events-and-activities/activity-management"
           className="transition-colors hover:text-primary"
@@ -73,13 +61,18 @@ const ActivityDetailsPage = () => {
         <span className="font-medium text-foreground">Activity Details</span>
       </nav>
 
+      <Button
+        variant="ghost"
+        className="flex gap-2 items-center mt-4 hover:bg-accent/50"
+        onClick={() => window.history.back()}
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Back to Activities</span>
+      </Button>
+
       <div className="space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
           <div className="space-y-1">
-            <div className="flex gap-2 items-center text-sm text-muted-foreground">
-              <Clock className="w-4 h-4" />
-              <span>{format(new Date(activity.createdAt), "PPP")}</span>
-            </div>
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
               {activity.title}
             </h1>
@@ -87,7 +80,7 @@ const ActivityDetailsPage = () => {
           <Badge
             className={`${getStatusColor(
               activity.status
-            )} px-6 py-2 text-sm font-medium self-start`}
+            )} px-3 py-1 text-xs font-medium rounded-full border self-start`}
           >
             {activity.status}
           </Badge>

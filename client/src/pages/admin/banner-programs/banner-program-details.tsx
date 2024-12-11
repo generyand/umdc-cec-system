@@ -189,10 +189,10 @@ export default function BannerProgramDetailsPage() {
       <div className="flex flex-col gap-6">
         {/* Breadcrumb */}
         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Link to="/admin" className="hover:text-foreground">
+          {/* <Link to="/admin" className="hover:text-foreground">
             Admin
-          </Link>
-          <ChevronRight className="w-4 h-4" />
+          </Link> */}
+          {/* <ChevronRight className="w-4 h-4" /> */}
           <Link
             to="/admin/community-engagement/banner-programs"
             className="hover:text-foreground"

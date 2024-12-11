@@ -55,6 +55,7 @@ import NotFound from "@/pages/not-found";
 // Events & Activities Pages
 import CalendarPage from "@/pages/admin/events-and-activities/calendar-view/calendar";
 import ActivityManagementPage from "./pages/admin/events-and-activities/activity-management";
+import ActivityDetailsPage from "./pages/admin/events-and-activities/activity-management/activity-details";
 // import ActivityManagementPage from "@/pages/admin/events-and-activities/management";
 // import ActivityDetailsPage from "@/pages/admin/events-and-activities/details";
 // import ActivityReportsPage from "@/pages/admin/events-and-activities/reports";
@@ -167,9 +168,15 @@ const App = () => {
             {/* Events & Activities */}
             <Route path="events-and-activities">
               <Route path="calendar" element={<CalendarPage />} />
-              <Route path="management" element={<ActivityManagementPage />} />
-              {/* <Route path="management/:id" element={<ActivityDetailsPage />} />
-              <Route path="reports" element={<ActivityReportsPage />} />
+              <Route
+                path="activity-management"
+                element={<ActivityManagementPage />}
+              />
+              <Route
+                path="activity-management/:id"
+                element={<ActivityDetailsPage />}
+              />
+              {/* <Route path="reports" element={<ActivityReportsPage />} />
               <Route path="history" element={<ActivityHistoryPage />} />  */}
             </Route>
 

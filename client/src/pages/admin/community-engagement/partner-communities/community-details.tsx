@@ -232,13 +232,13 @@ export default function CommunityDetailsPage() {
           Admin
         </Link> */}
         {/* <ChevronRight className="w-4 h-4" /> */}
-        <Link
+        {/* <Link
           to="/admin/community-engagement"
           className="hover:text-foreground"
         >
           Community Engagement
         </Link>
-        <ChevronRight className="w-4 h-4" />
+        <ChevronRight className="w-4 h-4" /> */}
         <Link
           to="/admin/community-engagement/partner-communities"
           className="hover:text-foreground"

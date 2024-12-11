@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
+// import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { bannerProgramsApi } from "@/services/api/banner-programs.service";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -123,18 +123,18 @@ const BannerProgramsPage = () => {
     return matchesSearch && matchesStatus && matchesDepartment;
   });
 
-  const getStatusColor = (status: "ACTIVE" | "INACTIVE" | "SUSPENDED") => {
-    switch (status) {
-      case "ACTIVE":
-        return "bg-emerald-100 text-emerald-800";
-      case "INACTIVE":
-        return "bg-slate-100 text-slate-800";
-      case "SUSPENDED":
-        return "bg-amber-100 text-amber-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  // const getStatusColor = (status: "ACTIVE" | "INACTIVE" | "SUSPENDED") => {
+  //   switch (status) {
+  //     case "ACTIVE":
+  //       return "bg-emerald-100 text-emerald-800";
+  //     case "INACTIVE":
+  //       return "bg-slate-100 text-slate-800";
+  //     case "SUSPENDED":
+  //       return "bg-amber-100 text-amber-800";
+  //     default:
+  //       return "bg-gray-100 text-gray-800";
+  //   }
+  // };
 
   if (isLoading) {
     return (
@@ -272,7 +272,7 @@ const BannerProgramsPage = () => {
                         <h3 className="text-xl font-semibold tracking-tight">
                           {program.abbreviation}
                         </h3>
-                        <Badge
+                        {/* <Badge
                           variant="secondary"
                           className={cn(
                             "shrink-0",
@@ -280,7 +280,7 @@ const BannerProgramsPage = () => {
                           )}
                         >
                           {program.status}
-                        </Badge>
+                        </Badge> */}
                       </div>
                       <p className="text-base text-muted-foreground">
                         {program.name}

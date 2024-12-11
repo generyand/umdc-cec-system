@@ -159,6 +159,50 @@ export const getActivityById: RequestHandler = async (
     const { id } = req.params;
     const activity = await prisma.activity.findUnique({
       where: { id: parseInt(id) },
+      include: {
+        department: {
+          select: {
+            name: true,
+            abbreviation: true,
+          },
+        },
+        partnerCommunity: {
+          select: {
+            name: true,
+            communityType: true,
+            address: true,
+            contactPerson: true,
+            contactNumber: true,
+            contactEmail: true,
+          },
+        },
+        bannerProgram: {
+          select: {
+            name: true,
+            abbreviation: true,
+          },
+        },
+        proposal: {
+          select: {
+            title: true,
+            description: true,
+            targetBeneficiaries: true,
+            budget: true,
+          },
+        },
+        documents: {
+          select: {
+            id: true,
+            fileName: true,
+            fileUrl: true,
+            fileSize: true,
+            fileType: true,
+            category: true,
+            description: true,
+            uploadedAt: true,
+          },
+        },
+      },
     });
 
     if (!activity) {

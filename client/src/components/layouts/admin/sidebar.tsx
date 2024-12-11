@@ -95,7 +95,7 @@ const navigationItems: NavItem[] = [
       },
       {
         title: "Activity Management",
-        href: "/admin/events-and-activities/management",
+        href: "/admin/events-and-activities/activity-management",
         icon: CheckSquare,
       },
       {

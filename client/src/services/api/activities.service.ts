@@ -1,5 +1,6 @@
 import api from "@/lib/api";
-import { Activity } from "@/types/activity.types";
+import { Activity, ActivityData } from "@/types/activity.types";
+import { ApiResponse } from "@/types/api.types";
 
 export const activitiesApi = {
   getActivities: async () => {
@@ -19,6 +20,14 @@ export const activitiesApi = {
       }
     );
 
+    console.log(response.data);
+    return response.data;
+  },
+
+  getActivityById: async (id: number) => {
+    const response = await api.get<ApiResponse<ActivityData>>(
+      `/api/activities/${id}`
+    );
     console.log(response.data);
     return response.data;
   },

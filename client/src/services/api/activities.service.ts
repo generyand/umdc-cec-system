@@ -8,10 +8,17 @@ export const activitiesApi = {
     return response.data;
   },
 
-  getActivitiesForAdmin: async () => {
+  getActivitiesForAdmin: async (page = 1, limit = 10) => {
     const response = await api.get(
-      "/api/activities/get-all-activities-for-admin"
+      `/api/activities/get-all-activities-for-admin`,
+      {
+        params: {
+          page,
+          limit,
+        },
+      }
     );
+
     console.log(response.data);
     return response.data;
   },

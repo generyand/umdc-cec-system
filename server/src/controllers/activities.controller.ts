@@ -98,38 +98,51 @@ export const getAllActivitiesForAdmin: RequestHandler = async (
   res: Response
 ) => {
   try {
-    const activities = await prisma.activity.findMany({
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        targetDate: true,
-        status: true,
-        department: {
-          select: {
-            name: true,
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    const [activities, total] = await Promise.all([
+      prisma.activity.findMany({
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          targetDate: true,
+          status: true,
+          department: {
+            select: {
+              name: true,
+            },
+          },
+          partnerCommunity: {
+            select: {
+              name: true,
+            },
+          },
+          bannerProgram: {
+            select: {
+              abbreviation: true,
+            },
           },
         },
-        partnerCommunity: {
-          select: {
-            name: true,
-          },
+        orderBy: {
+          targetDate: "desc",
         },
-        bannerProgram: {
-          select: {
-            abbreviation: true,
-          },
-        },
-      },
-      orderBy: {
-        targetDate: "desc",
-      },
-    });
+      }),
+      prisma.activity.count(), // Get total count for pagination
+    ]);
 
     res.status(200).json({
       success: true,
       message: "Activities fetched successfully",
       data: activities,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
     console.error("❌ Error fetching activities:", error);

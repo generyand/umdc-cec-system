@@ -50,18 +50,32 @@ import { toast } from "sonner";
 // Types
 import { Activity } from "@/types/activity.types";
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
 export default function ActivityManagementPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const queryClient = useQueryClient();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["activities"],
-    queryFn: activitiesApi.getActivitiesForAdmin,
+    queryKey: ["activities", currentPage],
+    queryFn: () =>
+      activitiesApi.getActivitiesForAdmin(currentPage, itemsPerPage),
   });
 
   const activities: Activity[] = data?.data || [];
+  const totalPages = Math.ceil((data?.total || 0) / itemsPerPage);
 
   const getStatusColor = (status: Activity["status"]) => {
     switch (status) {
@@ -394,6 +408,101 @@ export default function ActivityManagementPage() {
               ))}
             </TableBody>
           </Table>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-between items-center px-4 py-4 border-t">
+              <div className="text-sm text-muted-foreground">
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                {Math.min(currentPage * itemsPerPage, data?.total || 0)} of{" "}
+                {data?.total || 0} entries
+              </div>
+
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() =>
+                        currentPage > 1 && setCurrentPage((p) => p - 1)
+                      }
+                      className={
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                      aria-disabled={currentPage === 1}
+                    />
+                  </PaginationItem>
+
+                  {/* First Page */}
+                  {currentPage > 2 && (
+                    <PaginationItem>
+                      <PaginationLink onClick={() => setCurrentPage(1)}>
+                        1
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  {/* Ellipsis */}
+                  {currentPage > 3 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+
+                  {/* Current and Adjacent Pages */}
+                  {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
+                    const pageNumber = Math.min(
+                      Math.max(currentPage - 1 + i, 1),
+                      totalPages
+                    );
+                    return (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(pageNumber)}
+                          isActive={currentPage === pageNumber}
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+
+                  {/* Ellipsis */}
+                  {currentPage < totalPages - 2 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+
+                  {/* Last Page */}
+                  {currentPage < totalPages - 1 && (
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(totalPages)}
+                      >
+                        {totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        currentPage < totalPages && setCurrentPage((p) => p + 1)
+                      }
+                      className={
+                        currentPage === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                      aria-disabled={currentPage === totalPages}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </div>
       </div>
     </>

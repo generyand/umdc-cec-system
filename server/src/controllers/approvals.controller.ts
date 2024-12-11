@@ -23,38 +23,80 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
 
     switch (user.position) {
       case "CEC_HEAD":
-        // CEC Head sees all new pending proposals
         whereCondition = {
-          currentApprovalStep: "CEC_HEAD",
-          status: "PENDING",
+          OR: [
+            // Pending proposals that need CEC Head's approval
+            {
+              currentApprovalStep: "CEC_HEAD",
+              status: "PENDING",
+            },
+            // Proposals already approved by CEC Head
+            {
+              approvals: {
+                some: {
+                  approverPosition: "CEC_HEAD",
+                  status: "APPROVED",
+                  approverUserId: userId,
+                },
+              },
+            },
+          ],
         };
         break;
 
       case "VP_DIRECTOR":
-        // VP Director only sees proposals approved by CEC Head
         whereCondition = {
-          currentApprovalStep: "VP_DIRECTOR",
-          status: "PENDING",
-          approvals: {
-            some: {
-              approverPosition: "CEC_HEAD",
-              status: "APPROVED",
+          OR: [
+            // Pending proposals that need VP Director's approval
+            {
+              currentApprovalStep: "VP_DIRECTOR",
+              status: "PENDING",
+              approvals: {
+                some: {
+                  approverPosition: "CEC_HEAD",
+                  status: "APPROVED",
+                },
+              },
             },
-          },
+            // Proposals already approved by VP Director
+            {
+              approvals: {
+                some: {
+                  approverPosition: "VP_DIRECTOR",
+                  status: "APPROVED",
+                  approverUserId: userId,
+                },
+              },
+            },
+          ],
         };
         break;
 
       case "CHIEF_OPERATION_OFFICER":
-        // Chief Operation Officer only sees proposals approved by VP Director
         whereCondition = {
-          currentApprovalStep: "CHIEF_OPERATION_OFFICER",
-          status: "PENDING",
-          approvals: {
-            some: {
-              approverPosition: "VP_DIRECTOR",
-              status: "APPROVED",
+          OR: [
+            // Pending proposals that need COO's approval
+            {
+              currentApprovalStep: "CHIEF_OPERATION_OFFICER",
+              status: "PENDING",
+              approvals: {
+                some: {
+                  approverPosition: "VP_DIRECTOR",
+                  status: "APPROVED",
+                },
+              },
             },
-          },
+            // Proposals already approved by COO
+            {
+              approvals: {
+                some: {
+                  approverPosition: "CHIEF_OPERATION_OFFICER",
+                  status: "APPROVED",
+                  approverUserId: userId,
+                },
+              },
+            },
+          ],
         };
         break;
     }

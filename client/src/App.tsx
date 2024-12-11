@@ -182,9 +182,10 @@ const App = () => {
             </Route>
 
             {/* Administration */}
+            <Route path="/admin/settings" element={<SettingsPage />} />
+
             <Route path="administration">
               <Route path="user-management" element={<UserManagementPage />} />
-              <Route path="department-settings" element={<SettingsPage />} />
               <Route path="approvals" element={<ApprovalsPage />} />
               <Route
                 path="activity-logs"

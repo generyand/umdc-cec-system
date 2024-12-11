@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import { Search, MoreVertical, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { approvalsApi } from "@/services/api/approvals.service";
+import { format } from "date-fns";
 
 export default function ApprovalsPage() {
   const navigate = useNavigate();
@@ -129,7 +130,7 @@ export default function ApprovalsPage() {
               <Skeleton className="h-4 w-[120px]" />
             </TableHead>
             <TableHead>
-              <Skeleton className="h-4 w-[140px]" />
+              <Skeleton className="h-4 w-[120px]" />
             </TableHead>
             <TableHead>
               <Skeleton className="h-4 w-[100px]" />
@@ -139,9 +140,6 @@ export default function ApprovalsPage() {
             </TableHead>
             <TableHead>
               <Skeleton className="h-4 w-[80px]" />
-            </TableHead>
-            <TableHead className="text-right">
-              <Skeleton className="h-4 w-[100px] ml-auto" />
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -155,22 +153,17 @@ export default function ApprovalsPage() {
                 <Skeleton className="h-5 w-[150px]" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-5 w-[160px]" />
+                <Skeleton className="h-5 w-[150px]" />
               </TableCell>
               <TableCell>
                 <Skeleton className="h-5 w-[100px]" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-5 w-[90px]" />
-              </TableCell>
-              <TableCell>
                 <Skeleton className="h-5 w-[80px] rounded-full" />
               </TableCell>
-              <TableCell className="text-right">
-                <div className="flex gap-2 justify-end">
-                  <Skeleton className="h-9 w-[100px]" />
-                  <Skeleton className="h-9 w-[90px]" />
-                  <Skeleton className="h-9 w-[80px]" />
+              <TableCell>
+                <div className="flex justify-end">
+                  <Skeleton className="w-8 h-8" />
                 </div>
               </TableCell>
             </TableRow>
@@ -248,7 +241,9 @@ export default function ApprovalsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Title</TableHead>
-                    <TableHead>Current Step</TableHead>
+                    <TableHead>Submitted By</TableHead>
+                    <TableHead>Department</TableHead>
+                    <TableHead>Target Date</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="w-[100px]">Actions</TableHead>
                   </TableRow>
@@ -259,7 +254,11 @@ export default function ApprovalsPage() {
                       <TableCell className="font-medium">
                         {proposal.title}
                       </TableCell>
-                      <TableCell>{proposal.currentStep}</TableCell>
+                      <TableCell>{proposal.submittedBy.name}</TableCell>
+                      <TableCell>{proposal.submittedBy.department}</TableCell>
+                      <TableCell>
+                        {format(new Date(proposal.targetDate), "MMM d, yyyy")}
+                      </TableCell>
                       <TableCell>
                         <span
                           className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusBadgeVariant(

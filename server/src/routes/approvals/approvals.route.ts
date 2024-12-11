@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  approveProposal,
   getProposalsForApproval,
   // getProposalApprovalById,
   // approveProposal,
@@ -20,7 +21,7 @@ router.get("/", authenticateToken, getProposalsForApproval);
 // router.get("/:id/history", authenticateToken, getApprovalHistory);
 
 // Approve a proposal
-// router.post("/:id/approve", authenticateToken, approveProposal);
+router.post("/:id/approve", authenticateToken, approveProposal);
 
 // Reject a proposal
 // router.post("/:id/reject", authenticateToken, rejectProposal);

@@ -1,6 +1,7 @@
 import { Request, Response, RequestHandler } from "express";
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../utils/errors.js";
+import { getNextApprovalStep } from "@/utils/approval.utils.js";
 
 // Get all proposals that need the current user's approval
 export const getProposalsForApproval: RequestHandler = async (req, res) => {
@@ -259,7 +260,7 @@ export const approveProposal: RequestHandler = async (req, res) => {
     // 3. Process the approval in a transaction
     const updatedProposal = await prisma.$transaction(async (prisma) => {
       // Update the current approval
-      await prisma.projectApproval.update({
+      const updatedApproval = await prisma.projectApproval.update({
         where: {
           proposalId_approverRole: {
             proposalId: proposal.id,
@@ -274,17 +275,19 @@ export const approveProposal: RequestHandler = async (req, res) => {
         },
       });
 
+      console.log("🔍 Approval updated successfully", updatedApproval);
+
       // Determine and set next approval step
       const nextStep = getNextApprovalStep(user.position!);
 
+      // Update proposal status
       if (nextStep) {
-        return prisma.projectProposal.update({
+        return await prisma.projectProposal.update({
           where: { id: proposal.id },
           data: { currentApprovalStep: nextStep },
         });
       } else {
-        // If no next step, mark proposal as fully approved
-        return prisma.projectProposal.update({
+        return await prisma.projectProposal.update({
           where: { id: proposal.id },
           data: {
             status: "APPROVED",
@@ -293,6 +296,8 @@ export const approveProposal: RequestHandler = async (req, res) => {
         });
       }
     });
+
+    console.log("📊 Proposal updated:", updatedProposal);
 
     // 4. Get the updated proposal with all details
     const finalProposal = await prisma.projectProposal.findUnique({

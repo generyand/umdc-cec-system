@@ -11,6 +11,7 @@ import {
   Trash2,
   Plus,
   ChevronRight,
+  FileText,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
@@ -479,17 +480,29 @@ export default function DepartmentsPage() {
             </Button>
           </div>
 
-          {/* Move Add Department button here */}
-          <DepartmentFormModal
-            mode="create"
-            onSuccess={() => refetch()}
-            trigger={
-              <Button>
-                <Plus className="mr-2 w-4 h-4" />
-                Add Department
-              </Button>
-            }
-          />
+          {/* Actions Group */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                /* Add your report generation logic here */
+              }}
+            >
+              <FileText className="mr-2 w-4 h-4" />
+              Generate Report
+            </Button>
+
+            <DepartmentFormModal
+              mode="create"
+              onSuccess={() => refetch()}
+              trigger={
+                <Button>
+                  <Plus className="mr-2 w-4 h-4" />
+                  Add Department
+                </Button>
+              }
+            />
+          </div>
         </div>
 
         {renderContent()}

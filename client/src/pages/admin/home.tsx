@@ -49,7 +49,7 @@ export default function HomePage() {
     {
       title: "Calendar",
       description: "Extension activities schedule",
-      href: "/admin/events-and-activities",
+      href: "/admin/events-and-activities/calendar",
       icon: Calendar,
     },
   ];

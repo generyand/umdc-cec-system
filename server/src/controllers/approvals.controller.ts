@@ -37,7 +37,7 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
           status: "PENDING",
           approvals: {
             some: {
-              approverRole: "CEC_HEAD",
+              approverPosition: "CEC_HEAD",
               status: "APPROVED",
             },
           },
@@ -51,7 +51,7 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
           status: "PENDING",
           approvals: {
             some: {
-              approverRole: "VP_DIRECTOR",
+              approverPosition: "VP_DIRECTOR",
               status: "APPROVED",
             },
           },
@@ -81,7 +81,7 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
         },
         approvals: {
           select: {
-            approverRole: true,
+            approverPosition: true,
             status: true,
             comment: true,
             approvedAt: true,
@@ -112,7 +112,7 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
         department: proposal.user.department?.name || "",
       },
       approvalFlow: proposal.approvals.map((approval) => ({
-        role: approval.approverRole,
+        role: approval.approverPosition,
         status: approval.status,
         comment: approval.comment,
         approvedAt: approval.approvedAt,
@@ -262,9 +262,9 @@ export const approveProposal: RequestHandler = async (req, res) => {
       // Update the current approval
       const updatedApproval = await prisma.projectApproval.update({
         where: {
-          proposalId_approverRole: {
+          proposalId_approverPosition: {
             proposalId: proposal.id,
-            approverRole: user.position!,
+            approverPosition: user.position!,
           },
         },
         data: {
@@ -309,7 +309,7 @@ export const approveProposal: RequestHandler = async (req, res) => {
         currentApprovalStep: true,
         approvals: {
           select: {
-            approverRole: true,
+            approverPosition: true,
             status: true,
             comment: true,
             approvedAt: true,
@@ -334,7 +334,7 @@ export const approveProposal: RequestHandler = async (req, res) => {
         status: finalProposal?.status,
         currentStep: finalProposal?.currentApprovalStep,
         approvalFlow: finalProposal?.approvals.map((approval) => ({
-          role: approval.approverRole,
+          role: approval.approverPosition,
           status: approval.status,
           comment: approval.comment,
           approvedAt: approval.approvedAt,

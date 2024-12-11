@@ -298,19 +298,19 @@ model Announcement {
 }
 
 model ProjectApproval {
-  id              Int            @id @default(autoincrement())
-  proposalId      Int
-  proposal        ProjectProposal @relation(fields: [proposalId], references: [id])
-  approverRole    UserPosition
-  approverUserId  String?
-  approver        User?          @relation(fields: [approverUserId], references: [id])
-  status          ApprovalStatus @default(PENDING)
-  comment         String?
-  approvedAt      DateTime?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  id               Int            @id @default(autoincrement())
+  proposalId       Int
+  proposal         ProjectProposal @relation(fields: [proposalId], references: [id])
+  approverPosition UserPosition    // Renamed from approverRole
+  approverUserId   String?
+  approver         User?          @relation(fields: [approverUserId], references: [id])
+  status           ApprovalStatus @default(PENDING)
+  comment          String?
+  approvedAt       DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
-  @@unique([proposalId, approverRole])
+  @@unique([proposalId, approverPosition])  // Updated unique constraint
   @@index([proposalId])
   @@index([approverUserId])
   @@map("project_approvals")

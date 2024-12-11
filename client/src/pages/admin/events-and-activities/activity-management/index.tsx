@@ -5,7 +5,6 @@ import {
   Filter,
   MapPin,
   MoreHorizontal,
-  Plus,
   Search,
   Building2,
   Check,
@@ -187,10 +186,6 @@ export default function ActivityManagementPage() {
             <CardTitle className="text-2xl font-bold">
               Activity Management
             </CardTitle>
-            <Button onClick={() => navigate("new")}>
-              <Plus className="mr-2 w-4 h-4" />
-              New Activity
-            </Button>
           </div>
         </CardHeader>
         <CardContent>

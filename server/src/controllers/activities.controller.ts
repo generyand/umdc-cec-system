@@ -76,12 +76,56 @@ export const createActivity: RequestHandler = async (
 };
 
 // Get all activities
-export const getAllActivities: RequestHandler = async (
+export const getAllActivitiesForCalendar: RequestHandler = async (
   req: Request,
   res: Response
 ) => {
   try {
     const activities = await prisma.activity.findMany();
+    res.status(200).json({
+      success: true,
+      message: "Activities fetched successfully",
+      data: activities,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching activities:", error);
+    throw new ApiError(500, "Failed to fetch activities");
+  }
+};
+
+export const getAllActivitiesForAdmin: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const activities = await prisma.activity.findMany({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        targetDate: true,
+        status: true,
+        department: {
+          select: {
+            name: true,
+          },
+        },
+        partnerCommunity: {
+          select: {
+            name: true,
+          },
+        },
+        bannerProgram: {
+          select: {
+            abbreviation: true,
+          },
+        },
+      },
+      orderBy: {
+        targetDate: "desc",
+      },
+    });
+
     res.status(200).json({
       success: true,
       message: "Activities fetched successfully",
@@ -143,6 +187,23 @@ export const updateActivity: RequestHandler = async (
     console.error("❌ Error updating activity:", error);
     throw new ApiError(500, "Failed to update activity");
   }
+};
+
+export const updateActivityStatus: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
+  const { id, status } = req.body;
+  const updatedActivity = await prisma.activity.update({
+    where: { id: parseInt(id) },
+    data: { status },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Activity status updated successfully",
+    data: updatedActivity,
+  });
 };
 
 // Delete an activity

@@ -65,7 +65,7 @@ const navigationItems: NavItem[] = [
       },
     ],
   },
-  { title: "Calendar", href: "/staff/events/calendar", icon: Calendar },
+  { title: "Calendar", href: "/staff/calendar", icon: Calendar },
   { title: "Profile Settings", href: "/staff/profile", icon: User },
 ];
 

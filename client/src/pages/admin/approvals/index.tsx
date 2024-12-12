@@ -15,17 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +33,16 @@ import { approvalsApi } from "@/services/api/approvals.service";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
 import { UserPosition } from "@/types/user.types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ApprovalFlow {
   role: UserPosition;
@@ -75,6 +74,7 @@ export default function ApprovalsPage() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+  const [comment, setComment] = useState("");
 
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -329,79 +329,120 @@ export default function ApprovalsPage() {
                             {getCurrentUserApprovalStatus(proposal) ===
                               "PENDING" && (
                               <>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
+                                <Dialog>
+                                  <DialogTrigger asChild>
                                     <DropdownMenuItem
                                       className="text-green-600 focus:text-green-600"
                                       onSelect={(e) => e.preventDefault()}
                                     >
                                       Approve
                                     </DropdownMenuItem>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>
                                         Approve Proposal
-                                      </AlertDialogTitle>
-                                      <AlertDialogDescription>
+                                      </DialogTitle>
+                                      <DialogDescription>
                                         Are you sure you want to approve this
-                                        proposal?
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>
+                                        proposal? You can add an optional
+                                        comment below.
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="py-4">
+                                      <Textarea
+                                        placeholder="Add a comment (optional)"
+                                        value={comment}
+                                        onChange={(e) =>
+                                          setComment(e.target.value)
+                                        }
+                                        className="min-h-[100px]"
+                                      />
+                                    </div>
+                                    <DialogFooter>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                          setComment("");
+                                        }}
+                                      >
                                         Cancel
-                                      </AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() =>
+                                      </Button>
+                                      <Button
+                                        className="bg-green-600 hover:bg-green-700"
+                                        onClick={() => {
                                           approveMutation.mutate(
                                             proposal.id.toString()
-                                          )
-                                        }
-                                        className="bg-green-600 hover:bg-green-700"
+                                          );
+                                          setComment("");
+                                        }}
+                                        disabled={approveMutation.isPending}
                                       >
-                                        Approve
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
+                                        {approveMutation.isPending
+                                          ? "Approving..."
+                                          : "Approve"}
+                                      </Button>
+                                    </DialogFooter>
+                                  </DialogContent>
+                                </Dialog>
 
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
+                                <Dialog>
+                                  <DialogTrigger asChild>
                                     <DropdownMenuItem
                                       className="text-destructive focus:text-destructive"
                                       onSelect={(e) => e.preventDefault()}
                                     >
                                       Return
                                     </DropdownMenuItem>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>
-                                        Return Proposal
-                                      </AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to return this
-                                        proposal?
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>Return Proposal</DialogTitle>
+                                      <DialogDescription>
+                                        Please provide a reason for returning
+                                        this proposal. This will be visible to
+                                        the proposal owner.
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="py-4">
+                                      <Textarea
+                                        placeholder="Enter reason for returning"
+                                        value={comment}
+                                        onChange={(e) =>
+                                          setComment(e.target.value)
+                                        }
+                                        className="min-h-[100px]"
+                                      />
+                                    </div>
+                                    <DialogFooter>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                          setComment("");
+                                        }}
+                                      >
                                         Cancel
-                                      </AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() =>
+                                      </Button>
+                                      <Button
+                                        variant="destructive"
+                                        onClick={() => {
                                           rejectMutation.mutate(
                                             proposal.id.toString()
-                                          )
+                                          );
+                                          setComment("");
+                                        }}
+                                        disabled={
+                                          rejectMutation.isPending ||
+                                          !comment.trim()
                                         }
-                                        className="bg-destructive hover:bg-destructive/90"
                                       >
-                                        Return
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
+                                        {rejectMutation.isPending
+                                          ? "Returning..."
+                                          : "Return"}
+                                      </Button>
+                                    </DialogFooter>
+                                  </DialogContent>
+                                </Dialog>
                               </>
                             )}
                           </DropdownMenuContent>

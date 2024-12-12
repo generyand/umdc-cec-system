@@ -53,7 +53,7 @@ import UnauthorizedPage from "@/pages/unauth-page";
 import NotFound from "@/pages/not-found";
 
 // Events & Activities Pages
-import CalendarPage from "@/pages/admin/events-and-activities/calendar-view/calendar";
+import CalendarPage from "@/pages/common/calendar-view/calendar";
 import ActivityManagementPage from "./pages/admin/events-and-activities/activity-management";
 import ActivityDetailsPage from "./pages/admin/events-and-activities/activity-management/activity-details";
 import ApprovalsPage from "./pages/admin/approvals";
@@ -248,7 +248,7 @@ const App = () => {
             <Route path="proposals" element={<StaffProposalsPage />} />
             <Route path="proposals/:id" element={<ProposalDetailsPage />} />
             <Route path="settings" element={<SettingsPage />} />
-            <Route path="events" element={<div>Staff Events</div>} />
+            <Route path="calendar" element={<CalendarPage />} />
           </Route>
 
           {/* Public routes */}

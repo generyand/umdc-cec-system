@@ -25,12 +25,13 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
+import { approvalsApi } from "@/services/api/approvals.service";
 
 interface Proposal {
   id: number;
   title: string;
   description: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  status: "PENDING" | "APPROVED" | "RETURNED";
   targetDate: string;
   budget: string;
   targetBeneficiaries: string;
@@ -159,12 +160,23 @@ export default function ProposalDetailsPage() {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: (newStatus: "APPROVED" | "RETURNED") =>
-      projectProposalsService.updateProposalStatus(
-        id as string,
-        newStatus,
-        useAuth.getState().token as string
-      ),
+    mutationFn: async ({
+      status,
+      comment,
+    }: {
+      status: "APPROVED" | "RETURNED";
+      comment?: string;
+    }) => {
+      if (status === "APPROVED") {
+        return approvalsApi.approveProposal(Number(id), comment);
+      } else {
+        // Return requires a comment
+        return approvalsApi.returnProposal(
+          Number(id),
+          comment || "Proposal returned"
+        );
+      }
+    },
     onSuccess: () => {
       refetch();
       toast.success("Proposal status updated successfully");
@@ -176,14 +188,15 @@ export default function ProposalDetailsPage() {
   });
 
   const handleStatusUpdate = (newStatus: "APPROVED" | "RETURNED") => {
-    updateStatusMutation.mutate(newStatus);
+    // You might want to add a prompt for comments, especially for returns
+    updateStatusMutation.mutate({ status: newStatus });
   };
 
   const getStatusBadgeVariant = (status: Proposal["status"]) => {
     switch (status) {
       case "APPROVED":
         return "bg-green-100 text-green-800";
-      case "REJECTED":
+      case "RETURNED":
         return "bg-red-100 text-red-800";
       default:
         return "bg-yellow-100 text-yellow-800";
@@ -207,22 +220,22 @@ export default function ProposalDetailsPage() {
     });
   };
 
-  const getProgressWidth = (index: number, steps: Proposal["approvalFlow"]) => {
-    const currentStep = steps[index];
-    const nextStep = steps[index + 1];
+  // const getProgressWidth = (index: number, steps: Proposal["approvalFlow"]) => {
+  //   const currentStep = steps[index];
+  //   const nextStep = steps[index + 1];
 
-    if (currentStep.status === "APPROVED") {
-      return "w-full"; // Full width if current step is approved
-    } else if (currentStep.status === "PENDING" && index === 0) {
-      return "w-0"; // No width for first pending step
-    } else if (
-      currentStep.status === "PENDING" &&
-      steps[index - 1]?.status === "APPROVED"
-    ) {
-      return "w-1/2"; // Half width if previous step was approved
-    }
-    return "w-0"; // Default to no width
-  };
+  //   if (currentStep.status === "APPROVED") {
+  //     return "w-full"; // Full width if current step is approved
+  //   } else if (currentStep.status === "PENDING" && index === 0) {
+  //     return "w-0"; // No width for first pending step
+  //   } else if (
+  //     currentStep.status === "PENDING" &&
+  //     steps[index - 1]?.status === "APPROVED"
+  //   ) {
+  //     return "w-1/2"; // Half width if previous step was approved
+  //   }
+  //   return "w-0"; // Default to no width
+  // };
 
   if (isLoading) {
     return (

@@ -26,6 +26,8 @@ import {
   // Wrench,
   Calendar,
 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { UserPosition, UserRole } from "@/types/user.types";
 
 // Types
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
@@ -46,103 +48,6 @@ interface CollapsibleSectionProps {
   onToggle: () => void;
   children: React.ReactNode;
 }
-
-// Navigation Configuration
-const navigationItems: NavItem[] = [
-  { title: "Home", href: "/admin", icon: Home },
-  // { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  {
-    title: "Academic Departments",
-    href: "/admin/academic-departments",
-    icon: School,
-  },
-  {
-    title: "Community Engagement",
-    href: "#",
-    icon: Handshake,
-    children: [
-      {
-        title: "Project Proposals",
-        href: "/admin/community-engagement/project-proposals",
-        icon: FileText,
-      },
-      {
-        title: "Banner Programs",
-        href: "/admin/community-engagement/banner-programs",
-        icon: Flag,
-      },
-      {
-        title: "Partner Communities",
-        href: "/admin/community-engagement/partner-communities",
-        icon: Users,
-      },
-      {
-        title: "Partnerships & Linkages",
-        href: "/admin/community-engagement/partnerships-and-linkages",
-        icon: Building2,
-      },
-    ],
-  },
-  {
-    title: "Events & Activities",
-    href: "#",
-    icon: Calendar,
-    children: [
-      {
-        title: "Calendar View",
-        href: "/admin/events-and-activities/calendar",
-        icon: Calendar,
-      },
-      {
-        title: "Activity Management",
-        href: "/admin/events-and-activities/activity-management",
-        icon: CheckSquare,
-      },
-      // {
-      //   title: "Activity Reports",
-      //   href: "/admin/events-and-activities/reports",
-      //   icon: FileText,
-      // },
-      // {
-      //   title: "Activity History",
-      //   href: "/admin/events-and-activities/history",
-      //   icon: History,
-      // },
-    ],
-  },
-  {
-    title: "Administration",
-    href: "#",
-    icon: Settings,
-    children: [
-      {
-        title: "User Management",
-        href: "/admin/administration/user-management",
-        icon: UserCog,
-      },
-      // {
-      //   title: "Department Settings",
-      //   href: "/admin/administration/department-settings",
-      //   icon: Building,
-      // },
-      {
-        title: "Approvals",
-        href: "/admin/administration/approvals",
-        icon: CheckSquare,
-      },
-      // {
-      //   title: "Activity Logs",
-      //   href: "/admin/administration/activity-logs",
-      //   icon: History,
-      // },
-      {
-        title: "Announcements",
-        href: "/admin/administration/announcements",
-        icon: Bell,
-      },
-    ],
-  },
-];
 
 // Reusable Components
 function CollapsibleSection({
@@ -209,6 +114,133 @@ function CollapsibleSection({
 
 // Main Component
 export function Sidebar({ className }: SidebarProps) {
+  const { user } = useAuth();
+
+  // Helper function to check if user can access approvals
+
+  const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
+
+  const canAccessApprovals = () => {
+    if (!user || !user.position) return false;
+
+    // Super Admin always has access
+    if (isSuperAdmin) return true;
+
+    // Check for specific positions using the enum
+    const approverPositions = [
+      UserPosition.CEC_HEAD,
+      UserPosition.VP_DIRECTOR,
+      UserPosition.CHIEF_OPERATION_OFFICER,
+    ];
+
+    return approverPositions.includes(user.position);
+  };
+
+  // Navigation Configuration
+  const navigationItems: NavItem[] = [
+    { title: "Home", href: "/admin", icon: Home },
+    // { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    {
+      title: "Academic Departments",
+      href: "/admin/academic-departments",
+      icon: School,
+    },
+    {
+      title: "Community Engagement",
+      href: "#",
+      icon: Handshake,
+      children: [
+        {
+          title: "Project Proposals",
+          href: "/admin/community-engagement/project-proposals",
+          icon: FileText,
+        },
+        {
+          title: "Banner Programs",
+          href: "/admin/community-engagement/banner-programs",
+          icon: Flag,
+        },
+        {
+          title: "Partner Communities",
+          href: "/admin/community-engagement/partner-communities",
+          icon: Users,
+        },
+        {
+          title: "Partnerships & Linkages",
+          href: "/admin/community-engagement/partnerships-and-linkages",
+          icon: Building2,
+        },
+      ],
+    },
+    {
+      title: "Events & Activities",
+      href: "#",
+      icon: Calendar,
+      children: [
+        {
+          title: "Calendar View",
+          href: "/admin/events-and-activities/calendar",
+          icon: Calendar,
+        },
+        {
+          title: "Activity Management",
+          href: "/admin/events-and-activities/activity-management",
+          icon: CheckSquare,
+        },
+        // {
+        //   title: "Activity Reports",
+        //   href: "/admin/events-and-activities/reports",
+        //   icon: FileText,
+        // },
+        // {
+        //   title: "Activity History",
+        //   href: "/admin/events-and-activities/history",
+        //   icon: History,
+        // },
+      ],
+    },
+    {
+      title: "Administration",
+      href: "#",
+      icon: Settings,
+      children: [
+        ...(isSuperAdmin
+          ? [
+              {
+                title: "User Management",
+                href: "/admin/administration/user-management",
+                icon: UserCog,
+              },
+            ]
+          : []),
+        // {
+        //   title: "Department Settings",
+        //   href: "/admin/administration/department-settings",
+        //   icon: Building,
+        // },
+        ...(canAccessApprovals()
+          ? [
+              {
+                title: "Approvals",
+                href: "/admin/administration/approvals",
+                icon: CheckSquare,
+              },
+            ]
+          : []),
+        // {
+        //   title: "Activity Logs",
+        //   href: "/admin/administration/activity-logs",
+        //   icon: History,
+        // },
+        {
+          title: "Announcements",
+          href: "/admin/administration/announcements",
+          icon: Bell,
+        },
+      ],
+    },
+  ];
+
   const isOpen = useSidebarStore((state) => state.isOpen);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 

@@ -99,6 +99,8 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
           ],
         };
         break;
+      default:
+        throw new ApiError(400, "User position not found");
     }
 
     const proposals = await prisma.projectProposal.findMany({

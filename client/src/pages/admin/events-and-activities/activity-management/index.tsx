@@ -47,7 +47,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 // Types
-import { Activity } from "@/types/activity.types";
 
 import {
   Pagination,
@@ -64,6 +63,29 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { format } from "date-fns";
+
+// Add these type definitions at the top of the file, after the imports
+type ActivityStatus = "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED";
+
+interface Activity {
+  id: number;
+  title: string;
+  description?: string;
+  status: ActivityStatus;
+  targetDate: string;
+  department?: {
+    name: string;
+  };
+  partnerCommunity?: {
+    name: string;
+  };
+  bannerProgram?: {
+    abbreviation: string;
+  };
+}
+
+const isStatusEqual = (status1: ActivityStatus, status2: ActivityStatus) =>
+  status1 === status2;
 
 export default function ActivityManagementPage() {
   const navigate = useNavigate();
@@ -82,7 +104,7 @@ export default function ActivityManagementPage() {
   const activities: Activity[] = data?.data || [];
   const totalPages = Math.ceil((data?.total || 0) / itemsPerPage);
 
-  const getStatusColor = (status: Activity["status"]) => {
+  const getStatusColor = (status: ActivityStatus) => {
     switch (status) {
       case "UPCOMING":
         return "bg-blue-500/10 text-blue-500";
@@ -96,7 +118,7 @@ export default function ActivityManagementPage() {
   };
 
   const updateStatusMutation = useMutation({
-    mutationFn: (variables: { id: number; status: Activity["status"] }) =>
+    mutationFn: (variables: { id: number; status: ActivityStatus }) =>
       activitiesApi.updateActivityStatus(variables.id, variables.status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["activities"] });
@@ -294,112 +316,183 @@ export default function ActivityManagementPage() {
                           >
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuSub>
-                            <DropdownMenuSubTrigger className="flex items-center">
-                              <div className="flex gap-2 items-center">
-                                <Circle
-                                  className={`w-2 h-2 ${getStatusColor(
-                                    activity.status
-                                  )}`}
-                                />
-                                <span>Update Status</span>
-                              </div>
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent className="w-[180px]">
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  updateStatusMutation.mutate({
-                                    id: activity.id,
-                                    status: "UPCOMING",
-                                  })
-                                }
-                                className="flex gap-2 items-center px-3 py-2 cursor-pointer"
-                                disabled={
-                                  updateStatusMutation.isPending ||
-                                  activity.status === "UPCOMING"
-                                }
-                              >
-                                <div className="flex flex-1 gap-2 items-center">
-                                  <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                                  <span className="text-sm">Upcoming</span>
-                                </div>
-                                {activity.status === "UPCOMING" && (
-                                  <Check className="w-4 h-4 text-blue-500" />
-                                )}
-                              </DropdownMenuItem>
 
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  updateStatusMutation.mutate({
-                                    id: activity.id,
-                                    status: "ONGOING",
-                                  })
-                                }
-                                className="flex gap-2 items-center px-3 py-2 cursor-pointer"
-                                disabled={
-                                  updateStatusMutation.isPending ||
-                                  activity.status === "ONGOING"
-                                }
-                              >
-                                <div className="flex flex-1 gap-2 items-center">
-                                  <div className="w-2 h-2 bg-green-500 rounded-full" />
-                                  <span className="text-sm">Ongoing</span>
-                                </div>
-                                {activity.status === "ONGOING" && (
-                                  <Check className="w-4 h-4 text-green-500" />
-                                )}
-                              </DropdownMenuItem>
+                          {/* Only show status update options if activity is not completed or cancelled */}
+                          {!isStatusEqual(activity.status, "COMPLETED") &&
+                            !isStatusEqual(activity.status, "CANCELLED") && (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuSub>
+                                  <DropdownMenuSubTrigger className="flex items-center">
+                                    <div className="flex gap-2 items-center">
+                                      <Circle
+                                        className={`w-2 h-2 ${getStatusColor(
+                                          activity.status
+                                        )}`}
+                                      />
+                                      <span>Update Status</span>
+                                    </div>
+                                  </DropdownMenuSubTrigger>
+                                  <DropdownMenuSubContent className="w-[180px]">
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        updateStatusMutation.mutate({
+                                          id: activity.id,
+                                          status: "UPCOMING",
+                                        })
+                                      }
+                                      className="flex gap-2 items-center px-3 py-2 cursor-pointer"
+                                      disabled={
+                                        updateStatusMutation.isPending ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "UPCOMING"
+                                        ) ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "COMPLETED"
+                                        ) ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "CANCELLED"
+                                        ) ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "ONGOING"
+                                        )
+                                      }
+                                    >
+                                      <div className="flex flex-1 gap-2 items-center">
+                                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                                        <span className="text-sm">
+                                          Upcoming
+                                        </span>
+                                      </div>
+                                      {isStatusEqual(
+                                        activity.status,
+                                        "UPCOMING"
+                                      ) && (
+                                        <Check className="w-4 h-4 text-blue-500" />
+                                      )}
+                                    </DropdownMenuItem>
 
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  updateStatusMutation.mutate({
-                                    id: activity.id,
-                                    status: "COMPLETED",
-                                  })
-                                }
-                                className="flex gap-2 items-center px-3 py-2 cursor-pointer"
-                                disabled={
-                                  updateStatusMutation.isPending ||
-                                  activity.status === "COMPLETED"
-                                }
-                              >
-                                <div className="flex flex-1 gap-2 items-center">
-                                  <div className="w-2 h-2 bg-gray-500 rounded-full" />
-                                  <span className="text-sm">Completed</span>
-                                </div>
-                                {activity.status === "COMPLETED" && (
-                                  <Check className="w-4 h-4 text-gray-500" />
-                                )}
-                              </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        updateStatusMutation.mutate({
+                                          id: activity.id,
+                                          status: "ONGOING",
+                                        })
+                                      }
+                                      className="flex gap-2 items-center px-3 py-2 cursor-pointer"
+                                      disabled={
+                                        updateStatusMutation.isPending ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "ONGOING"
+                                        ) ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "COMPLETED"
+                                        ) ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "CANCELLED"
+                                        ) ||
+                                        !isStatusEqual(
+                                          activity.status,
+                                          "UPCOMING"
+                                        )
+                                      }
+                                    >
+                                      <div className="flex flex-1 gap-2 items-center">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                                        <span className="text-sm">Ongoing</span>
+                                      </div>
+                                      {isStatusEqual(
+                                        activity.status,
+                                        "ONGOING"
+                                      ) && (
+                                        <Check className="w-4 h-4 text-green-500" />
+                                      )}
+                                    </DropdownMenuItem>
 
-                              <DropdownMenuSeparator className="my-1" />
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        updateStatusMutation.mutate({
+                                          id: activity.id,
+                                          status: "COMPLETED",
+                                        })
+                                      }
+                                      className="flex gap-2 items-center px-3 py-2 cursor-pointer"
+                                      disabled={
+                                        updateStatusMutation.isPending ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "COMPLETED"
+                                        ) ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "CANCELLED"
+                                        ) ||
+                                        !isStatusEqual(
+                                          activity.status,
+                                          "ONGOING"
+                                        )
+                                      }
+                                    >
+                                      <div className="flex flex-1 gap-2 items-center">
+                                        <div className="w-2 h-2 bg-gray-500 rounded-full" />
+                                        <span className="text-sm">
+                                          Completed
+                                        </span>
+                                      </div>
+                                      {isStatusEqual(
+                                        activity.status,
+                                        "COMPLETED"
+                                      ) && (
+                                        <Check className="w-4 h-4 text-gray-500" />
+                                      )}
+                                    </DropdownMenuItem>
 
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  updateStatusMutation.mutate({
-                                    id: activity.id,
-                                    status: "CANCELLED",
-                                  })
-                                }
-                                className="flex gap-2 items-center px-3 py-2 cursor-pointer text-destructive focus:text-destructive"
-                                disabled={
-                                  updateStatusMutation.isPending ||
-                                  activity.status === "CANCELLED"
-                                }
-                              >
-                                <div className="flex flex-1 gap-2 items-center">
-                                  <div className="w-2 h-2 bg-red-500 rounded-full" />
-                                  <span className="text-sm">
-                                    Cancel Activity
-                                  </span>
-                                </div>
-                                {activity.status === "CANCELLED" && (
-                                  <Check className="w-4 h-4 text-red-500" />
-                                )}
-                              </DropdownMenuItem>
-                            </DropdownMenuSubContent>
-                          </DropdownMenuSub>
+                                    <DropdownMenuSeparator className="my-1" />
+
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        updateStatusMutation.mutate({
+                                          id: activity.id,
+                                          status: "CANCELLED",
+                                        })
+                                      }
+                                      className="flex gap-2 items-center px-3 py-2 cursor-pointer text-destructive focus:text-destructive"
+                                      disabled={
+                                        updateStatusMutation.isPending ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "COMPLETED"
+                                        ) ||
+                                        isStatusEqual(
+                                          activity.status,
+                                          "CANCELLED"
+                                        )
+                                      }
+                                    >
+                                      <div className="flex flex-1 gap-2 items-center">
+                                        <div className="w-2 h-2 bg-red-500 rounded-full" />
+                                        <span className="text-sm">
+                                          Cancel Activity
+                                        </span>
+                                      </div>
+                                      {isStatusEqual(
+                                        activity.status,
+                                        "CANCELLED"
+                                      ) && (
+                                        <Check className="w-4 h-4 text-red-500" />
+                                      )}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+                              </>
+                            )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

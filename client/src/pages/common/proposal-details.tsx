@@ -101,6 +101,8 @@ const APPROVAL_SEQUENCE = [
   "CHIEF_OPERATION_OFFICER",
 ] as const;
 
+type ApprovalRole = (typeof APPROVAL_SEQUENCE)[number];
+
 // Add these variants for animations
 // const progressVariants = {
 //   pending: { scaleY: 0 },
@@ -142,9 +144,6 @@ const contentVariants = {
 //     },
 //   },
 // };
-
-// Add this type if not already defined
-// type ApprovalRole = (typeof APPROVAL_SEQUENCE)[number];
 
 export default function ProposalDetailsPage() {
   const { id } = useParams();
@@ -746,12 +745,22 @@ export default function ProposalDetailsPage() {
                                     Approved by {step.approvedBy}
                                   </p>
                                 )}
-                                {step.status === "PENDING" && (
-                                  <p className="mt-1 text-xs text-amber-600">
-                                    Note: If no action is taken within 3 days,
-                                    the approver must be notified.
-                                  </p>
-                                )}
+                                {step.status === "PENDING" &&
+                                  !proposal.approvalFlow.some(
+                                    (s: { status: string; role: string }) =>
+                                      s.status === "PENDING" &&
+                                      APPROVAL_SEQUENCE.indexOf(
+                                        s.role as ApprovalRole
+                                      ) <
+                                        APPROVAL_SEQUENCE.indexOf(
+                                          step.role as ApprovalRole
+                                        )
+                                  ) && (
+                                    <p className="mt-1 text-xs text-amber-600">
+                                      Note: If no action is taken within 3 days,
+                                      the approver must be notified.
+                                    </p>
+                                  )}
                               </div>
                               <span
                                 className={`px-2 py-1 text-xs font-medium rounded-full ${

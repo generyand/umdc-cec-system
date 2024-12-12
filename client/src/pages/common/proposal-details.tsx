@@ -746,6 +746,12 @@ export default function ProposalDetailsPage() {
                                     Approved by {step.approvedBy}
                                   </p>
                                 )}
+                                {step.status === "PENDING" && (
+                                  <p className="mt-1 text-xs text-amber-600">
+                                    Note: If no action is taken within 3 days,
+                                    the approver must be notified.
+                                  </p>
+                                )}
                               </div>
                               <span
                                 className={`px-2 py-1 text-xs font-medium rounded-full ${

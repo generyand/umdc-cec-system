@@ -268,13 +268,18 @@ export default function ProposalDetailsPage() {
   const isCurrentApprover = () => {
     if (!proposal || !user) return false;
 
+    console.log("proposal", proposal);
+
     // Find the first pending approval step
     const currentStep = proposal.approvalFlow.find(
       (step: { status: string }) => step.status === "PENDING"
     );
 
+    console.log("current step", currentStep);
+
     // Check if the current user's role matches the required role for this step
-    return currentStep?.role === user.role;
+    // TODO: change to position
+    return currentStep?.role === user.position;
   };
 
   if (isLoading) {
@@ -669,7 +674,7 @@ export default function ProposalDetailsPage() {
                   )}
 
                   {/* Action Buttons */}
-                  {proposal.status === "PENDING" && isCurrentApprover() && (
+                  {isCurrentApprover() && (
                     <div className="flex gap-4 pt-6">
                       <Button
                         className="bg-green-600 hover:bg-green-700"

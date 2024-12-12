@@ -15,6 +15,146 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const DepartmentOverviewSkeleton = () => {
+  return (
+    <div className="space-y-8">
+      {/* Header Skeleton */}
+      <div className="flex flex-col gap-6 p-6 rounded-lg border md:flex-row md:items-center md:justify-between bg-card">
+        <div className="space-y-3">
+          <Skeleton className="h-8 w-[300px]" /> {/* Department name */}
+          <Skeleton className="h-4 w-[100px]" /> {/* Abbreviation */}
+          <Skeleton className="h-4 w-[400px]" /> {/* Description */}
+        </div>
+        <div className="flex gap-3">
+          <Skeleton className="h-10 w-[140px]" /> {/* Download button */}
+          <Skeleton className="h-10 w-[160px]" /> {/* Create button */}
+        </div>
+      </div>
+
+      {/* Stats Skeleton */}
+      <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="p-6">
+            <div className="flex gap-4 items-center">
+              <Skeleton className="w-12 h-12 rounded-lg" /> {/* Icon */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[100px]" /> {/* Title */}
+                <Skeleton className="h-6 w-[60px]" /> {/* Value */}
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Programs Grid Skeleton */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Academic Programs Skeleton */}
+        <div className="lg:col-span-2">
+          <Card className="h-[600px] flex flex-col">
+            <div className="p-6 border-b">
+              <div className="flex justify-between items-center">
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[200px]" /> {/* Title */}
+                  <Skeleton className="h-4 w-[150px]" /> {/* Subtitle */}
+                </div>
+                <Skeleton className="h-9 w-[80px]" /> {/* Button */}
+              </div>
+            </div>
+            <div className="grid flex-1 grid-cols-2 gap-6 p-6">
+              {/* Active Programs */}
+              <div className="space-y-4">
+                <div className="flex gap-2 items-center">
+                  <Skeleton className="h-5 w-[150px]" /> {/* Section title */}
+                  <Skeleton className="h-5 w-[30px]" /> {/* Count */}
+                </div>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="p-4 rounded-lg border">
+                    <div className="space-y-3">
+                      <Skeleton className="h-5 w-[200px]" />{" "}
+                      {/* Program name */}
+                      <Skeleton className="w-full h-4" /> {/* Description */}
+                      <Skeleton className="h-4 w-[100px]" /> {/* Stats */}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Inactive Programs - Similar structure */}
+              <div className="space-y-4">
+                <div className="flex gap-2 items-center">
+                  <Skeleton className="h-5 w-[150px]" />
+                  <Skeleton className="h-5 w-[30px]" />
+                </div>
+                {[1, 2].map((i) => (
+                  <div key={i} className="p-4 rounded-lg border border-dashed">
+                    <div className="space-y-3">
+                      <Skeleton className="h-5 w-[200px]" />
+                      <Skeleton className="w-full h-4" />
+                      <Skeleton className="h-4 w-[100px]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Banner Programs Skeleton */}
+        <div className="lg:col-span-1">
+          <Card className="h-[600px]">
+            <div className="p-6 border-b">
+              <Skeleton className="h-6 w-[150px] mb-2" />
+              <Skeleton className="h-4 w-[200px]" />
+            </div>
+            <div className="p-6 space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="p-4 bg-gradient-to-br rounded-lg from-blue-600/30 to-indigo-700/30"
+                >
+                  <div className="space-y-3">
+                    <Skeleton className="h-5 w-[100px]" />
+                    <Skeleton className="h-6 w-[150px]" />
+                    <Skeleton className="w-full h-4" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Activities Section Skeleton */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {[1, 2].map((i) => (
+          <Card key={i} className="h-[600px] flex flex-col">
+            <div className="p-6 border-b">
+              <div className="flex justify-between items-center">
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[200px]" />
+                  <Skeleton className="h-4 w-[150px]" />
+                </div>
+                <Skeleton className="h-9 w-[80px]" />
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              {[1, 2, 3].map((j) => (
+                <div key={j} className="p-4 rounded-lg border">
+                  <div className="space-y-3">
+                    <Skeleton className="h-5 w-[250px]" />
+                    <Skeleton className="w-full h-4" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default function StaffDepartmentOverviewPage() {
   const { user } = useAuth();
@@ -40,11 +180,7 @@ export default function StaffDepartmentOverviewPage() {
 
   // Show loading state
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-[200px]">
-        <p>Loading department information...</p>
-      </div>
-    );
+    return <DepartmentOverviewSkeleton />;
   }
 
   // Show error state

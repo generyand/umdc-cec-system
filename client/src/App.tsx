@@ -57,10 +57,7 @@ import CalendarPage from "@/pages/admin/events-and-activities/calendar-view/cale
 import ActivityManagementPage from "./pages/admin/events-and-activities/activity-management";
 import ActivityDetailsPage from "./pages/admin/events-and-activities/activity-management/activity-details";
 import ApprovalsPage from "./pages/admin/approvals";
-// import ActivityManagementPage from "@/pages/admin/events-and-activities/management";
-// import ActivityDetailsPage from "@/pages/admin/events-and-activities/details";
-// import ActivityReportsPage from "@/pages/admin/events-and-activities/reports";
-// import ActivityHistoryPage from "@/pages/admin/events-and-activities/history";
+import { UserRole } from "./types/user.types";
 
 const App = () => {
   const { user, initialized } = useAuth();
@@ -79,7 +76,12 @@ const App = () => {
             element={
               user ? (
                 <Navigate
-                  to={user.role === "ADMIN" ? "/admin" : "/staff"}
+                  to={
+                    user.role === UserRole.ADMIN ||
+                    user.role === UserRole.SUPER_ADMIN
+                      ? "/admin"
+                      : "/staff"
+                  }
                   replace
                 />
               ) : (
@@ -95,7 +97,12 @@ const App = () => {
               element={
                 user ? (
                   <Navigate
-                    to={user.role === "ADMIN" ? "/admin" : "/staff"}
+                    to={
+                      user.role === UserRole.ADMIN ||
+                      user.role === UserRole.SUPER_ADMIN
+                        ? "/admin"
+                        : "/staff"
+                    }
                     replace
                   />
                 ) : (
@@ -108,7 +115,12 @@ const App = () => {
               element={
                 user ? (
                   <Navigate
-                    to={user.role === "ADMIN" ? "/admin" : "/staff"}
+                    to={
+                      user.role === UserRole.ADMIN ||
+                      user.role === UserRole.SUPER_ADMIN
+                        ? "/admin"
+                        : "/staff"
+                    }
                     replace
                   />
                 ) : (
@@ -121,15 +133,18 @@ const App = () => {
           {/* Admin routes */}
           <Route
             path="/admin"
-            element={
-              user?.role === "ADMIN" ? (
-                <AdminLayout />
-              ) : user ? (
-                <Navigate to="/unauthorized" replace />
-              ) : (
-                <Navigate to="/auth/login" replace />
-              )
-            }
+            element={(() => {
+              if (
+                user?.role === UserRole.SUPER_ADMIN ||
+                user?.role === UserRole.ADMIN
+              ) {
+                return <AdminLayout />;
+              } else if (user) {
+                return <Navigate to="/unauthorized" replace />;
+              } else {
+                return <Navigate to="/auth/login" replace />;
+              }
+            })()}
           >
             {/* Home */}
             <Route index element={<HomePage />} />

@@ -4,6 +4,7 @@ import { Header } from "@/components/layouts/common/header";
 import { useAuth } from "@/hooks/use-auth";
 import { AdminLayoutSkeleton } from "@/components/skeletons/admin-layout-skeleton";
 import { useEffect } from "react";
+import { UserRole } from "@/types/user.types";
 
 export default function AdminLayout() {
   const { user, isLoading } = useAuth();
@@ -19,7 +20,7 @@ export default function AdminLayout() {
     return <AdminLayoutSkeleton />;
   }
 
-  if (user?.role !== "ADMIN") {
+  if (user?.role !== UserRole.ADMIN && user?.role !== UserRole.SUPER_ADMIN) {
     return <Navigate to="/not-authorized" replace />;
   }
 

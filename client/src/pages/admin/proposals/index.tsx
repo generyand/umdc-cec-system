@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertCircle, Search, CheckCircle, MoreHorizontal } from "lucide-react";
+import { AlertCircle, Search, MoreHorizontal } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { projectProposalsService } from "@/services/api/project-proposals.service";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import {
   Select,
   SelectTrigger,
@@ -24,24 +24,13 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { activitiesApi } from "@/services/api/activities.service";
+import { useQuery } from "@tanstack/react-query";
+
+// import { activitiesApi } from "@/services/api/activities.service";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -76,7 +65,7 @@ export default function ProposalsPage() {
     data: response,
     isLoading,
     error,
-    refetch,
+    // refetch,
   } = useQuery({
     queryKey: ["proposals"],
     queryFn: async () => {
@@ -130,66 +119,48 @@ export default function ProposalsPage() {
     );
   }, [filteredProposals, page, itemsPerPage]);
 
-  const updateStatusMutation = useMutation({
-    mutationFn: ({
-      id,
-      newStatus,
-    }: {
-      id: string;
-      newStatus: "APPROVED" | "RETURNED";
-    }) =>
-      projectProposalsService.updateProposalStatus(
-        id,
-        newStatus,
-        useAuth.getState().token as string
-      ),
-    onSuccess: (data, variables) => {
-      refetch();
-      toast.success("Proposal status updated successfully");
+  // const updateStatusMutation = useMutation({
+  //   mutationFn: ({
+  //     id,
+  //     newStatus,
+  //   }: {
+  //     id: string;
+  //     newStatus: "APPROVED" | "RETURNED";
+  //   }) =>
+  //     projectProposalsService.updateProposalStatus(
+  //       id,
+  //       newStatus,
+  //       useAuth.getState().token as string
+  //     ),
+  //   onSuccess: (data, variables) => {
+  //     refetch();
+  //     toast.success("Proposal status updated successfully");
 
-      // Call createActivity if the proposal is approved
-      if (variables.newStatus === "APPROVED") {
-        createActivityMutation.mutate(Number(variables.id));
-      }
-    },
-    onError: (error) => {
-      toast.error("Failed to update proposal status. Please try again.");
-      console.error("Error updating proposal status:", error);
-    },
-  });
+  //     // Call createActivity if the proposal is approved
+  //     if (variables.newStatus === "APPROVED") {
+  //       createActivityMutation.mutate(Number(variables.id));
+  //     }
+  //   },
+  //   onError: (error) => {
+  //     toast.error("Failed to update proposal status. Please try again.");
+  //     console.error("Error updating proposal status:", error);
+  //   },
+  // });
 
-  const createActivityMutation = useMutation({
-    mutationFn: (proposalId: number) =>
-      activitiesApi.createActivity(proposalId),
-    onSuccess: () => {
-      toast.success("Activity created successfully");
-    },
-    onError: (error) => {
-      toast.error("Failed to create activity. Please try again.");
-      console.error("Error creating activity:", error);
-    },
-  });
+  // const createActivityMutation = useMutation({
+  //   mutationFn: (proposalId: number) =>
+  //     activitiesApi.createActivity(proposalId),
+  //   onSuccess: () => {
+  //     toast.success("Activity created successfully");
+  //   },
+  //   onError: (error) => {
+  //     toast.error("Failed to create activity. Please try again.");
+  //     console.error("Error creating activity:", error);
+  //   },
+  // });
 
   const handleViewDetails = (id: string) => {
     navigate(`/admin/community-engagement/project-proposals/${id}`);
-  };
-
-  const handleStatusUpdate = (
-    id: string,
-    newStatus: "APPROVED" | "RETURNED"
-  ) => {
-    updateStatusMutation.mutate(
-      { id, newStatus },
-      {
-        onSuccess: () => {
-          toast.success(`Proposal ${newStatus.toLowerCase()} successfully`);
-        },
-        onError: (error) => {
-          toast.error("Failed to update proposal status. Please try again.");
-          console.error("Error updating proposal status:", error);
-        },
-      }
-    );
   };
 
   const getStatusBadgeVariant = (status: Proposal["status"]) => {
@@ -444,125 +415,6 @@ export default function ProposalsPage() {
                               >
                                 View Details
                               </DropdownMenuItem>
-
-                              {proposal.status === "PENDING" && (
-                                <>
-                                  <DropdownMenuSeparator />
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <DropdownMenuItem
-                                        className="text-green-600 focus:text-green-600"
-                                        onSelect={(e) => e.preventDefault()}
-                                      >
-                                        Approve Proposal
-                                      </DropdownMenuItem>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent className="max-w-md">
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle className="flex gap-2 items-center text-xl">
-                                          <div className="p-2 bg-green-100 rounded-full">
-                                            <CheckCircle className="w-5 h-5 text-green-600" />
-                                          </div>
-                                          Approve Project Proposal
-                                        </AlertDialogTitle>
-                                        <AlertDialogDescription className="pt-3 space-y-2">
-                                          <p>
-                                            You are about to approve "
-                                            <span className="font-medium">
-                                              {proposal.title}
-                                            </span>
-                                            " submitted by{" "}
-                                            <span className="font-medium">
-                                              {proposal.user.firstName}{" "}
-                                              {proposal.user.lastName}
-                                            </span>
-                                            .
-                                          </p>
-                                          <p className="text-muted-foreground">
-                                            An activity will be automatically
-                                            generated and can be viewed in the
-                                            Calendar or Activity Management
-                                            page.
-                                          </p>
-                                          <p className="text-muted-foreground">
-                                            This action cannot be undone.
-                                          </p>
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter className="gap-2">
-                                        <AlertDialogCancel className="mt-0">
-                                          Cancel
-                                        </AlertDialogCancel>
-                                        <AlertDialogAction
-                                          onClick={() =>
-                                            handleStatusUpdate(
-                                              proposal.id.toString(),
-                                              "APPROVED"
-                                            )
-                                          }
-                                          className="bg-green-600 hover:bg-green-700"
-                                        >
-                                          Confirm Approval
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <DropdownMenuItem
-                                        className="text-destructive focus:text-destructive"
-                                        onSelect={(e) => e.preventDefault()}
-                                      >
-                                        Return Proposal
-                                      </DropdownMenuItem>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent className="max-w-md">
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle className="flex gap-2 items-center text-xl">
-                                          <div className="p-2 bg-red-100 rounded-full">
-                                            <AlertCircle className="w-5 h-5 text-red-600" />
-                                          </div>
-                                          Return Project Proposal
-                                        </AlertDialogTitle>
-                                        <AlertDialogDescription className="pt-3 space-y-2">
-                                          <p>
-                                            You are about to return "
-                                            <span className="font-medium">
-                                              {proposal.title}
-                                            </span>
-                                            " submitted by{" "}
-                                            <span className="font-medium">
-                                              {proposal.user.firstName}{" "}
-                                              {proposal.user.lastName}
-                                            </span>
-                                            .
-                                          </p>
-                                          <p className="text-muted-foreground">
-                                            This action cannot be undone.
-                                          </p>
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter className="gap-2">
-                                        <AlertDialogCancel className="mt-0">
-                                          Cancel
-                                        </AlertDialogCancel>
-                                        <AlertDialogAction
-                                          onClick={() =>
-                                            handleStatusUpdate(
-                                              proposal.id.toString(),
-                                              "RETURNED"
-                                            )
-                                          }
-                                          className="bg-destructive hover:bg-destructive/90"
-                                        >
-                                          Confirm Return
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-                                </>
-                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>

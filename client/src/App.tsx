@@ -34,7 +34,7 @@ import PartnershipsAndLinkagesPage from "@/pages/admin/community-engagement/part
 import PartnerCommunitiesPage from "@/pages/admin/community-engagement/partner-communities";
 import CommunityDetailsPage from "./pages/admin/community-engagement/partner-communities/community-details";
 import ProposalsPage from "@/pages/admin/proposals";
-import NewProposalPage from "@/pages/admin/proposals/new";
+import NewProposalPage from "@/components/common/create-proposal";
 import ProposalDetailsPage from "@/pages/admin/proposals/proposal-details";
 import BannerProgramsPage from "@/pages/admin/banner-programs";
 import BannerProgramDetailsPage from "@/pages/admin/banner-programs/banner-program-details";
@@ -243,6 +243,7 @@ const App = () => {
               path="department-overview"
               element={<StaffDepartmentOverviewPage />}
             />
+            <Route path="proposals/new" element={<NewProposalPage />} />
           </Route>
 
           {/* Public routes */}

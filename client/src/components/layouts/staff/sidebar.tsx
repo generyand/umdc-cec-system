@@ -6,10 +6,13 @@ import {
   LucideIcon,
   Home,
   Building,
-  FileText,
   Calendar,
   User,
   ChevronDown,
+  FolderKanban,
+  FilePlus,
+  Files,
+  FileEdit,
 } from "lucide-react";
 
 // Types
@@ -36,56 +39,33 @@ interface CollapsibleSectionProps {
 const navigationItems: NavItem[] = [
   { title: "Home", href: "/staff", icon: Home },
   {
-    title: "My Department",
-    href: "#",
+    title: "Department Overview",
+    href: "/staff/department-overview",
     icon: Building,
-    children: [
-      {
-        title: "Department Overview",
-        href: "/staff/department-overview",
-        icon: FileText,
-      },
-      {
-        title: "Programs & Projects",
-        href: "/staff/programs-projects",
-        icon: FileText,
-      },
-      { title: "Proposals", href: "/staff/proposals", icon: FileText },
-      // { title: "Reports", href: "/staff/reports", icon: FileText },
-    ],
   },
   {
-    title: "Events & Activities",
+    title: "Programs & Projects",
+    href: "/staff/programs-projects",
+    icon: FolderKanban,
+  },
+  {
+    title: "Proposals",
     href: "#",
-    icon: Calendar,
+    icon: FileEdit,
     children: [
-      { title: "Calendar", href: "/staff/events/calendar", icon: Calendar },
-      { title: "My Events", href: "/staff/events/my-events", icon: Calendar },
-      // {
-      //   title: "Register for Events",
-      //   href: "/staff/events/register",
-      //   icon: Calendar,
-      // },
+      {
+        title: "Create Proposal",
+        href: "/staff/proposals/new",
+        icon: FilePlus,
+      },
+      {
+        title: "My Proposals",
+        href: "/staff/proposals",
+        icon: Files,
+      },
     ],
   },
-  // {
-  //   title: "Documents",
-  //   href: "#",
-  //   icon: FileText,
-  //   children: [
-  //     {
-  //       title: "My Proposals",
-  //       href: "/staff/documents/my-proposals",
-  //       icon: FileText,
-  //     },
-  //     { title: "Reports", href: "/staff/documents/reports", icon: FileText },
-  //     {
-  //       title: "Templates",
-  //       href: "/staff/documents/templates",
-  //       icon: FileText,
-  //     },
-  //   ],
-  // },
+  { title: "Calendar", href: "/staff/events/calendar", icon: Calendar },
   { title: "Profile Settings", href: "/staff/profile-settings", icon: User },
 ];
 

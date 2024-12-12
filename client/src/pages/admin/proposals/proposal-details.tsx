@@ -249,41 +249,6 @@ export default function ProposalDetailsPage() {
                 </div>
               </div>
 
-              {/* Approval Progress Section */}
-              <div className="py-6 border-b">
-                <div className="flex gap-2 items-center mb-4">
-                  <Users className="w-5 h-5 text-gray-500" />
-                  <h3 className="text-lg font-semibold">Approval Progress</h3>
-                </div>
-                <div className="overflow-hidden relative">
-                  {/* Single Timeline Line */}
-                  <div className="absolute h-[calc(100%-32px)] w-0.5 bg-gray-200 left-4 top-8" />
-
-                  {/* Skeleton Steps */}
-                  {[1, 2, 3].map((_, index) => (
-                    <div key={index} className="flex gap-4 mb-8 last:mb-0">
-                      {/* Status Circle */}
-                      <div className="relative z-10">
-                        <div className="flex justify-center items-center w-8 h-8 text-gray-600 bg-gray-100 rounded-full ring-2 ring-gray-300">
-                          {index + 1}
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <Skeleton className="mb-2 w-32 h-5" />
-                            <Skeleton className="w-24 h-4" />
-                          </div>
-                          <Skeleton className="w-20 h-6 rounded-full" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               {/* Key Details Section */}
               <div className="grid grid-cols-2 gap-6 py-6 border-b">
                 {[...Array(4)].map((_, i) => (

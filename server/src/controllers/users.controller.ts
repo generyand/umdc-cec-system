@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
-import { authService } from "@/services/auth.service.js";
-import { ApiError } from "@/utils/errors.js";
+import { authService } from "../services/auth.service.js";
+import { ApiError } from "../utils/errors.js";
 
 // Validation schema for profile updates based on your Prisma schema
 const profileUpdateSchema = z.object({

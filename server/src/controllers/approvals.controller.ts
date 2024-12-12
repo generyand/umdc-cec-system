@@ -324,19 +324,38 @@ export const approveProposal: RequestHandler = async (req, res) => {
       // Determine and set next approval step
       const nextStep = getNextApprovalStep(user.position!);
 
-      // Update proposal status
-      if (nextStep) {
-        return await prisma.projectProposal.update({
-          where: { id: proposal.id },
-          data: { currentApprovalStep: nextStep },
-        });
-      } else {
-        return await prisma.projectProposal.update({
+      // If there's no next step, this is the final approval
+      if (!nextStep) {
+        // First update the proposal status
+        const approvedProposal = await prisma.projectProposal.update({
           where: { id: proposal.id },
           data: {
             status: "APPROVED",
             currentApprovalStep: user.position!,
           },
+        });
+
+        // Then create the activity
+        await prisma.activity.create({
+          data: {
+            title: proposal.title,
+            description: proposal.description,
+            targetDate: proposal.targetDate,
+            status: "UPCOMING",
+            departmentId: proposal.departmentId,
+            partnerCommunityId: proposal.communityId!,
+            proposalId: proposal.id,
+            bannerProgramId: proposal.bannerProgramId || undefined,
+          },
+        });
+
+        console.log("✅ Activity created for approved proposal:", proposal.id);
+        return approvedProposal;
+      } else {
+        // If there are more approval steps, just update the current step
+        return await prisma.projectProposal.update({
+          where: { id: proposal.id },
+          data: { currentApprovalStep: nextStep },
         });
       }
     });

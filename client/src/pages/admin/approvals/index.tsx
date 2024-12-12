@@ -42,6 +42,32 @@ import { Search, MoreVertical, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { approvalsApi } from "@/services/api/approvals.service";
 import { format } from "date-fns";
+import { useAuth } from "@/hooks/use-auth";
+import { UserPosition } from "@/types/user.types";
+
+interface ApprovalFlow {
+  role: UserPosition;
+  status: "PENDING" | "APPROVED" | "RETURNED";
+  comment?: string;
+  approvedAt?: Date;
+  approvedBy: string | null;
+}
+
+interface Proposal {
+  id: number;
+  title: string;
+  description: string;
+  targetDate: Date;
+  budget: number;
+  status: "PENDING" | "APPROVED" | "RETURNED";
+  currentStep: UserPosition;
+  createdAt: Date;
+  submittedBy: {
+    name: string;
+    department: string;
+  };
+  approvalFlow: ApprovalFlow[];
+}
 
 export default function ApprovalsPage() {
   const navigate = useNavigate();
@@ -51,6 +77,7 @@ export default function ApprovalsPage() {
   const itemsPerPage = 10;
 
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["approvals"],
@@ -107,12 +134,28 @@ export default function ApprovalsPage() {
     navigate(`/admin/community-engagement/project-proposals/${id}`);
   };
 
+  // Helper function to get approval status for current user
+  const getCurrentUserApprovalStatus = (proposal: Proposal) => {
+    if (!user?.position) return "PENDING";
+
+    // Find approval in approvalFlow instead of approvals
+    const userApproval = proposal.approvalFlow.find(
+      (approval) => approval.role === user.position
+    );
+
+    return userApproval?.status || "PENDING";
+  };
+
+  console.log("in approvals", user?.position);
+
+  // Helper function for status badge styling
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case "APPROVED":
         return "bg-green-100 text-green-800";
       case "RETURNED":
         return "bg-red-100 text-red-800";
+      case "PENDING":
       default:
         return "bg-yellow-100 text-yellow-800";
     }
@@ -261,11 +304,11 @@ export default function ApprovalsPage() {
                       </TableCell>
                       <TableCell>
                         <span
-                          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusBadgeVariant(
-                            proposal.status
+                          className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeVariant(
+                            getCurrentUserApprovalStatus(proposal)
                           )}`}
                         >
-                          {proposal.status}
+                          {getCurrentUserApprovalStatus(proposal)}
                         </span>
                       </TableCell>
                       <TableCell>
@@ -283,7 +326,8 @@ export default function ApprovalsPage() {
                             >
                               View Details
                             </DropdownMenuItem>
-                            {proposal.status === "PENDING" && (
+                            {getCurrentUserApprovalStatus(proposal) ===
+                              "PENDING" && (
                               <>
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>

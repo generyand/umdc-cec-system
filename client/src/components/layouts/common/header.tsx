@@ -145,7 +145,7 @@ export function Header() {
               <DropdownMenuItem asChild>
                 <Link
                   to={
-                    user?.role === "ADMIN"
+                    user?.role === "ADMIN" || user?.role === "SUPER_ADMIN"
                       ? "/admin/settings"
                       : "/staff/settings"
                   }

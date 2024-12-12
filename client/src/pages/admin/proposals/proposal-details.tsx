@@ -26,6 +26,16 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { approvalsApi } from "@/services/api/approvals.service";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 
 interface Proposal {
   id: number;
@@ -92,11 +102,11 @@ const APPROVAL_SEQUENCE = [
 ] as const;
 
 // Add these variants for animations
-const progressVariants = {
-  pending: { scaleY: 0 },
-  inProgress: { scaleY: 0.5 },
-  complete: { scaleY: 1 },
-};
+// const progressVariants = {
+//   pending: { scaleY: 0 },
+//   inProgress: { scaleY: 0.5 },
+//   complete: { scaleY: 1 },
+// };
 
 const circleVariants = {
   initial: { scale: 0.8, opacity: 0 },
@@ -122,20 +132,24 @@ const contentVariants = {
   },
 };
 
-const checkmarkVariants = {
-  initial: { pathLength: 0 },
-  animate: {
-    pathLength: 1,
-    transition: {
-      duration: 0.5,
-      ease: "easeInOut",
-    },
-  },
-};
+// const checkmarkVariants = {
+//   initial: { pathLength: 0 },
+//   animate: {
+//     pathLength: 1,
+//     transition: {
+//       duration: 0.5,
+//       ease: "easeInOut",
+//     },
+//   },
+// };
+
+// Add this type if not already defined
+// type ApprovalRole = (typeof APPROVAL_SEQUENCE)[number];
 
 export default function ProposalDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const {
     data: proposal,
@@ -187,9 +201,22 @@ export default function ProposalDetailsPage() {
     },
   });
 
+  // Add these new states
+  const [showApproveDialog, setShowApproveDialog] = useState(false);
+  const [showReturnDialog, setShowReturnDialog] = useState(false);
+  const [comment, setComment] = useState("");
+
   const handleStatusUpdate = (newStatus: "APPROVED" | "RETURNED") => {
-    // You might want to add a prompt for comments, especially for returns
-    updateStatusMutation.mutate({ status: newStatus });
+    updateStatusMutation.mutate(
+      { status: newStatus, comment },
+      {
+        onSuccess: () => {
+          setShowApproveDialog(false);
+          setShowReturnDialog(false);
+          setComment("");
+        },
+      }
+    );
   };
 
   const getStatusBadgeVariant = (status: Proposal["status"]) => {
@@ -236,6 +263,19 @@ export default function ProposalDetailsPage() {
   //   }
   //   return "w-0"; // Default to no width
   // };
+
+  // Helper function to check if user is current approver
+  const isCurrentApprover = () => {
+    if (!proposal || !user) return false;
+
+    // Find the first pending approval step
+    const currentStep = proposal.approvalFlow.find(
+      (step: { status: string }) => step.status === "PENDING"
+    );
+
+    // Check if the current user's role matches the required role for this step
+    return currentStep?.role === user.role;
+  };
 
   if (isLoading) {
     return (
@@ -629,17 +669,17 @@ export default function ProposalDetailsPage() {
                   )}
 
                   {/* Action Buttons */}
-                  {proposal.status === "PENDING" && (
+                  {proposal.status === "PENDING" && isCurrentApprover() && (
                     <div className="flex gap-4 pt-6">
                       <Button
                         className="bg-green-600 hover:bg-green-700"
-                        onClick={() => handleStatusUpdate("APPROVED")}
+                        onClick={() => setShowApproveDialog(true)}
                       >
                         Approve Proposal
                       </Button>
                       <Button
                         variant="destructive"
-                        onClick={() => handleStatusUpdate("RETURNED")}
+                        onClick={() => setShowReturnDialog(true)}
                       >
                         Return Proposal
                       </Button>
@@ -667,7 +707,8 @@ export default function ProposalDetailsPage() {
                         animate={{
                           scaleY:
                             proposal.approvalFlow.filter(
-                              (step) => step.status === "APPROVED"
+                              (step: { status: string }) =>
+                                step.status === "APPROVED"
                             ).length /
                             (APPROVAL_SEQUENCE.length - 1),
                         }}
@@ -756,6 +797,84 @@ export default function ProposalDetailsPage() {
             </div>
           </div>
         )}
+
+        {/* Approve Dialog */}
+        <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Approve Proposal</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to approve this proposal? You can add an
+                optional comment below.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Textarea
+                placeholder="Add a comment (optional)"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowApproveDialog(false);
+                  setComment("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => handleStatusUpdate("APPROVED")}
+                disabled={updateStatusMutation.isPending}
+              >
+                {updateStatusMutation.isPending ? "Approving..." : "Approve"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Return Dialog */}
+        <Dialog open={showReturnDialog} onOpenChange={setShowReturnDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Return Proposal</DialogTitle>
+              <DialogDescription>
+                Please provide a reason for returning this proposal. This will
+                be visible to the proposal owner.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Textarea
+                placeholder="Enter reason for returning"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowReturnDialog(false);
+                  setComment("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => handleStatusUpdate("RETURNED")}
+                disabled={updateStatusMutation.isPending || !comment.trim()}
+              >
+                {updateStatusMutation.isPending ? "Returning..." : "Return"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

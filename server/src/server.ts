@@ -16,6 +16,7 @@ import activitiesRoutes from "./routes/activities/activities.route.js";
 import partnerCommunitiesRoutes from "./routes/partner-communities/partner-communities.route.js";
 import approvalsRoutes from "./routes/approvals/approvals.route.js";
 import { scheduleActivityStatusUpdates } from "./jobs/updateActivityStatus.js";
+import testRoutes from "./routes/tests/test.routes.js";
 
 async function createServer() {
   const app = express();
@@ -41,6 +42,7 @@ async function createServer() {
   app.use("/api/activities", activitiesRoutes);
   app.use("/api/partner-communities", partnerCommunitiesRoutes);
   app.use("/api/approvals", approvalsRoutes);
+  app.use("/api/tests", testRoutes);
 
   app.use(errorHandler);
 

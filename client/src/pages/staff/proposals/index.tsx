@@ -31,6 +31,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const getApprovalProgress = (approvals: Array<any>) => {
+  const totalSteps = approvals.length;
+  const approvedSteps = approvals.filter((a) => a.status === "APPROVED").length;
+  const currentStep = approvals.find(
+    (a) => a.status === "PENDING"
+  )?.approverPosition;
+
+  // Format the position to be more readable
+  const formatPosition = (pos: string) => pos.split("_").join(" ");
+
+  if (approvedSteps === totalSteps) {
+    return {
+      label: "Fully Approved",
+      variant: "bg-green-100 text-green-800",
+    };
+  }
+
+  return {
+    label: currentStep
+      ? `Pending: ${formatPosition(currentStep)}`
+      : "Processing",
+    variant: "bg-blue-100 text-blue-800",
+    progress: `${approvedSteps}/${totalSteps} steps`,
+  };
+};
+
 export default function StaffProposalsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
@@ -278,9 +304,25 @@ export default function StaffProposalsPage() {
                         </TableCell>
                         <TableCell>{proposal.community?.name || "—"}</TableCell>
                         <TableCell>
-                          <span className="text-xs font-medium">
-                            {proposal.currentApprovalStep.replace(/_/g, " ")}
-                          </span>
+                          {proposal.approvals && (
+                            <div className="space-y-1">
+                              <span
+                                className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium
+                                ${
+                                  getApprovalProgress(proposal.approvals)
+                                    .variant
+                                }`}
+                              >
+                                {getApprovalProgress(proposal.approvals).label}
+                              </span>
+                              <div className="text-xs text-muted-foreground">
+                                {
+                                  getApprovalProgress(proposal.approvals)
+                                    .progress
+                                }
+                              </div>
+                            </div>
+                          )}
                         </TableCell>
                         <TableCell>
                           <span

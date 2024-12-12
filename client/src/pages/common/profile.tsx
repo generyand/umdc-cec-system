@@ -72,7 +72,7 @@ const formatRole = (role: string) => {
   }
 };
 
-export default function AdminProfile() {
+export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const { user, updateProfile } = useAuth();
 

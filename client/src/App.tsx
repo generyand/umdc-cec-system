@@ -22,8 +22,8 @@ import RegisterPage from "@/pages/auth/register";
 // Admin Pages
 import HomePage from "@/pages/admin/home";
 import DashboardPage from "@/pages/admin/dashboard";
-import AdminProfile from "@/pages/admin/profile";
-import SettingsPage from "@/pages/admin/settings";
+import ProfilePage from "@/pages/common/profile";
+import SettingsPage from "@/pages/common/settings";
 
 // Academic Department Pages
 import AcademicDepartmentsPage from "@/pages/admin/academic-departments";
@@ -151,7 +151,7 @@ const App = () => {
           >
             {/* Home */}
             <Route index element={<HomePage />} />
-            <Route path="profile" element={<AdminProfile />} />
+            <Route path="profile" element={<ProfilePage />} />
             <Route path="dashboard" element={<DashboardPage />} />
 
             {/* Academic Departments */}
@@ -238,7 +238,7 @@ const App = () => {
             <Route index element={<StaffHomePage />} />
 
             {/* Add other staff routes here */}
-            <Route path="profile" element={<div>Staff Profile</div>} />
+            <Route path="profile" element={<ProfilePage />} />
             <Route path="projects" element={<div>Staff Projects</div>} />
             <Route
               path="department-overview"
@@ -247,6 +247,8 @@ const App = () => {
             <Route path="proposals/new" element={<NewProposalPage />} />
             <Route path="proposals" element={<StaffProposalsPage />} />
             <Route path="proposals/:id" element={<ProposalDetailsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="events" element={<div>Staff Events</div>} />
           </Route>
 
           {/* Public routes */}

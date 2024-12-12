@@ -414,13 +414,10 @@ export default function ProposalDetailsPage() {
           <div className="flex justify-between items-center mb-6">
             <Button
               variant="ghost"
-              onClick={() =>
-                navigate("/admin/community-engagement/project-proposals")
-              }
+              onClick={() => navigate(-1)}
               className="hover:bg-gray-100"
             >
               <ArrowLeft className="mr-2 w-4 h-4" />
-              Back to Proposals
             </Button>
             <span
               className={`px-4 py-2 rounded-full text-sm font-medium shadow-sm

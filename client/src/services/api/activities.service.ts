@@ -43,4 +43,11 @@ export const activitiesApi = {
     const response = await api.put(`/api/activities/${id}`, { status });
     return response.data;
   },
+
+  getActivitiesByDepartment: async (departmentId: number) => {
+    const response = await api.get(
+      `/api/activities/department/${departmentId}`
+    );
+    return response.data;
+  },
 };

@@ -59,6 +59,7 @@ import ActivityDetailsPage from "./pages/admin/events-and-activities/activity-ma
 import ApprovalsPage from "./pages/admin/approvals";
 import { UserRole } from "./types/user.types";
 import StaffHomePage from "./pages/staff/home";
+import StaffDepartmentOverviewPage from "./pages/staff/department-overview";
 
 const App = () => {
   const { user, initialized } = useAuth();
@@ -238,7 +239,10 @@ const App = () => {
             {/* Add other staff routes here */}
             <Route path="profile" element={<div>Staff Profile</div>} />
             <Route path="projects" element={<div>Staff Projects</div>} />
-            {/* ... more staff routes ... */}
+            <Route
+              path="department-overview"
+              element={<StaffDepartmentOverviewPage />}
+            />
           </Route>
 
           {/* Public routes */}

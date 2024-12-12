@@ -58,6 +58,7 @@ import ActivityManagementPage from "./pages/admin/events-and-activities/activity
 import ActivityDetailsPage from "./pages/admin/events-and-activities/activity-management/activity-details";
 import ApprovalsPage from "./pages/admin/approvals";
 import { UserRole } from "./types/user.types";
+import StaffHomePage from "./pages/staff/home";
 
 const App = () => {
   const { user, initialized } = useAuth();
@@ -232,7 +233,7 @@ const App = () => {
             }
           >
             {/* Staff Home */}
-            <Route index element={<div>Staff Home</div>} />
+            <Route index element={<StaffHomePage />} />
 
             {/* Add other staff routes here */}
             <Route path="profile" element={<div>Staff Profile</div>} />

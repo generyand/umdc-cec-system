@@ -247,23 +247,6 @@ export default function ProposalDetailsPage() {
     });
   };
 
-  // const getProgressWidth = (index: number, steps: Proposal["approvalFlow"]) => {
-  //   const currentStep = steps[index];
-  //   const nextStep = steps[index + 1];
-
-  //   if (currentStep.status === "APPROVED") {
-  //     return "w-full"; // Full width if current step is approved
-  //   } else if (currentStep.status === "PENDING" && index === 0) {
-  //     return "w-0"; // No width for first pending step
-  //   } else if (
-  //     currentStep.status === "PENDING" &&
-  //     steps[index - 1]?.status === "APPROVED"
-  //   ) {
-  //     return "w-1/2"; // Half width if previous step was approved
-  //   }
-  //   return "w-0"; // Default to no width
-  // };
-
   // Helper function to check if user is current approver
   const isCurrentApprover = () => {
     if (!proposal || !user) return false;

@@ -1,7 +1,7 @@
 import { Request, Response, RequestHandler } from "express";
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../utils/errors.js";
-import { getNextApprovalStep } from "@/utils/approval.utils.js";
+import { getNextApprovalStep } from "../utils/approval.utils.js";
 
 // Get all proposals that need the current user's approval
 export const getProposalsForApproval: RequestHandler = async (req, res) => {

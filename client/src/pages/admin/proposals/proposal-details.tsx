@@ -227,7 +227,7 @@ export default function ProposalDetailsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="container py-8 mx-auto max-w-4xl">
+        <div className="container py-8 mx-auto max-w-7xl">
           {/* Header Skeleton */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
@@ -237,96 +237,112 @@ export default function ProposalDetailsPage() {
             </div>
           </div>
 
-          {/* Main Content Skeleton */}
-          <Card className="shadow-sm">
-            <CardContent className="p-8 space-y-8">
-              {/* Title Section */}
-              <div className="pb-6 border-b">
-                <Skeleton className="mb-2 w-2/3 h-8" /> {/* Title */}
-                <div className="flex gap-2 items-center">
-                  <Skeleton className="w-40 h-5" /> {/* Author */}
-                  <Skeleton className="w-24 h-5" /> {/* Date */}
-                </div>
-              </div>
-
-              {/* Key Details Section */}
-              <div className="grid grid-cols-2 gap-6 py-6 border-b">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="flex gap-2 items-start">
-                    <Skeleton className="w-5 h-5" /> {/* Icon */}
-                    <div className="flex-1">
-                      <Skeleton className="mb-2 w-24 h-4" /> {/* Label */}
-                      <Skeleton className="w-full h-6" /> {/* Value */}
+          {/* Main Content */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Left Column - Main Content Skeleton */}
+            <div className="lg:col-span-2">
+              <Card className="shadow-sm">
+                <CardContent className="p-8 space-y-8">
+                  {/* Title Section */}
+                  <div className="pb-6 border-b">
+                    <Skeleton className="mb-2 w-2/3 h-8" /> {/* Title */}
+                    <div className="flex gap-2 items-center">
+                      <Skeleton className="w-40 h-5" /> {/* Author */}
+                      <Skeleton className="w-24 h-5" /> {/* Date */}
                     </div>
                   </div>
-                ))}
-              </div>
 
-              {/* Description Section */}
-              <div className="py-6 border-b">
-                <div className="flex gap-2 items-center mb-4">
-                  <Skeleton className="w-5 h-5" /> {/* Icon */}
-                  <Skeleton className="w-32 h-6" /> {/* Section title */}
-                </div>
-                <div className="space-y-2">
-                  <Skeleton className="w-full h-4" />
-                  <Skeleton className="w-full h-4" />
-                  <Skeleton className="w-3/4 h-4" />
-                </div>
-              </div>
-
-              {/* Implementation Details */}
-              <div className="py-6 border-b">
-                <Skeleton className="mb-4 w-48 h-6" /> {/* Section title */}
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="flex gap-2 items-start">
-                      <Skeleton className="w-5 h-5" /> {/* Icon */}
-                      <div className="flex-1">
-                        <Skeleton className="mb-2 w-24 h-4" /> {/* Label */}
-                        <Skeleton className="w-full h-6" /> {/* Value */}
+                  {/* Key Details Section */}
+                  <div className="grid grid-cols-2 gap-6 py-6 border-b">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="flex gap-2 items-start">
+                        <Skeleton className="w-5 h-5" /> {/* Icon */}
+                        <div className="flex-1">
+                          <Skeleton className="mb-2 w-24 h-4" /> {/* Label */}
+                          <Skeleton className="w-full h-6" /> {/* Value */}
+                        </div>
                       </div>
+                    ))}
+                  </div>
+
+                  {/* Description Section */}
+                  <div className="py-6 border-b">
+                    <div className="flex gap-2 items-center mb-4">
+                      <Skeleton className="w-5 h-5" /> {/* Icon */}
+                      <Skeleton className="w-32 h-6" /> {/* Section title */}
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Community Partner Section */}
-              <div className="py-6 border-b">
-                <div className="flex gap-2 items-center mb-4">
-                  <Skeleton className="w-5 h-5" /> {/* Icon */}
-                  <Skeleton className="w-40 h-6" /> {/* Section title */}
-                </div>
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i}>
-                      <Skeleton className="mb-2 w-24 h-4" /> {/* Label */}
-                      <Skeleton className="w-full h-6" /> {/* Value */}
+                    <div className="space-y-2">
+                      <Skeleton className="w-full h-4" />
+                      <Skeleton className="w-full h-4" />
+                      <Skeleton className="w-3/4 h-4" />
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
 
-              {/* Attachments Section */}
-              <div className="py-6 border-b">
-                <div className="flex gap-2 items-center mb-4">
-                  <Skeleton className="w-5 h-5" /> {/* Icon */}
-                  <Skeleton className="w-32 h-6" /> {/* Section title */}
-                </div>
-                <div className="space-y-2">
-                  <Skeleton className="w-full h-4" />
-                  <Skeleton className="w-full h-4" />
-                  <Skeleton className="w-3/4 h-4" />
-                </div>
-              </div>
+                  {/* Implementation Details */}
+                  <div className="py-6 border-b">
+                    <Skeleton className="mb-4 w-48 h-6" /> {/* Section title */}
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="flex gap-2 items-start">
+                          <Skeleton className="w-5 h-5" /> {/* Icon */}
+                          <div className="flex-1">
+                            <Skeleton className="mb-2 w-24 h-4" /> {/* Label */}
+                            <Skeleton className="w-full h-6" /> {/* Value */}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-4 pt-6">
-                <Skeleton className="w-32 h-10" /> {/* Approve button */}
-                <Skeleton className="w-32 h-10" /> {/* Reject button */}
-              </div>
-            </CardContent>
-          </Card>
+                  {/* Action Buttons */}
+                  <div className="flex gap-4 pt-6">
+                    <Skeleton className="w-32 h-10" /> {/* Approve button */}
+                    <Skeleton className="w-32 h-10" /> {/* Reject button */}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Column - Approval Progress Skeleton */}
+            <div className="lg:col-span-1">
+              <Card className="overflow-hidden sticky top-8 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex gap-2 items-center mb-4">
+                    <Skeleton className="w-5 h-5" /> {/* Icon */}
+                    <Skeleton className="w-40 h-6" /> {/* Title */}
+                  </div>
+                  <div className="relative">
+                    {/* Timeline Line */}
+                    <div className="absolute h-[calc(100%-32px)] w-0.5 bg-gray-200 left-4 top-8" />
+
+                    {/* Approval Steps Skeleton */}
+                    {[...Array(3)].map((_, index) => (
+                      <div key={index} className="flex gap-4 mb-8 last:mb-0">
+                        {/* Circle */}
+                        <div className="relative z-10">
+                          <Skeleton className="w-8 h-8 rounded-full" />
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <Skeleton className="mb-2 w-32 h-5" />{" "}
+                              {/* Role */}
+                              <Skeleton className="w-24 h-4" /> {/* Approver */}
+                            </div>
+                            <Skeleton className="w-20 h-6 rounded-full" />{" "}
+                            {/* Status */}
+                          </div>
+                          <Skeleton className="mt-2 w-32 h-4" /> {/* Date */}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     );

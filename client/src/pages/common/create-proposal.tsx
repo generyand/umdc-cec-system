@@ -117,7 +117,7 @@ export default function NewProposalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
 
   // Fetch departments data
   const { data: departmentsData, isLoading: isDepartmentsLoading } = useQuery({
@@ -210,7 +210,13 @@ export default function NewProposalPage() {
       await projectProposalsService.createProposal(formData, token || "");
 
       toast.success("Proposal created successfully");
-      navigate("/admin/community-engagement/proposals");
+
+      // Navigate based on user role
+      if (user?.role === "ADMIN" || user?.role === "SUPER_ADMIN") {
+        navigate("/admin/community-engagement/project-proposals");
+      } else {
+        navigate("/staff/proposals");
+      }
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error("Failed to create proposal", {

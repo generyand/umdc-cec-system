@@ -100,4 +100,12 @@ export const projectProposalsService = {
     );
     return response.data;
   },
+
+  getProposalsByUser: async (userId: string, token: string) => {
+    return await api.get(`/api/project-proposals/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
 };

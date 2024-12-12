@@ -34,8 +34,8 @@ import PartnershipsAndLinkagesPage from "@/pages/admin/community-engagement/part
 import PartnerCommunitiesPage from "@/pages/admin/community-engagement/partner-communities";
 import CommunityDetailsPage from "./pages/admin/community-engagement/partner-communities/community-details";
 import ProposalsPage from "@/pages/admin/proposals";
-import NewProposalPage from "@/components/common/create-proposal";
-import ProposalDetailsPage from "@/pages/admin/proposals/proposal-details";
+import NewProposalPage from "@/pages/common/create-proposal";
+import ProposalDetailsPage from "@/pages/common/proposal-details";
 import BannerProgramsPage from "@/pages/admin/banner-programs";
 import BannerProgramDetailsPage from "@/pages/admin/banner-programs/banner-program-details";
 
@@ -60,6 +60,7 @@ import ApprovalsPage from "./pages/admin/approvals";
 import { UserRole } from "./types/user.types";
 import StaffHomePage from "./pages/staff/home";
 import StaffDepartmentOverviewPage from "./pages/staff/department-overview";
+import StaffProposalsPage from "./pages/staff/proposals";
 
 const App = () => {
   const { user, initialized } = useAuth();
@@ -244,6 +245,8 @@ const App = () => {
               element={<StaffDepartmentOverviewPage />}
             />
             <Route path="proposals/new" element={<NewProposalPage />} />
+            <Route path="proposals" element={<StaffProposalsPage />} />
+            <Route path="proposals/:id" element={<ProposalDetailsPage />} />
           </Route>
 
           {/* Public routes */}

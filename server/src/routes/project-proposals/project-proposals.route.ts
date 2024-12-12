@@ -9,6 +9,7 @@ import {
   deleteProposal,
   updateProposalStatus,
   getDepartmentsWithPrograms,
+  getProposalsByUser,
   //   getProposalsByDepartment,
   //   getProposalsByStatus,
   //   getProposalsByUser,
@@ -45,6 +46,9 @@ router.get(
   authenticateToken,
   getDepartmentsWithPrograms
 );
+
+// Get proposals by user
+router.get("/user/:userId", authenticateToken, getProposalsByUser);
 
 // Optional: Additional routes based on your needs
 // Get proposals by department

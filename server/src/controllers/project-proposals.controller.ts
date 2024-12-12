@@ -538,3 +538,47 @@ export const getDepartmentsWithPrograms: RequestHandler = async (req, res) => {
     throw new ApiError(500, "Failed to fetch departments with programs");
   }
 };
+
+// Get proposals by user
+export const getProposalsByUser: RequestHandler = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    console.log(`📝 Fetching proposals for user ${userId}...`);
+
+    if (!userId) {
+      throw new ApiError(400, "User ID is required");
+    }
+
+    const proposals = await prisma.projectProposal.findMany({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+      include: {
+        department: true,
+        program: true,
+        community: true,
+        bannerProgram: true,
+        approvals: true,
+        attachments: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    console.log(`✅ Successfully fetched ${proposals.length} proposals`);
+
+    res.status(200).json({
+      success: true,
+      message: "Proposals fetched successfully",
+      data: proposals,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching user proposals:", error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(500, "Failed to fetch user proposals");
+  }
+};

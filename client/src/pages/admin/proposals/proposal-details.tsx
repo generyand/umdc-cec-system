@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { motion } from "framer-motion";
 
 interface Proposal {
   id: number;
@@ -82,6 +83,54 @@ interface Proposal {
     approvedBy: string;
   }[];
 }
+
+const APPROVAL_SEQUENCE = [
+  "CEC_HEAD",
+  "VP_DIRECTOR",
+  "CHIEF_OPERATION_OFFICER",
+] as const;
+
+// Add these variants for animations
+const progressVariants = {
+  pending: { scaleY: 0 },
+  inProgress: { scaleY: 0.5 },
+  complete: { scaleY: 1 },
+};
+
+const circleVariants = {
+  initial: { scale: 0.8, opacity: 0 },
+  animate: { scale: 1, opacity: 1 },
+  approved: {
+    scale: 1.1,
+    transition: {
+      type: "spring",
+      stiffness: 200,
+      damping: 10,
+    },
+  },
+};
+
+const contentVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
+
+const checkmarkVariants = {
+  initial: { pathLength: 0 },
+  animate: {
+    pathLength: 1,
+    transition: {
+      duration: 0.5,
+      ease: "easeInOut",
+    },
+  },
+};
 
 export default function ProposalDetailsPage() {
   const { id } = useParams();
@@ -146,6 +195,35 @@ export default function ProposalDetailsPage() {
     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   };
 
+  const getSortedApprovalFlow = (approvalFlow: Proposal["approvalFlow"]) => {
+    return [...approvalFlow].sort((a, b) => {
+      const aIndex = APPROVAL_SEQUENCE.indexOf(
+        a.role as (typeof APPROVAL_SEQUENCE)[number]
+      );
+      const bIndex = APPROVAL_SEQUENCE.indexOf(
+        b.role as (typeof APPROVAL_SEQUENCE)[number]
+      );
+      return aIndex - bIndex;
+    });
+  };
+
+  const getProgressWidth = (index: number, steps: Proposal["approvalFlow"]) => {
+    const currentStep = steps[index];
+    const nextStep = steps[index + 1];
+
+    if (currentStep.status === "APPROVED") {
+      return "w-full"; // Full width if current step is approved
+    } else if (currentStep.status === "PENDING" && index === 0) {
+      return "w-0"; // No width for first pending step
+    } else if (
+      currentStep.status === "PENDING" &&
+      steps[index - 1]?.status === "APPROVED"
+    ) {
+      return "w-1/2"; // Half width if previous step was approved
+    }
+    return "w-0"; // Default to no width
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -177,28 +255,16 @@ export default function ProposalDetailsPage() {
                   <Users className="w-5 h-5 text-gray-500" />
                   <h3 className="text-lg font-semibold">Approval Progress</h3>
                 </div>
-                <div className="relative bg-red-700">
-                  {proposal?.approvals.map((step, index) => (
-                    <div
-                      key={step.approverPosition}
-                      className="flex gap-4 mb-8 last:mb-0"
-                    >
-                      {/* Timeline Line */}
-                      {index !== proposal?.approvals.length - 1 && (
-                        <div className="absolute h-full w-0.5 bg-gray-200 left-4 top-8" />
-                      )}
+                <div className="overflow-hidden relative">
+                  {/* Single Timeline Line */}
+                  <div className="absolute h-[calc(100%-32px)] w-0.5 bg-gray-200 left-4 top-8" />
 
+                  {/* Skeleton Steps */}
+                  {[1, 2, 3].map((_, index) => (
+                    <div key={index} className="flex gap-4 mb-8 last:mb-0">
                       {/* Status Circle */}
                       <div className="relative z-10">
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            step.status === "APPROVED"
-                              ? "bg-green-100 text-green-600 ring-2 ring-green-600"
-                              : step.status === "RETURNED"
-                              ? "bg-red-100 text-red-600 ring-2 ring-red-600"
-                              : "bg-gray-100 text-gray-600 ring-2 ring-gray-300"
-                          }`}
-                        >
+                        <div className="flex justify-center items-center w-8 h-8 text-gray-600 bg-gray-100 rounded-full ring-2 ring-gray-300">
                           {index + 1}
                         </div>
                       </div>
@@ -207,40 +273,11 @@ export default function ProposalDetailsPage() {
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-medium text-gray-900">
-                              {step.role.split("_").join(" ")}
-                            </h4>
-                            {step.approvedBy && (
-                              <p className="text-sm text-gray-500">
-                                Approved by {step.approvedBy}
-                              </p>
-                            )}
+                            <Skeleton className="mb-2 w-32 h-5" />
+                            <Skeleton className="w-24 h-4" />
                           </div>
-                          <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              step.status === "APPROVED"
-                                ? "bg-green-100 text-green-600"
-                                : step.status === "RETURNED"
-                                ? "bg-red-100 text-red-600"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {step.status}
-                          </span>
+                          <Skeleton className="w-20 h-6 rounded-full" />
                         </div>
-                        {step.approvedAt && (
-                          <p className="mt-1 text-sm text-gray-500">
-                            {format(
-                              new Date(step.approvedAt),
-                              "MMM d, yyyy 'at' h:mm a"
-                            )}
-                          </p>
-                        )}
-                        {step.comment && (
-                          <p className="p-3 mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg">
-                            "{step.comment}"
-                          </p>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -620,79 +657,105 @@ export default function ProposalDetailsPage() {
 
             {/* Right Column - Approval Progress */}
             <div className="lg:col-span-1">
-              <Card className="sticky top-8 shadow-sm">
+              <Card className="overflow-hidden sticky top-8 shadow-sm">
                 <CardContent className="p-6">
                   <div className="flex gap-2 items-center mb-4">
                     <Users className="w-5 h-5 text-gray-500" />
                     <h3 className="text-lg font-semibold">Approval Progress</h3>
                   </div>
                   <div className="relative">
-                    {proposal.approvalFlow.map((step, index) => (
-                      <div
-                        key={step.role}
-                        className="flex gap-4 mb-8 last:mb-0"
-                      >
-                        {/* Timeline Line */}
-                        {index !== proposal.approvalFlow.length - 1 && (
-                          <div className="absolute h-full w-0.5 bg-gray-200 left-4 top-8" />
-                        )}
+                    {/* Single Timeline Line */}
+                    <div className="absolute h-[calc(100%-32px)] w-0.5 bg-gray-200 left-4 top-8">
+                      <motion.div
+                        className="absolute top-0 left-0 w-full bg-green-500 origin-top"
+                        style={{ height: "100%" }}
+                        initial={{ scaleY: 0 }}
+                        animate={{
+                          scaleY:
+                            proposal.approvalFlow.filter(
+                              (step) => step.status === "APPROVED"
+                            ).length /
+                            (APPROVAL_SEQUENCE.length - 1),
+                        }}
+                        transition={{ duration: 1, ease: "easeInOut" }}
+                      />
+                    </div>
 
-                        {/* Status Circle */}
-                        <div className="relative z-10">
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    {/* Approval Steps */}
+                    {getSortedApprovalFlow(proposal.approvalFlow).map(
+                      (step, index) => (
+                        <motion.div
+                          key={step.role}
+                          className="flex gap-4 mb-8 last:mb-0"
+                          initial="initial"
+                          animate="animate"
+                          variants={contentVariants}
+                        >
+                          {/* Status Circle */}
+                          <motion.div
+                            className="relative z-10"
+                            variants={circleVariants}
+                            animate={
                               step.status === "APPROVED"
-                                ? "bg-green-100 text-green-600 ring-2 ring-green-600"
-                                : step.status === "RETURNED"
-                                ? "bg-red-100 text-red-600 ring-2 ring-red-600"
-                                : "bg-gray-100 text-gray-600 ring-2 ring-gray-300"
-                            }`}
+                                ? "approved"
+                                : "animate"
+                            }
                           >
-                            {index + 1}
-                          </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1">
-                          <div className="flex flex-wrap gap-2 justify-between items-start">
-                            <div>
-                              <h4 className="font-medium text-gray-900">
-                                {step.role.split("_").join(" ")}
-                              </h4>
-                              {step.approvedBy && (
-                                <p className="text-sm text-gray-500">
-                                  Approved by {step.approvedBy}
-                                </p>
-                              )}
-                            </div>
-                            <span
-                              className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center ${
                                 step.status === "APPROVED"
-                                  ? "bg-green-100 text-green-600"
+                                  ? "bg-green-100 text-green-600 ring-2 ring-green-600"
                                   : step.status === "RETURNED"
-                                  ? "bg-red-100 text-red-600"
-                                  : "bg-gray-100 text-gray-600"
+                                  ? "bg-red-100 text-red-600 ring-2 ring-red-600"
+                                  : "bg-gray-100 text-gray-600 ring-2 ring-gray-300"
                               }`}
                             >
-                              {step.status}
-                            </span>
+                              {index + 1}
+                            </div>
+                          </motion.div>
+
+                          {/* Rest of the content */}
+                          <div className="flex-1">
+                            <div className="flex flex-wrap gap-2 justify-between items-start">
+                              <div>
+                                <h4 className="font-medium text-gray-900">
+                                  {step.role.split("_").join(" ")}
+                                </h4>
+                                {step.approvedBy && (
+                                  <p className="text-sm text-gray-500">
+                                    Approved by {step.approvedBy}
+                                  </p>
+                                )}
+                              </div>
+                              <span
+                                className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                  step.status === "APPROVED"
+                                    ? "bg-green-100 text-green-600"
+                                    : step.status === "RETURNED"
+                                    ? "bg-red-100 text-red-600"
+                                    : "bg-gray-100 text-gray-600"
+                                }`}
+                              >
+                                {step.status}
+                              </span>
+                            </div>
+                            {step.approvedAt && (
+                              <p className="mt-1 text-sm text-gray-500">
+                                {format(
+                                  new Date(step.approvedAt),
+                                  "MMM d, yyyy 'at' h:mm a"
+                                )}
+                              </p>
+                            )}
+                            {step.comment && (
+                              <p className="p-3 mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg">
+                                "{step.comment}"
+                              </p>
+                            )}
                           </div>
-                          {step.approvedAt && (
-                            <p className="mt-1 text-sm text-gray-500">
-                              {format(
-                                new Date(step.approvedAt),
-                                "MMM d, yyyy 'at' h:mm a"
-                              )}
-                            </p>
-                          )}
-                          {step.comment && (
-                            <p className="p-3 mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg">
-                              "{step.comment}"
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                        </motion.div>
+                      )
+                    )}
                   </div>
                 </CardContent>
               </Card>

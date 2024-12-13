@@ -11,7 +11,7 @@ export interface Activity {
   id: number;
   title: string;
   description: string;
-  status: "UPCOMING" | "COMPLETED";
+  status: "UPCOMING" | "COMPLETED" | "ONGOING" | "CANCELLED";
   targetDate: string;
 }
 

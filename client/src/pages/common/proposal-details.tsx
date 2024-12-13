@@ -774,8 +774,9 @@ export default function ProposalDetailsPage() {
                                           )
                                     ) && (
                                       <p className="mt-1 text-xs text-amber-600">
-                                        Note: If no action is taken within 3
-                                        days, the approver must be notified.
+                                        Note: Approval estimation is within 3
+                                        days. If no action is taken, the
+                                        approver will be automatically notified.
                                       </p>
                                     )}
                                 </div>

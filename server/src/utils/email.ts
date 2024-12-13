@@ -48,7 +48,7 @@ const createEmailTemplate = ({
   ">
     <!-- Logo Section -->
     <div style="text-align: center; margin-bottom: 24px;">
-      <img src="${process.env.CLIENT_URL}/logo.png" alt="Logo" style="height: 40px;">
+      <img src="${process.env.FRONTEND_URL}/logo.png" alt="Logo" style="height: 40px;">
     </div>
 
     <div style="
@@ -123,7 +123,7 @@ const createEmailTemplate = ({
 
         <!-- Action Button -->
         <div style="text-align: center; margin: 32px 0;">
-          <a href="${process.env.CLIENT_URL}/proposals" style="
+          <a href="${process.env.FRONTEND_URL}/proposals" style="
             background-color: #2563eb;
             color: white;
             padding: 12px 32px;
@@ -191,7 +191,7 @@ const createEmailTemplate = ({
 export const sendEmail = async ({ to, subject, body }: EmailParams) => {
   try {
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `UMDC Community Extension Center <${process.env.EMAIL_USER}>`,
       to,
       subject,
       text: body, // Plain text version

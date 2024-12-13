@@ -14,6 +14,9 @@ import {
   Building,
   Phone,
   Mail,
+  Clock,
+  Check,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,6 +39,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import React from "react";
 
 interface Proposal {
   id: number;
@@ -123,16 +127,16 @@ const circleVariants = {
   },
 };
 
-const contentVariants = {
-  initial: { opacity: 0, y: 20 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-    },
-  },
-};
+// const contentVariants = {
+//   initial: { opacity: 0, y: 20 },
+//   animate: {
+//     opacity: 1,
+//     y: 0,
+//     transition: {
+//       duration: 0.5,
+//     },
+//   },
+// };
 
 // const checkmarkVariants = {
 //   initial: { pathLength: 0 },
@@ -677,120 +681,108 @@ export default function ProposalDetailsPage() {
             <div className="lg:col-span-1">
               <Card className="overflow-hidden sticky top-8 shadow-sm">
                 <CardContent className="p-6">
-                  <div className="flex gap-2 items-center mb-4">
+                  <div className="flex gap-2 items-center mb-6">
                     <Users className="w-5 h-5 text-gray-500" />
                     <h3 className="text-lg font-semibold">Approval Progress</h3>
                   </div>
-                  <div className="relative">
-                    {/* Single Timeline Line */}
-                    <div className="absolute h-[calc(100%-32px)] w-0.5 bg-gray-200 left-4 top-8">
-                      <motion.div
-                        className="absolute top-0 left-0 w-full bg-green-500 origin-top"
-                        style={{ height: "100%" }}
-                        initial={{ scaleY: 0 }}
-                        animate={{
-                          scaleY:
-                            proposal.approvalFlow.filter(
-                              (step: { status: string }) =>
-                                step.status === "APPROVED"
-                            ).length /
-                            (APPROVAL_SEQUENCE.length - 1),
-                        }}
-                        transition={{ duration: 1, ease: "easeInOut" }}
-                      />
-                    </div>
 
-                    {/* Approval Steps */}
-                    {getSortedApprovalFlow(proposal.approvalFlow).map(
-                      (step, index) => (
-                        <motion.div
-                          key={step.role}
-                          className="flex gap-4 mb-8 last:mb-0"
-                          initial="initial"
-                          animate="animate"
-                          variants={contentVariants}
-                        >
-                          {/* Status Circle */}
-                          <motion.div
-                            className="relative z-10"
-                            variants={circleVariants}
-                            animate={
-                              step.status === "APPROVED"
-                                ? "approved"
-                                : "animate"
-                            }
-                          >
-                            <div
-                              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                step.status === "APPROVED"
-                                  ? "bg-green-100 text-green-600 ring-2 ring-green-600"
-                                  : step.status === "RETURNED"
-                                  ? "bg-red-100 text-red-600 ring-2 ring-red-600"
-                                  : "bg-gray-100 text-gray-600 ring-2 ring-gray-300"
-                              }`}
-                            >
-                              {index + 1}
+                  {/* Grid container with 3 rows for the 3 approval steps */}
+                  <div className="relative min-h-[400px]">
+                    <div className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-8">
+                      {/* Approval Steps */}
+                      {getSortedApprovalFlow(proposal.approvalFlow).map(
+                        (step, index) => (
+                          <React.Fragment key={step.role}>
+                            {/* Circle */}
+                            <div className="relative">
+                              <motion.div
+                                variants={circleVariants}
+                                animate={
+                                  step.status === "APPROVED"
+                                    ? "approved"
+                                    : "animate"
+                                }
+                              >
+                                <div
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                    step.status === "APPROVED"
+                                      ? "bg-green-100 text-green-600 ring-2 ring-green-600"
+                                      : step.status === "RETURNED"
+                                      ? "bg-red-100 text-red-600 ring-2 ring-red-600"
+                                      : "bg-gray-100 text-gray-600 ring-2 ring-gray-300"
+                                  }`}
+                                >
+                                  {index + 1}
+                                </div>
+                              </motion.div>
                             </div>
-                          </motion.div>
 
-                          {/* Rest of the content */}
-                          <div className="flex-1">
-                            <div className="flex flex-wrap gap-2 justify-between items-start">
-                              <div>
-                                <h4 className="font-medium text-gray-900">
-                                  {step.role.split("_").join(" ")}
-                                </h4>
-                                {step.approvedBy && (
-                                  <p className="text-sm text-gray-500">
-                                    Approved by {step.approvedBy}
-                                  </p>
-                                )}
-                                {step.status === "PENDING" &&
-                                  !proposal.approvalFlow.some(
-                                    (s: { status: string; role: string }) =>
-                                      s.status === "PENDING" &&
-                                      APPROVAL_SEQUENCE.indexOf(
-                                        s.role as ApprovalRole
-                                      ) <
-                                        APPROVAL_SEQUENCE.indexOf(
-                                          step.role as ApprovalRole
-                                        )
-                                  ) && (
-                                    <p className="mt-1 text-xs text-amber-600">
-                                      Note: If no action is taken within 3 days,
-                                      the approver must be notified.
+                            {/* Content */}
+                            <div>
+                              <div className="flex flex-wrap gap-2 justify-between items-start">
+                                <div>
+                                  <h4 className="font-medium text-gray-900">
+                                    {step.role.split("_").join(" ")}
+                                  </h4>
+                                  {step.approvedBy && (
+                                    <p className="text-sm text-gray-500">
+                                      Approved by {step.approvedBy}
                                     </p>
                                   )}
+                                  {step.status === "PENDING" &&
+                                    !proposal.approvalFlow.some(
+                                      (s: { status: string; role: string }) =>
+                                        s.status === "PENDING" &&
+                                        APPROVAL_SEQUENCE.indexOf(
+                                          s.role as ApprovalRole
+                                        ) <
+                                          APPROVAL_SEQUENCE.indexOf(
+                                            step.role as ApprovalRole
+                                          )
+                                    ) && (
+                                      <p className="mt-1 text-xs text-amber-600">
+                                        Note: If no action is taken within 3
+                                        days, the approver must be notified.
+                                      </p>
+                                    )}
+                                </div>
+                                <span
+                                  className={`px-2 py-1 text-xs font-medium rounded-full inline-flex items-center gap-1 ${
+                                    step.status === "APPROVED"
+                                      ? "bg-green-100 text-green-600"
+                                      : step.status === "RETURNED"
+                                      ? "bg-red-100 text-red-600"
+                                      : "bg-gray-100 text-gray-600"
+                                  }`}
+                                >
+                                  {step.status === "APPROVED" ? (
+                                    <Check className="w-3 h-3" />
+                                  ) : step.status === "RETURNED" ? (
+                                    <X className="w-3 h-3" />
+                                  ) : (
+                                    <Clock className="w-3 h-3" />
+                                  )}
+                                  {step.status}
+                                </span>
                               </div>
-                              <span
-                                className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                  step.status === "APPROVED"
-                                    ? "bg-green-100 text-green-600"
-                                    : step.status === "RETURNED"
-                                    ? "bg-red-100 text-red-600"
-                                    : "bg-gray-100 text-gray-600"
-                                }`}
-                              >
-                                {step.status}
-                              </span>
+                              {step.approvedAt && (
+                                <p className="mt-1 text-sm text-gray-500">
+                                  {format(
+                                    new Date(step.approvedAt),
+                                    "MMM d, yyyy 'at' h:mm a"
+                                  )}
+                                </p>
+                              )}
+                              {step.comment && (
+                                <p className="p-3 mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg">
+                                  "{step.comment}"
+                                </p>
+                              )}
                             </div>
-                            {step.approvedAt && (
-                              <p className="mt-1 text-sm text-gray-500">
-                                {format(
-                                  new Date(step.approvedAt),
-                                  "MMM d, yyyy 'at' h:mm a"
-                                )}
-                              </p>
-                            )}
-                            {step.comment && (
-                              <p className="p-3 mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg">
-                                "{step.comment}"
-                              </p>
-                            )}
-                          </div>
-                        </motion.div>
-                      )
-                    )}
+                          </React.Fragment>
+                        )
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>

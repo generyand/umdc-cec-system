@@ -101,16 +101,16 @@ export async function checkPendingApprovals() {
           subject: "Action Required: Pending Proposal Review",
           body: `Dear Yow,
 
-A proposal has been awaiting your review for more than 3 days.
+                A proposal has been awaiting your review for more than 3 days.
 
-Proposal Title: ${proposal.title}
-Submitted by: ${proposal.user.firstName} ${proposal.user.lastName}
-Submitted Date: ${proposal.createdAt}
+                Proposal Title: ${proposal.title}
+                Submitted by: ${proposal.user.firstName} ${proposal.user.lastName}
+                Submitted Date: ${proposal.createdAt}
 
-Please review this proposal at your earliest convenience.
+                Please review this proposal at your earliest convenience.
 
-Best regards,
-System Administrator`,
+                Best regards,
+                System Administrator`,
         });
 
         console.log(`✅ Reminder sent to Yow`);

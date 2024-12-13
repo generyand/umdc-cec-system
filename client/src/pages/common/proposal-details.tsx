@@ -149,6 +149,13 @@ const circleVariants = {
 //   },
 // };
 
+// Add this after your existing circleVariants
+const lineVariants = {
+  pending: { scaleY: 0 },
+  inProgress: { scaleY: 0.5 },
+  complete: { scaleY: 1 },
+};
+
 export default function ProposalDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -689,12 +696,34 @@ export default function ProposalDetailsPage() {
                   {/* Grid container with 3 rows for the 3 approval steps */}
                   <div className="relative min-h-[250px]">
                     <div className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-8">
-                      {/* Approval Steps */}
                       {getSortedApprovalFlow(proposal.approvalFlow).map(
-                        (step, index) => (
+                        (step, index, array) => (
                           <React.Fragment key={step.role}>
-                            {/* Circle */}
                             <div className="relative">
+                              {/* Progress line - adjusted height to reach the next step */}
+                              {index < array.length - 1 && (
+                                <motion.div
+                                  className="absolute left-4 top-8 w-0.5 h-[calc(100%+24px)] origin-top"
+                                  style={{
+                                    background:
+                                      step.status === "APPROVED"
+                                        ? "#16a34a"
+                                        : "#e5e7eb",
+                                    zIndex: 0,
+                                  }}
+                                  variants={lineVariants}
+                                  initial="pending"
+                                  animate={
+                                    step.status === "APPROVED"
+                                      ? "complete"
+                                      : step.status === "PENDING"
+                                      ? "pending"
+                                      : "inProgress"
+                                  }
+                                />
+                              )}
+
+                              {/* Circle */}
                               <motion.div
                                 variants={circleVariants}
                                 animate={
@@ -702,6 +731,7 @@ export default function ProposalDetailsPage() {
                                     ? "approved"
                                     : "animate"
                                 }
+                                className="relative z-10"
                               >
                                 <div
                                   className={`w-8 h-8 rounded-full flex items-center justify-center ${

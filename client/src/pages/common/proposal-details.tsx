@@ -40,7 +40,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import React from "react";
-
 interface Proposal {
   id: number;
   title: string;
@@ -181,6 +180,10 @@ export default function ProposalDetailsPage() {
       return response.data.data;
     },
     enabled: !!id,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const updateStatusMutation = useMutation({

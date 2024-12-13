@@ -341,7 +341,7 @@ export default function DepartmentPage() {
       </div>
 
       {/* Activities Section */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-3">
         {/* Upcoming Activities */}
         <Card className="h-[600px] flex flex-col">
           <div className="flex-shrink-0 p-6 border-b">
@@ -425,6 +425,105 @@ export default function DepartmentPage() {
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   There are no scheduled activities at the moment.
+                </p>
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* Ongoing Activities */}
+        <Card className="h-[600px] flex flex-col">
+          <div className="flex-shrink-0 p-6 border-b">
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="flex gap-2 items-center">
+                  <h2 className="text-xl font-semibold">Ongoing Activities</h2>
+                  <span className="px-2 py-0.5 text-xs font-medium text-muted-foreground bg-muted rounded-full">
+                    {
+                      departmentData.activities.filter((activity) => {
+                        const today = new Date();
+                        const startDate = new Date(activity.targetDate);
+                        const endDate = new Date(activity.targetDate);
+                        return startDate <= today && today <= endDate;
+                      }).length
+                    }
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Currently running activities
+                </p>
+              </div>
+              <Button variant="outline" size="sm">
+                View All
+              </Button>
+            </div>
+          </div>
+          <div className="overflow-y-auto flex-1 p-6 scrollbar-thin">
+            {departmentData.activities.filter((activity) => {
+              const today = new Date();
+              const startDate = new Date(activity.targetDate);
+              const endDate = new Date(activity.targetDate);
+              return startDate <= today && today <= endDate;
+            }).length > 0 ? (
+              <div className="space-y-4">
+                {departmentData.activities
+                  .filter((activity) => {
+                    const today = new Date();
+                    const startDate = new Date(activity.targetDate);
+                    const endDate = new Date(activity.targetDate);
+                    return startDate <= today && today <= endDate;
+                  })
+                  .map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="p-4 rounded-lg border-2 transition-all border-primary/20 hover:border-primary/40 hover:shadow-sm bg-primary/5"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1 mr-4 space-y-1 min-w-0">
+                          <div className="flex gap-2 items-center">
+                            <div className="w-2 h-2 rounded-full animate-pulse bg-primary" />
+                            <h4 className="font-medium">{activity.title}</h4>
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {activity.description}
+                          </p>
+                          {activity.bannerProgram && (
+                            <div className="flex gap-2 items-center mt-2">
+                              <Badge
+                                variant="outline"
+                                className="max-w-min text-xs"
+                              >
+                                {activity.bannerProgram.abbreviation}
+                              </Badge>
+                              <span className="text-sm text-muted-foreground">
+                                {activity.bannerProgram.name}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2 items-center text-muted-foreground shrink-0">
+                          <Calendar className="w-4 h-4" />
+                          <time className="text-sm">
+                            {new Date(activity.targetDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              }
+                            )}
+                          </time>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="flex flex-col justify-center items-center p-8 text-center">
+                <CalendarClock className="mb-4 w-12 h-12 text-muted-foreground/50" />
+                <h3 className="text-lg font-semibold">No Ongoing Activities</h3>
+                <p className="text-sm text-muted-foreground">
+                  There are no activities currently in progress.
                 </p>
               </div>
             )}

@@ -112,9 +112,11 @@ export const getAllActivitiesForAdmin: RequestHandler = async (
           description: true,
           targetDate: true,
           status: true,
+          createdAt: true,
           department: {
             select: {
               name: true,
+              abbreviation: true,
             },
           },
           partnerCommunity: {

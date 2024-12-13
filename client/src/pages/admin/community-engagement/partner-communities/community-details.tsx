@@ -1,11 +1,9 @@
 import { useNavigate, Link, useParams } from "react-router-dom";
 import {
-  ArrowLeft,
   MapPin,
   Calendar,
   Phone,
   Building2,
-  History,
   Users,
   GanttChart,
   ChevronRight,
@@ -17,12 +15,10 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
 import { partnerCommunitiesApi } from "@/services/api/partner-communities.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Activity } from "@/types/activity.types";
-import { Community } from "@/types/community.types";
 
 // interface Activity {
 //   id: number;

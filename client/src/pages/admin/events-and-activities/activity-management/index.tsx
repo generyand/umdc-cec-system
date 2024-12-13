@@ -73,7 +73,9 @@ interface Activity {
   description?: string;
   status: ActivityStatus;
   targetDate: string;
+  createdAt: string;
   department?: {
+    abbreviation: string;
     name: string;
   };
   partnerCommunity?: {
@@ -159,6 +161,7 @@ export default function ActivityManagementPage() {
                     <TableHead>Department</TableHead>
                     <TableHead>Partner Community</TableHead>
                     <TableHead>Target Date</TableHead>
+                    <TableHead>Approved By</TableHead>
                     <TableHead>Banner Program</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="w-[70px]"></TableHead>
@@ -254,6 +257,7 @@ export default function ActivityManagementPage() {
                   <TableHead>Department</TableHead>
                   <TableHead>Partner Community</TableHead>
                   <TableHead>Target Date</TableHead>
+                  <TableHead>Approved By</TableHead>
                   <TableHead>Banner Program</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="w-[70px]"></TableHead>
@@ -273,9 +277,24 @@ export default function ActivityManagementPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center">
-                        <Building2 className="mr-2 w-4 h-4 text-muted-foreground" />
-                        {activity.department?.name || "No Department"}
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex gap-2 items-center">
+                          <div className="p-1.5 rounded-md bg-primary/10">
+                            <Building2 className="w-3.5 h-3.5 text-primary" />
+                          </div>
+                          <span className="text-sm font-medium">
+                            {activity.department?.abbreviation ||
+                              "No Department"}
+                          </span>
+                        </div>
+                        {activity.bannerProgram && (
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
+                            <span className="text-xs text-muted-foreground">
+                              {activity.bannerProgram.abbreviation}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -287,15 +306,14 @@ export default function ActivityManagementPage() {
                     <TableCell>
                       <div className="flex items-center">
                         <Calendar className="mr-2 w-4 h-4 text-muted-foreground" />
-                        {format(new Date(activity.targetDate), "MMMM d, yyyy")}
+                        {format(new Date(activity.targetDate), "MMM d, yyyy")}
                       </div>
                     </TableCell>
                     <TableCell>
-                      {activity.bannerProgram && (
-                        <Badge variant="secondary">
-                          {activity.bannerProgram.abbreviation}
-                        </Badge>
-                      )}
+                      <div className="flex items-center">
+                        <Calendar className="mr-2 w-4 h-4 text-muted-foreground" />
+                        {format(new Date(activity.createdAt), "MMM d, yyyy")}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Badge className={getStatusColor(activity.status)}>

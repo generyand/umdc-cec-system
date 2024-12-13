@@ -738,7 +738,7 @@ export default function ProposalDetailsPage() {
                         (step, index, array) => (
                           <React.Fragment key={step.role}>
                             <div className="relative">
-                              {/* Progress line - adjusted height to reach the next step */}
+                              {/* Progress line - only show if not returned and not last step */}
                               {index < array.length - 1 && (
                                 <motion.div
                                   className="absolute left-4 top-8 w-0.5 h-[calc(100%+24px)] origin-top"
@@ -747,6 +747,17 @@ export default function ProposalDetailsPage() {
                                       step.status === "APPROVED"
                                         ? "#16a34a"
                                         : "#e5e7eb",
+                                    // Hide line after current step or if returned
+                                    opacity:
+                                      proposal.status === "RETURNED" &&
+                                      APPROVAL_SEQUENCE.indexOf(
+                                        step.role as ApprovalRole
+                                      ) >=
+                                        APPROVAL_SEQUENCE.indexOf(
+                                          proposal.currentApprovalStep as ApprovalRole
+                                        )
+                                        ? "0"
+                                        : "1",
                                     zIndex: 0,
                                   }}
                                   variants={lineVariants}
@@ -754,6 +765,8 @@ export default function ProposalDetailsPage() {
                                   animate={
                                     step.status === "APPROVED"
                                       ? "complete"
+                                      : step.status === "RETURNED"
+                                      ? "pending" // Reset to pending state if returned
                                       : step.status === "PENDING"
                                       ? "pending"
                                       : "inProgress"
@@ -767,6 +780,8 @@ export default function ProposalDetailsPage() {
                                 animate={
                                   step.status === "APPROVED"
                                     ? "approved"
+                                    : step.status === "RETURNED"
+                                    ? "returned" // Add new animation state for returned
                                     : "animate"
                                 }
                                 className="relative z-10"
@@ -798,16 +813,9 @@ export default function ProposalDetailsPage() {
                                     </p>
                                   )}
                                   {step.status === "PENDING" &&
-                                    !proposal.approvalFlow.some(
-                                      (s: { status: string; role: string }) =>
-                                        s.status === "PENDING" &&
-                                        APPROVAL_SEQUENCE.indexOf(
-                                          s.role as ApprovalRole
-                                        ) <
-                                          APPROVAL_SEQUENCE.indexOf(
-                                            step.role as ApprovalRole
-                                          )
-                                    ) && (
+                                    step.role ===
+                                      proposal.currentApprovalStep &&
+                                    proposal.status !== "RETURNED" && (
                                       <p className="mt-1 text-xs text-amber-600">
                                         Note: Approval estimation is within 3
                                         days. If no action is taken, the

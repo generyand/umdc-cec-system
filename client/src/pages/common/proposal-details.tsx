@@ -687,7 +687,7 @@ export default function ProposalDetailsPage() {
                   </div>
 
                   {/* Grid container with 3 rows for the 3 approval steps */}
-                  <div className="relative min-h-[400px]">
+                  <div className="relative min-h-[250px]">
                     <div className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-8">
                       {/* Approval Steps */}
                       {getSortedApprovalFlow(proposal.approvalFlow).map(

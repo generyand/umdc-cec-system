@@ -414,79 +414,145 @@ export const approveProposal: RequestHandler = async (req, res) => {
   }
 };
 
-// // Reject a proposal
-// export const rejectProposal: RequestHandler = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const userId = req.user.id;
-//     const { comment } = req.body;
-//     console.log(
-//       `📝 Processing rejection for proposal ID: ${id} by user: ${userId}`
-//     );
+export const returnProposal: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+    const { comment } = req.body;
 
-//     const proposal = await prisma.projectProposal.findUnique({
-//       where: { id: parseInt(id) },
-//       include: { approvals: true },
-//     });
+    console.log(`📝 Starting return process for proposal ID: ${id}`);
+    console.log(`👤 User ID: ${userId}`);
+    console.log(`💬 Return comment: ${comment}`);
 
-//     if (!proposal) {
-//       console.log(`❌ Proposal with ID ${id} not found`);
-//       throw new ApiError(404, "Proposal not found");
-//     }
+    // 1. Validation
+    if (!comment) {
+      console.log("❌ Return failed: Comment is missing");
+      throw new ApiError(400, "Comment is required when returning a proposal");
+    }
 
-//     const user = await prisma.user.findUnique({
-//       where: { id: userId },
-//       select: { position: true },
-//     });
+    // 2. Get the proposal
+    const proposal = await prisma.projectProposal.findUnique({
+      where: { id: parseInt(id) },
+      include: { approvals: true },
+    });
 
-//     if (user?.position !== proposal.currentApprovalStep) {
-//       console.log("❌ User not authorized for this approval step");
-//       throw new ApiError(403, "Not authorized for this approval step");
-//     }
+    if (!proposal) {
+      console.log(`❌ Return failed: Proposal ${id} not found`);
+      throw new ApiError(404, "Proposal not found");
+    }
+    console.log(`📋 Found proposal: ${proposal.title}`);
 
-//     const updatedProposal = await prisma.$transaction(async (prisma) => {
-//       // Update the current approval
-//       await prisma.projectApproval.update({
-//         where: {
-//           proposalId_approverRole: {
-//             proposalId: proposal.id,
-//             approverRole: user.position!,
-//           },
-//         },
-//         data: {
-//           status: "REJECTED",
-//           approverUserId: userId,
-//           comment,
-//           approvedAt: new Date(),
-//         },
-//       });
+    // 3. Get user's position and verify
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { position: true },
+    });
 
-//       // Update proposal status to rejected
-//       return prisma.projectProposal.update({
-//         where: { id: proposal.id },
-//         data: { status: "REJECTED" },
-//       });
-//     });
+    console.log(`👤 User position: ${user?.position}`);
+    console.log(`🔍 Current approval step: ${proposal.currentApprovalStep}`);
 
-//     console.log("✅ Successfully processed rejection");
-//     res.status(200).json({
-//       success: true,
-//       message: "Proposal rejected successfully",
-//       data: updatedProposal,
-//     });
-//   } catch (error) {
-//     console.error("❌ Error processing rejection:", error);
-//     if (error instanceof ApiError) throw error;
-//     throw new ApiError(500, "Failed to process rejection");
-//   }
-// };
+    if (user?.position !== proposal.currentApprovalStep) {
+      console.log(`❌ Return failed: User not authorized for this step`);
+      console.log(
+        `Expected: ${proposal.currentApprovalStep}, Got: ${user?.position}`
+      );
+      throw new ApiError(403, "Not authorized for this approval step");
+    }
 
-// // Helper function to determine next approval step
-// function getNextApprovalStep(currentStep: string): string | null {
-//   const flow = {
-//     'CEC_HEAD': 'VP_DIRECTOR',
-//     'VP_DIRECTOR': 'CHIEF_OPERATION_OFFICER',
-//     'CHIEF_OPERATION_OFFICER': null
-//   };
-//   return flow[currentStep] || null;
-// }
+    // 4. Process return in transaction
+    console.log("🔄 Starting return transaction...");
+    const returnedProposal = await prisma.$transaction(async (prisma) => {
+      // Update approval
+      console.log("📝 Updating approval record...");
+      await prisma.projectApproval.update({
+        where: {
+          proposalId_approverPosition: {
+            proposalId: proposal.id,
+            approverPosition: user.position!,
+          },
+        },
+        data: {
+          status: "RETURNED",
+          approverUserId: userId,
+          comment,
+          approvedAt: new Date(),
+        },
+      });
+      console.log("✅ Approval record updated");
+
+      // Update proposal
+      console.log("📝 Updating proposal status...");
+      return await prisma.projectProposal.update({
+        where: { id: proposal.id },
+        data: {
+          status: "RETURNED",
+          currentApprovalStep: user.position!,
+        },
+      });
+    });
+    console.log("✅ Return transaction completed");
+
+    // 5. Get final state
+    console.log("🔍 Fetching final proposal state...");
+    const finalProposal = await prisma.projectProposal.findUnique({
+      where: { id: proposal.id },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        currentApprovalStep: true,
+        approvals: {
+          select: {
+            approverPosition: true,
+            status: true,
+            comment: true,
+            approvedAt: true,
+            approver: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    console.log("📊 Final proposal state:", {
+      id: finalProposal?.id,
+      title: finalProposal?.title,
+      status: finalProposal?.status,
+      currentStep: finalProposal?.currentApprovalStep,
+    });
+
+    console.log("✅ Return process completed successfully");
+
+    res.status(200).json({
+      success: true,
+      message: "Proposal returned successfully",
+      data: {
+        id: finalProposal?.id,
+        title: finalProposal?.title,
+        status: finalProposal?.status,
+        returnedBy: {
+          role: user?.position,
+          comment: comment,
+        },
+        approvalFlow: finalProposal?.approvals.map((approval) => ({
+          role: approval.approverPosition,
+          status: approval.status,
+          comment: approval.comment,
+          actionDate: approval.approvedAt,
+          actionBy: approval.approver
+            ? `${approval.approver.firstName} ${approval.approver.lastName}`
+            : null,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("❌ Error returning proposal:", error);
+    console.error("Error details:", error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(500, "Failed to return proposal");
+  }
+};

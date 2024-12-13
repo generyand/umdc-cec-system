@@ -38,8 +38,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
+import { cn } from "@/lib/utils";
+
 interface Proposal {
   id: number;
   title: string;
@@ -218,6 +220,15 @@ export default function ProposalDetailsPage() {
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [showReturnDialog, setShowReturnDialog] = useState(false);
   const [comment, setComment] = useState("");
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  // Reset states when dialog opens/closes
+  useEffect(() => {
+    if (!showReturnDialog) {
+      setComment("");
+      setSubmitAttempted(false);
+    }
+  }, [showReturnDialog]);
 
   const handleStatusUpdate = (newStatus: "APPROVED" | "RETURNED") => {
     updateStatusMutation.mutate(
@@ -276,6 +287,30 @@ export default function ProposalDetailsPage() {
     // Check if the current user's role matches the required role for this step
     // TODO: change to position
     return currentStep?.role === user.position;
+  };
+
+  const handleReturn = async () => {
+    setSubmitAttempted(true);
+
+    if (!comment.trim()) {
+      toast.error("Please provide a reason for returning the proposal");
+      return;
+    }
+
+    try {
+      await approvalsApi.returnProposal(Number(id), comment);
+      setShowReturnDialog(false);
+      toast.success("Proposal returned successfully");
+    } catch (error: unknown) {
+      console.error("Error returning proposal:", error);
+
+      // Type guard for error object
+      if (error instanceof Error) {
+        toast.error(`Failed to return proposal: ${error.message}`);
+      } else {
+        toast.error("Failed to return proposal. Please try again.");
+      }
+    }
   };
 
   if (isLoading) {
@@ -878,26 +913,26 @@ export default function ProposalDetailsPage() {
                 placeholder="Enter reason for returning"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="min-h-[100px]"
+                className={cn(
+                  "min-h-[100px]",
+                  submitAttempted && !comment.trim() && "border-destructive"
+                )}
+                required
               />
+              {submitAttempted && !comment.trim() && (
+                <p className="mt-2 text-sm text-destructive">
+                  Please provide a reason for returning the proposal
+                </p>
+              )}
             </div>
             <DialogFooter>
               <Button
                 variant="outline"
-                onClick={() => {
-                  setShowReturnDialog(false);
-                  setComment("");
-                }}
+                onClick={() => setShowReturnDialog(false)}
               >
                 Cancel
               </Button>
-              <Button
-                variant="destructive"
-                onClick={() => handleStatusUpdate("RETURNED")}
-                disabled={updateStatusMutation.isPending || !comment.trim()}
-              >
-                {updateStatusMutation.isPending ? "Returning..." : "Return"}
-              </Button>
+              <Button onClick={handleReturn}>Return Proposal</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

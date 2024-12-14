@@ -161,6 +161,22 @@ export default function ApprovalsPage() {
     }
   };
 
+  const getApprovalProgress = (proposal: Proposal) => {
+    const totalSteps = proposal.approvalFlow.length;
+    const approvedSteps = proposal.approvalFlow.filter(
+      (a) => a.status === "APPROVED"
+    ).length;
+
+    return {
+      progress: `${approvedSteps}/${totalSteps} steps`,
+      currentApprover: proposal.currentStep,
+    };
+  };
+
+  const formatPosition = (position: string) => {
+    return position.split("_").join(" ");
+  };
+
   const TableSkeleton = () => (
     <div className="rounded-md border">
       <Table>
@@ -287,7 +303,7 @@ export default function ApprovalsPage() {
                     <TableHead>Submitted By</TableHead>
                     <TableHead>Department</TableHead>
                     <TableHead>Target Date</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Current Approver</TableHead>
                     <TableHead className="w-[100px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -303,13 +319,22 @@ export default function ApprovalsPage() {
                         {format(new Date(proposal.targetDate), "MMM d, yyyy")}
                       </TableCell>
                       <TableCell>
-                        <span
-                          className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeVariant(
-                            getCurrentUserApprovalStatus(proposal)
-                          )}`}
-                        >
-                          {getCurrentUserApprovalStatus(proposal)}
-                        </span>
+                        <div className="space-y-1">
+                          {proposal.status === "RETURNED" ? (
+                            <span className="text-red-600">
+                              Returned by {formatPosition(proposal.currentStep)}
+                            </span>
+                          ) : proposal.status === "PENDING" ? (
+                            <span className="text-amber-600">
+                              Awaiting {formatPosition(proposal.currentStep)}
+                            </span>
+                          ) : proposal.status === "APPROVED" ? (
+                            <span className="text-green-600">Approved</span>
+                          ) : null}
+                          <div className="text-xs text-muted-foreground">
+                            {getApprovalProgress(proposal).progress}
+                          </div>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>

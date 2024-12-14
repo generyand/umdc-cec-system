@@ -31,30 +31,60 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+interface ApproverPosition {
+  id: string;
+  name: string;
+}
+
+const APPROVAL_SEQUENCE: ApproverPosition[] = [
+  { id: "CEC_HEAD", name: "CEC Head" },
+  { id: "VP_DIRECTOR", name: "VP Director" },
+  { id: "CHIEF_OPERATION_OFFICER", name: "Chief Operation Officer" },
+] as const;
+
+// type ApprovalRole = (typeof APPROVAL_SEQUENCE)[number];
+
 const getApprovalProgress = (approvals: Array<any>) => {
-  const totalSteps = approvals.length;
+  const totalSteps = APPROVAL_SEQUENCE.length;
   const approvedSteps = approvals.filter((a) => a.status === "APPROVED").length;
-  const currentStep = approvals.find(
-    (a) => a.status === "PENDING"
-  )?.approverPosition;
 
-  // Format the position to be more readable
-  const formatPosition = (pos: string) => pos.split("_").join(" ");
+  return {
+    progress: `${approvedSteps}/${totalSteps} steps`,
+  };
+};
 
-  if (approvedSteps === totalSteps) {
+const getCurrentStep = (proposal: any) => {
+  const { status, currentApprovalStep, approvals } = proposal;
+
+  if (status === "RETURNED") {
+    const returnedApproval = approvals.find((a) => a.status === "RETURNED");
     return {
-      label: "Fully Approved",
-      variant: "bg-green-100 text-green-800",
+      position: returnedApproval?.approverPosition,
+      approver: returnedApproval?.approver,
     };
   }
 
-  return {
-    label: currentStep
-      ? `Pending: ${formatPosition(currentStep)}`
-      : "Processing",
-    variant: "bg-blue-100 text-blue-800",
-    progress: `${approvedSteps}/${totalSteps} steps`,
-  };
+  if (status === "PENDING") {
+    return {
+      position: currentApprovalStep,
+      approver: approvals.find(
+        (a) => a.approverPosition === currentApprovalStep
+      )?.approver,
+    };
+  }
+
+  return null;
+};
+
+const formatPosition = (position: string | null | undefined) => {
+  if (!position) return "Unknown"; // or return any default value you prefer
+
+  return (
+    position
+      .split("_")
+      // .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+      .join(" ")
+  );
 };
 
 export default function StaffProposalsPage() {
@@ -133,6 +163,8 @@ export default function StaffProposalsPage() {
         return "bg-green-100 text-green-800";
       case "RETURNED":
         return "bg-red-100 text-red-800";
+      case "RESUBMITTED":
+        return "bg-blue-100 text-blue-800";
       default:
         return "bg-yellow-100 text-yellow-800";
     }
@@ -304,25 +336,26 @@ export default function StaffProposalsPage() {
                         </TableCell>
                         <TableCell>{proposal.community?.name || "—"}</TableCell>
                         <TableCell>
-                          {proposal.approvals && (
-                            <div className="space-y-1">
-                              <span
-                                className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium
-                                ${
-                                  getApprovalProgress(proposal.approvals)
-                                    .variant
-                                }`}
-                              >
-                                {getApprovalProgress(proposal.approvals).label}
+                          <div className="space-y-1">
+                            {proposal.status === "RETURNED" ? (
+                              <span className="text-red-600">
+                                Returned by{" "}
+                                {formatPosition(
+                                  getCurrentStep(proposal)?.position
+                                )}
                               </span>
-                              <div className="text-xs text-muted-foreground">
-                                {
-                                  getApprovalProgress(proposal.approvals)
-                                    .progress
-                                }
-                              </div>
+                            ) : proposal.status === "PENDING" ? (
+                              <span className="text-amber-600">
+                                Awaiting{" "}
+                                {formatPosition(proposal.currentApprovalStep)}
+                              </span>
+                            ) : proposal.status === "APPROVED" ? (
+                              <span className="text-green-600">Approved</span>
+                            ) : null}
+                            <div className="text-xs text-muted-foreground">
+                              {getApprovalProgress(proposal.approvals).progress}
                             </div>
-                          )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <span

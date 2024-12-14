@@ -25,10 +25,18 @@ enum UserPosition {
   CHIEF_OPERATION_OFFICER
 }
 
+enum ProposalStatus {
+  PENDING
+  APPROVED
+  RETURNED
+  RESUBMITTED
+}
+
 enum ApprovalStatus {
   PENDING
   APPROVED
   RETURNED
+  RESUBMITTED
 }
 
 model User {
@@ -130,7 +138,7 @@ model ProjectProposal {
   targetDate          DateTime
   venue               String
   budget              Decimal        @db.Decimal(10, 2)
-  status              String         @default("PENDING")
+  status              ProposalStatus  @default(PENDING)
 
   // File attachments
   attachments ProjectAttachment[] // One-to-many relationship with attachments

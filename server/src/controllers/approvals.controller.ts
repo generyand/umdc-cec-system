@@ -28,7 +28,9 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
             // Pending proposals that need CEC Head's approval
             {
               currentApprovalStep: "CEC_HEAD",
-              status: "PENDING",
+              status: {
+                in: ["PENDING", "RESUBMITTED"],
+              },
             },
             // Proposals already approved by CEC Head
             {
@@ -50,7 +52,9 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
             // Pending proposals that need VP Director's approval
             {
               currentApprovalStep: "VP_DIRECTOR",
-              status: "PENDING",
+              status: {
+                in: ["PENDING", "RESUBMITTED"],
+              },
               approvals: {
                 some: {
                   approverPosition: "CEC_HEAD",
@@ -78,7 +82,9 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
             // Pending proposals that need COO's approval
             {
               currentApprovalStep: "CHIEF_OPERATION_OFFICER",
-              status: "PENDING",
+              status: {
+                in: ["PENDING", "RESUBMITTED"],
+              },
               approvals: {
                 some: {
                   approverPosition: "VP_DIRECTOR",
@@ -269,13 +275,28 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
 // // Approve a proposal
 export const approveProposal: RequestHandler = async (req, res) => {
   try {
-    const { id } = req.params; // proposal ID
+    const { id } = req.params;
     const userId = req.user?.id;
     const { comment } = req.body;
 
-    console.log(
-      `📝 Processing approval for proposal ID: ${id} by user: ${userId}`
-    );
+    const existingProposal = await prisma.projectProposal.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingProposal) {
+      throw new ApiError(404, "Proposal not found");
+    }
+
+    // Allow approval if status is PENDING or RESUBMITTED
+    if (
+      existingProposal.status !== "PENDING" &&
+      existingProposal.status !== "RESUBMITTED"
+    ) {
+      throw new ApiError(
+        400,
+        "Proposal cannot be approved in its current status"
+      );
+    }
 
     // 1. Get the proposal and check if it exists
     const proposal = await prisma.projectProposal.findUnique({
@@ -462,13 +483,23 @@ export const returnProposal: RequestHandler = async (req, res) => {
     // 4. Process return in transaction
     console.log("🔄 Starting return transaction...");
     const returnedProposal = await prisma.$transaction(async (prisma) => {
-      // Update approval
+      // First, verify the current step hasn't changed
+      const currentProposal = await prisma.projectProposal.findUnique({
+        where: { id: parseInt(id) },
+        select: { currentApprovalStep: true },
+      });
+
+      if (currentProposal?.currentApprovalStep !== user?.position) {
+        throw new ApiError(400, "Approval step has changed");
+      }
+
+      // Update approval record for the current step only
       console.log("📝 Updating approval record...");
       await prisma.projectApproval.update({
         where: {
           proposalId_approverPosition: {
             proposalId: proposal.id,
-            approverPosition: user.position!,
+            approverPosition: user.position,
           },
         },
         data: {
@@ -480,13 +511,13 @@ export const returnProposal: RequestHandler = async (req, res) => {
       });
       console.log("✅ Approval record updated");
 
-      // Update proposal
+      // Update proposal status while explicitly keeping the same approval step
       console.log("📝 Updating proposal status...");
       return await prisma.projectProposal.update({
         where: { id: proposal.id },
         data: {
           status: "RETURNED",
-          currentApprovalStep: user.position!,
+          currentApprovalStep: currentProposal.currentApprovalStep, // Explicitly set to keep the same step
         },
       });
     });

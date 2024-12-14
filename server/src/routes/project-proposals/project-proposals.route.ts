@@ -10,6 +10,7 @@ import {
   updateProposalStatus,
   getDepartmentsWithPrograms,
   getProposalsByUser,
+  resubmitProposal,
   //   getProposalsByDepartment,
   //   getProposalsByStatus,
   //   getProposalsByUser,
@@ -50,31 +51,7 @@ router.get(
 // Get proposals by user
 router.get("/user/:userId", authenticateToken, getProposalsByUser);
 
-// Optional: Additional routes based on your needs
-// Get proposals by department
-// router.get(
-//   "/department/:departmentId",
-//   isAuthenticated,
-// getProposalsByDepartment
-// );
-
-// // Get proposals by status
-// router.get("/status/:status", isAuthenticated, getProposalsByStatus);
-
-// // Get proposals by user
-// router.get("/user/:userId", isAuthenticated, getProposalsByUser);
-
-// // Update proposal status
-// router.patch("/:id/status", isAuthenticated, updateProposalStatus);
-
-// // Add attachments to proposal
-// router.post("/:id/attachments", isAuthenticated, addProposalAttachments);
-
-// // Remove attachment from proposal
-// router.delete(
-//   "/:id/attachments/:attachmentId",
-//   isAuthenticated,
-//   removeProposalAttachment
-// );
+// Resubmit proposal
+router.post("/:id/resubmit", authenticateToken, resubmitProposal);
 
 export default router;

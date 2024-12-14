@@ -71,11 +71,15 @@ export const projectProposalsService = {
   },
 
   async getProposalById(id: string, token: string) {
-    return await api.get(`/api/project-proposals/${id}`, {
+    const response = await api.get(`/api/project-proposals/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    console.log("response: " + response.data.data.currentApprovalStep);
+
+    return response;
   },
 
   async updateProposalStatus(

@@ -17,6 +17,7 @@ import {
   Clock,
   Check,
   X,
+  ArrowUpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,7 +25,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 import { projectProposalsService } from "@/services/api/project-proposals.service";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -42,11 +43,19 @@ import { useState, useEffect } from "react";
 import React from "react";
 import { cn } from "@/lib/utils";
 
+interface ApprovalStep {
+  role: string;
+  status: "PENDING" | "APPROVED" | "RETURNED" | "RESUBMITTED";
+  comment: string | null;
+  approvedAt: string | null;
+  approvedBy: string | null;
+}
+
 interface Proposal {
   id: number;
   title: string;
   description: string;
-  status: "PENDING" | "APPROVED" | "RETURNED";
+  status: "PENDING" | "APPROVED" | "RETURNED" | "RESUBMITTED";
   targetDate: string;
   budget: string;
   targetBeneficiaries: string;
@@ -161,6 +170,7 @@ export default function ProposalDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const {
     data: proposal,
@@ -249,6 +259,8 @@ export default function ProposalDetailsPage() {
         return "bg-green-100 text-green-800";
       case "RETURNED":
         return "bg-red-100 text-red-800";
+      case "RESUBMITTED":
+        return "bg-blue-100 text-blue-800";
       default:
         return "bg-yellow-100 text-yellow-800";
     }
@@ -275,42 +287,52 @@ export default function ProposalDetailsPage() {
   const isCurrentApprover = () => {
     if (!proposal || !user) return false;
 
-    console.log("proposal", proposal);
+    // Simple check: user's position matches currentApprovalStep
+    const canApprove = user.position === proposal.currentApprovalStep;
 
-    // Find the first pending approval step
-    const currentStep = proposal.approvalFlow.find(
-      (step: { status: string }) => step.status === "PENDING"
+    // alert("proposal.currentApprovalStep: " + proposal.currentApprovalStep);
+
+    // alert("canApprove: " + canApprove);
+
+    // Show buttons if:
+    // 1. User is the current approver AND
+    // 2. Status is either PENDING or RESUBMITTED
+    return (
+      canApprove &&
+      (proposal.status === "PENDING" || proposal.status === "RESUBMITTED")
     );
-
-    console.log("current step", currentStep);
-
-    // Check if the current user's role matches the required role for this step
-    // TODO: change to position
-    return currentStep?.role === user.position;
   };
 
-  const handleReturn = async () => {
-    setSubmitAttempted(true);
+  // Return proposal mutation
+  const returnProposalMutation = useMutation({
+    mutationFn: ({ id, comment }: { id: number; comment: string }) =>
+      approvalsApi.returnProposal(id, comment),
+    onSuccess: () => {
+      // Refetch the proposal details
+      queryClient.invalidateQueries({ queryKey: ["proposal", id] });
 
+      // Close dialog and reset state
+      setShowReturnDialog(false);
+      setComment("");
+
+      // Show success message
+      toast.success("Proposal returned successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to return proposal");
+    },
+  });
+
+  const handleReturn = async () => {
     if (!comment.trim()) {
-      toast.error("Please provide a reason for returning the proposal");
+      setSubmitAttempted(true);
       return;
     }
 
-    try {
-      await approvalsApi.returnProposal(Number(id), comment);
-      setShowReturnDialog(false);
-      toast.success("Proposal returned successfully");
-    } catch (error: unknown) {
-      console.error("Error returning proposal:", error);
-
-      // Type guard for error object
-      if (error instanceof Error) {
-        toast.error(`Failed to return proposal: ${error.message}`);
-      } else {
-        toast.error("Failed to return proposal. Please try again.");
-      }
-    }
+    returnProposalMutation.mutate({
+      id: Number(id),
+      comment,
+    });
   };
 
   if (isLoading) {
@@ -703,18 +725,18 @@ export default function ProposalDetailsPage() {
 
                   {/* Action Buttons */}
                   {isCurrentApprover() && (
-                    <div className="flex gap-4 pt-6">
+                    <div className="flex space-x-4">
                       <Button
-                        className="bg-green-600 hover:bg-green-700"
                         onClick={() => setShowApproveDialog(true)}
+                        className="bg-green-600 hover:bg-green-700"
                       >
-                        Approve Proposal
+                        Approve
                       </Button>
                       <Button
                         variant="destructive"
                         onClick={() => setShowReturnDialog(true)}
                       >
-                        Return Proposal
+                        Return
                       </Button>
                     </div>
                   )}
@@ -829,6 +851,8 @@ export default function ProposalDetailsPage() {
                                       ? "bg-green-100 text-green-600"
                                       : step.status === "RETURNED"
                                       ? "bg-red-100 text-red-600"
+                                      : step.status === "RESUBMITTED"
+                                      ? "bg-blue-100 text-blue-600"
                                       : "bg-gray-100 text-gray-600"
                                   }`}
                                 >
@@ -836,6 +860,8 @@ export default function ProposalDetailsPage() {
                                     <Check className="w-3 h-3" />
                                   ) : step.status === "RETURNED" ? (
                                     <X className="w-3 h-3" />
+                                  ) : step.status === "RESUBMITTED" ? (
+                                    <ArrowUpCircle className="w-3 h-3" />
                                   ) : (
                                     <Clock className="w-3 h-3" />
                                   )}
@@ -854,6 +880,19 @@ export default function ProposalDetailsPage() {
                                 <p className="p-3 mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg">
                                   "{step.comment}"
                                 </p>
+                              )}
+                              {step.status === "RESUBMITTED" && (
+                                <div className="p-3 mt-2 bg-blue-50 rounded-lg">
+                                  <p className="text-sm text-blue-600">
+                                    <span className="font-medium">
+                                      Resubmitted
+                                    </span>{" "}
+                                    with comment:
+                                  </p>
+                                  <p className="mt-1 text-sm text-gray-600">
+                                    "{step.comment}"
+                                  </p>
+                                </div>
                               )}
                             </div>
                           </React.Fragment>
@@ -940,7 +979,14 @@ export default function ProposalDetailsPage() {
               >
                 Cancel
               </Button>
-              <Button onClick={handleReturn}>Return Proposal</Button>
+              <Button
+                onClick={handleReturn}
+                disabled={returnProposalMutation.isPending}
+              >
+                {returnProposalMutation.isPending
+                  ? "Returning..."
+                  : "Return Proposal"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

@@ -101,6 +101,7 @@ export const getProposalById: RequestHandler = async (req, res) => {
         title: true,
         description: true,
         status: true,
+        currentApprovalStep: true,
         targetDate: true,
         budget: true,
         targetBeneficiaries: true,
@@ -171,10 +172,11 @@ export const getProposalById: RequestHandler = async (req, res) => {
       throw new ApiError(404, "Proposal not found");
     }
 
-    // Transform the data to include approval flow
+    // Transform the data, removing the original approvals array
+    const { approvals, ...proposalData } = proposal;
     const transformedProposal = {
-      ...proposal,
-      approvalFlow: proposal.approvals.map((approval) => ({
+      ...proposalData,
+      approvalFlow: approvals.map((approval) => ({
         role: approval.approverPosition,
         status: approval.status,
         comment: approval.comment,
@@ -556,13 +558,35 @@ export const getProposalsByUser: RequestHandler = async (req, res) => {
           id: userId,
         },
       },
-      include: {
-        department: true,
-        program: true,
-        community: true,
-        bannerProgram: true,
-        approvals: true,
-        attachments: true,
+      select: {
+        id: true,
+        title: true,
+        targetDate: true,
+        budget: true,
+        status: true,
+        currentApprovalStep: true,
+        community: {
+          select: {
+            name: true,
+          },
+        },
+        approvals: {
+          select: {
+            approverPosition: true,
+            status: true,
+            comment: true,
+            approvedAt: true,
+            approver: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -580,5 +604,134 @@ export const getProposalsByUser: RequestHandler = async (req, res) => {
     console.error("❌ Error fetching user proposals:", error);
     if (error instanceof ApiError) throw error;
     throw new ApiError(500, "Failed to fetch user proposals");
+  }
+};
+
+export const resubmitProposal: RequestHandler = async (req, res) => {
+  try {
+    const { id: proposalId } = req.params;
+    const userId = req.user?.id;
+
+    console.log("🔄 Starting resubmission for proposal:", proposalId);
+
+    // Get the proposal and check if it exists
+    const proposal = await prisma.projectProposal.findUnique({
+      where: { id: parseInt(proposalId) },
+      include: {
+        approvals: {
+          orderBy: { approvedAt: "desc" },
+        },
+      },
+    });
+
+    console.log("📝 Current proposal state:", {
+      status: proposal?.status,
+      currentStep: proposal?.currentApprovalStep,
+    });
+
+    if (!proposal) {
+      throw new ApiError(404, "Proposal not found");
+    }
+
+    // Verify that the proposal is in RETURNED status
+    if (proposal.status !== "RETURNED") {
+      throw new ApiError(400, "Only returned proposals can be resubmitted");
+    }
+
+    // Get the last return action
+    const returnedApproval = proposal.approvals.find(
+      (a) => a.status === "RETURNED"
+    );
+
+    console.log("🔍 Found returned approval:", {
+      approverPosition: returnedApproval?.approverPosition,
+      status: returnedApproval?.status,
+    });
+
+    if (!returnedApproval) {
+      throw new ApiError(400, "No return record found");
+    }
+
+    // Process resubmission in a transaction
+    const updatedProposal = await prisma.$transaction(async (prisma) => {
+      console.log(
+        "📝 Updating approval record for position:",
+        returnedApproval.approverPosition
+      );
+
+      // 1. Update the existing approval record
+      await prisma.projectApproval.update({
+        where: {
+          proposalId_approverPosition: {
+            proposalId: proposal.id,
+            approverPosition: returnedApproval.approverPosition,
+          },
+        },
+        data: {
+          status: "PENDING",
+          approverUserId: userId,
+          approvedAt: new Date(),
+        },
+      });
+
+      console.log("✅ Approval record updated, now updating proposal");
+      console.log(
+        "📌 Setting currentApprovalStep to:",
+        returnedApproval.approverPosition
+      );
+
+      // 2. Update proposal status
+      return await prisma.projectProposal.update({
+        where: { id: proposal.id },
+        data: {
+          status: "RESUBMITTED",
+          currentApprovalStep: returnedApproval.approverPosition,
+        },
+        include: {
+          approvals: {
+            include: {
+              approver: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+            orderBy: { approvedAt: "desc" },
+          },
+        },
+      });
+    });
+
+    console.log("📊 Final proposal state:", {
+      id: updatedProposal.id,
+      status: updatedProposal.status,
+      currentStep: updatedProposal.currentApprovalStep,
+    });
+
+    // Format response
+    res.status(200).json({
+      success: true,
+      message: "Proposal resubmitted successfully",
+      data: {
+        id: updatedProposal.id,
+        status: updatedProposal.status,
+        currentStep: updatedProposal.currentApprovalStep,
+        revisionHistory: updatedProposal.approvals.map((approval) => ({
+          role: approval.approverPosition,
+          status: approval.status,
+          comment: approval.comment,
+          actionDate: approval.approvedAt,
+          actionBy: approval.approver
+            ? `${approval.approver.firstName} ${approval.approver.lastName}`
+            : null,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("❌ Error resubmitting proposal:", error);
+    console.error("Error details:", error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(500, "Failed to resubmit proposal");
   }
 };

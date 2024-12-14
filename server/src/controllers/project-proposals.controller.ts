@@ -111,12 +111,14 @@ export const getProposalById: RequestHandler = async (req, res) => {
         },
         user: {
           select: {
+            id: true,
             firstName: true,
             lastName: true,
           },
         },
         community: {
           select: {
+            id: true,
             name: true,
             communityType: true,
             address: true,

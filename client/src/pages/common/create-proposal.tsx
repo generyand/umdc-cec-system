@@ -99,6 +99,9 @@ export default function NewProposalPage({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { token, user } = useAuth();
+  const proposalData = initialData?.data?.data;
+
+  console.log("proposalData", proposalData);
 
   // Fetch form options data
   const { data, isLoading: isFormOptionsLoading } = useQuery({
@@ -108,7 +111,7 @@ export default function NewProposalPage({
 
   const formOptions = data?.data;
 
-  console.log(formOptions);
+  // console.log(formOptions);
 
   const handleFileDrop = useCallback(
     (
@@ -196,12 +199,28 @@ export default function NewProposalPage({
   useEffect(() => {
     if (mode === "resubmit" && initialData) {
       form.reset({
-        title: initialData.title,
-        description: initialData.description,
-        // ... populate other fields
+        title: proposalData.title,
+        description: proposalData.description,
+        department: proposalData.department?.id,
+        program: proposalData.program?.id,
+        bannerProgram: proposalData.bannerProgram?.id,
+        partnerCommunity: proposalData.community?.id.toString(),
+        targetBeneficiaries: proposalData.targetBeneficiaries,
+        targetArea: proposalData.targetArea,
+        targetDate: proposalData.targetDate
+          ? new Date(proposalData.targetDate)
+          : undefined,
+        venue: proposalData.venue,
+        budget: proposalData.budget,
+        attachments: proposalData.attachments,
       });
     }
+
+    console.log("Partner Community ID", proposalData?.community?.id);
   }, [initialData, mode, form]);
+
+  // console.log("Mode:", mode);
+  // console.log("Initial Data:", initialData);
 
   const onSubmit = async (data: ProposalFormValues) => {
     try {
@@ -230,7 +249,7 @@ export default function NewProposalPage({
 
       if (mode === "resubmit") {
         await projectProposalsService.resubmitProposal(
-          proposalId,
+          proposalId || "",
           formData,
           token || ""
         );

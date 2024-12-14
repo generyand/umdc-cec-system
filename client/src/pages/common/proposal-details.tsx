@@ -43,14 +43,6 @@ import { useState, useEffect } from "react";
 import React from "react";
 import { cn } from "@/lib/utils";
 
-// interface ApprovalStep {
-//   role: string;
-//   status: "PENDING" | "APPROVED" | "RETURNED" | "RESUBMITTED";
-//   comment: string | null;
-//   approvedAt: string | null;
-//   approvedBy: string | null;
-// }
-
 interface Proposal {
   id: number;
   title: string;
@@ -117,13 +109,6 @@ const APPROVAL_SEQUENCE = [
 
 type ApprovalRole = (typeof APPROVAL_SEQUENCE)[number];
 
-// Add these variants for animations
-// const progressVariants = {
-//   pending: { scaleY: 0 },
-//   inProgress: { scaleY: 0.5 },
-//   complete: { scaleY: 1 },
-// };
-
 const circleVariants = {
   initial: { scale: 0.8, opacity: 0 },
   animate: { scale: 1, opacity: 1 },
@@ -136,28 +121,6 @@ const circleVariants = {
     },
   },
 };
-
-// const contentVariants = {
-//   initial: { opacity: 0, y: 20 },
-//   animate: {
-//     opacity: 1,
-//     y: 0,
-//     transition: {
-//       duration: 0.5,
-//     },
-//   },
-// };
-
-// const checkmarkVariants = {
-//   initial: { pathLength: 0 },
-//   animate: {
-//     pathLength: 1,
-//     transition: {
-//       duration: 0.5,
-//       ease: "easeInOut",
-//     },
-//   },
-// };
 
 // Add this after your existing circleVariants
 const lineVariants = {
@@ -198,11 +161,11 @@ export default function ProposalDetailsPage() {
     gcTime: 0,
   });
 
-  alert(
-    `proposal.status: ${proposal?.status}, user.id: ${user?.id} ${
-      proposal?.user.id === user?.id
-    } ${proposal?.id}`
-  );
+  // alert(
+  //   `proposal.status: ${proposal?.status}, user.id: ${user?.id} ${
+  //     proposal?.user.id === user?.id 
+  //   } proposal user id:  ${proposal?.user.id} proposal id:  ${proposal?.id}`
+  // );
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({
@@ -295,10 +258,6 @@ export default function ProposalDetailsPage() {
 
     // Simple check: user's position matches currentApprovalStep
     const canApprove = user.position === proposal.currentApprovalStep;
-
-    // alert("proposal.currentApprovalStep: " + proposal.currentApprovalStep);
-
-    // alert("canApprove: " + canApprove);
 
     // Show buttons if:
     // 1. User is the current approver AND
@@ -753,12 +712,14 @@ export default function ProposalDetailsPage() {
                       proposal.user.id === user?.id && (
                         <Button
                           onClick={() =>
-                            navigate(`/staff/proposals/${proposal.id}/resubmit`)
+                            navigate(
+                              `/staff/proposals/edit-proposal/${proposal.id}`
+                            )
                           }
                           className="bg-blue-600 hover:bg-blue-700"
                         >
                           <ArrowUpCircle className="mr-2 w-4 h-4" />
-                          Resubmit Proposal
+                          Edit Proposal for Resubmission
                         </Button>
                       )}
                   </div>

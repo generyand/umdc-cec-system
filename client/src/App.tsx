@@ -61,6 +61,7 @@ import { UserRole } from "./types/user.types";
 import StaffHomePage from "./pages/staff/home";
 import StaffDepartmentOverviewPage from "./pages/staff/department-overview";
 import StaffProposalsPage from "./pages/staff/proposals";
+import ResubmitProposalPage from "./pages/staff/proposals/resubmit-proposal";
 
 const App = () => {
   const { user, initialized } = useAuth();
@@ -247,6 +248,10 @@ const App = () => {
             <Route path="proposals/new" element={<NewProposalPage />} />
             <Route path="proposals" element={<StaffProposalsPage />} />
             <Route path="proposals/:id" element={<ProposalDetailsPage />} />
+            <Route
+              path="proposals/edit-proposal/:proposalId"
+              element={<ResubmitProposalPage />}
+            />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="calendar" element={<CalendarPage />} />
           </Route>

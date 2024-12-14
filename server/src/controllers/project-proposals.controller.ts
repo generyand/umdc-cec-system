@@ -669,9 +669,9 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
         },
         data: {
           status: "PENDING",
-          approverUserId: userId,
+          approverUserId: null,
           comment: null,
-          approvedAt: new Date(),
+          approvedAt: null,
         },
       });
 

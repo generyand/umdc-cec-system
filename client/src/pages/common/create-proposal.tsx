@@ -52,6 +52,7 @@ import { AxiosError } from "axios";
 import { useAuth } from "@/hooks/use-auth";
 import { projectProposalsService } from "@/services/api/project-proposals.service";
 import { formOptionsApi } from "@/services/api/form-options.service";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const proposalFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
@@ -138,9 +139,9 @@ export default function NewProposalPage() {
     defaultValues: {
       title: "",
       description: "",
-      department: formOptions?.userDepartment?.id.toString() || "",
-      program: formOptions?.userProgram?.id.toString() || "",
-      bannerProgram: formOptions?.userBannerProgram?.id.toString() || "",
+      department: "",
+      program: "",
+      bannerProgram: "",
       partnerCommunity: "",
       targetBeneficiaries: "",
       targetArea: "",
@@ -150,6 +151,21 @@ export default function NewProposalPage() {
       attachments: undefined,
     },
   });
+
+  // Update form values when formOptions loads
+  useEffect(() => {
+    if (formOptions) {
+      form.setValue(
+        "department",
+        formOptions.userDepartment?.id.toString() || ""
+      );
+      form.setValue("program", formOptions.userProgram?.id.toString() || "");
+      form.setValue(
+        "bannerProgram",
+        formOptions.userBannerProgram?.id.toString() || ""
+      );
+    }
+  }, [formOptions, form]);
 
   // Watch for partner community changes
   const selectedPartnerCommunityId = form.watch("partnerCommunity");
@@ -218,6 +234,61 @@ export default function NewProposalPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (isFormOptionsLoading) {
+    return (
+      <div className="container mx-auto max-w-5xl">
+        <div className="mb-6">
+          <Skeleton className="mb-4 w-24 h-10" />
+          <Skeleton className="mb-2 w-64 h-9" />
+          <Skeleton className="w-96 h-5" />
+        </div>
+
+        <Card className="border-none shadow-lg">
+          <CardHeader>
+            <Skeleton className="mb-2 w-48 h-7" />
+            <Skeleton className="w-72 h-5" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-8">
+              {/* Basic Information Section */}
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {/* Title and Description - Full width */}
+                <div className="space-y-2 md:col-span-2">
+                  <Skeleton className="w-20 h-5" />
+                  <Skeleton className="w-full h-10" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Skeleton className="w-24 h-5" />
+                  <Skeleton className="w-full h-32" />
+                </div>
+
+                {/* Two columns layout */}
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="w-32 h-5" />
+                    <Skeleton className="w-full h-10" />
+                  </div>
+                ))}
+
+                {/* Attachments - Full width */}
+                <div className="space-y-2 md:col-span-2">
+                  <Skeleton className="w-28 h-5" />
+                  <Skeleton className="w-full h-40" />
+                </div>
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex gap-4 justify-end pt-6 mt-6 border-t">
+                <Skeleton className="w-24 h-10" />
+                <Skeleton className="w-32 h-10" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <motion.div

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -138,9 +138,9 @@ export default function NewProposalPage() {
     defaultValues: {
       title: "",
       description: "",
-      department: formOptions?.data?.userDepartment?.id.toString() || "",
-      program: formOptions?.data?.userProgram?.id.toString() || "",
-      bannerProgram: formOptions?.data?.userBannerProgram?.id.toString() || "",
+      department: formOptions?.userDepartment?.id.toString() || "",
+      program: formOptions?.userProgram?.id.toString() || "",
+      bannerProgram: formOptions?.userBannerProgram?.id.toString() || "",
       partnerCommunity: "",
       targetBeneficiaries: "",
       targetArea: "",
@@ -150,6 +150,21 @@ export default function NewProposalPage() {
       attachments: undefined,
     },
   });
+
+  // Watch for partner community changes
+  const selectedPartnerCommunityId = form.watch("partnerCommunity");
+
+  // Update target area when partner community changes
+  useEffect(() => {
+    if (selectedPartnerCommunityId && formOptions?.partnerCommunities) {
+      const selectedCommunity = formOptions.partnerCommunities.find(
+        (community) => community.id.toString() === selectedPartnerCommunityId
+      );
+      if (selectedCommunity) {
+        form.setValue("targetArea", selectedCommunity.address);
+      }
+    }
+  }, [selectedPartnerCommunityId, formOptions?.partnerCommunities, form]);
 
   const onSubmit = async (data: ProposalFormValues) => {
     try {
@@ -400,16 +415,12 @@ export default function NewProposalPage() {
                   name="targetArea"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="required">Target Area</FormLabel>
+                      <FormLabel>Target Area</FormLabel>
                       <FormDescription>
-                        Specify where this activity will take place.
+                        Specify the target area for the activity.
                       </FormDescription>
                       <FormControl>
-                        <Input
-                          placeholder="e.g., Quezon City, Philippines"
-                          className="transition-all hover:border-primary/50 focus:border-primary"
-                          {...field}
-                        />
+                        <Input {...field} disabled className="bg-muted" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

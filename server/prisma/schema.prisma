@@ -55,11 +55,14 @@ model User {
   updatedAt          DateTime          @updatedAt
   departmentId       Int?
   department         Department?       @relation(fields: [departmentId], references: [id])
+  academicProgramId  Int?
+  academicProgram    AcademicProgram?  @relation(fields: [academicProgramId], references: [id])
   projectProposals   ProjectProposal[]
   approvals         ProjectApproval[]
 
   @@index([email])
   @@index([departmentId])
+  @@index([academicProgramId])
   @@map("users")
 }
 
@@ -95,6 +98,7 @@ model AcademicProgram {
   bannerProgramId  Int? // Optional foreign key to BannerProgram
   bannerProgram    BannerProgram?    @relation(fields: [bannerProgramId], references: [id])
   projectProposals ProjectProposal[]
+  users            User[]
 
   @@index([departmentId])
   @@index([bannerProgramId])

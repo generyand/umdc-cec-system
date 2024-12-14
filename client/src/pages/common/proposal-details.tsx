@@ -43,13 +43,13 @@ import { useState, useEffect } from "react";
 import React from "react";
 import { cn } from "@/lib/utils";
 
-interface ApprovalStep {
-  role: string;
-  status: "PENDING" | "APPROVED" | "RETURNED" | "RESUBMITTED";
-  comment: string | null;
-  approvedAt: string | null;
-  approvedBy: string | null;
-}
+// interface ApprovalStep {
+//   role: string;
+//   status: "PENDING" | "APPROVED" | "RETURNED" | "RESUBMITTED";
+//   comment: string | null;
+//   approvedAt: string | null;
+//   approvedBy: string | null;
+// }
 
 interface Proposal {
   id: number;
@@ -318,8 +318,10 @@ export default function ProposalDetailsPage() {
       // Show success message
       toast.success("Proposal returned successfully");
     },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to return proposal");
+    onError: (error: unknown) => {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to return proposal"
+      );
     },
   });
 

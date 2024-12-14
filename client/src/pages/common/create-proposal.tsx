@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -169,7 +169,7 @@ export default function NewProposalPage() {
     defaultValues: {
       title: "",
       description: "",
-      department: "",
+      department: user?.departmentId?.toString() || "",
       program: "",
       bannerProgram: "",
       partnerCommunity: "",
@@ -181,6 +181,14 @@ export default function NewProposalPage() {
       attachments: undefined,
     },
   });
+
+  useEffect(() => {
+    if (user?.departmentId) {
+      const deptId = user.departmentId.toString();
+      form.setValue("department", deptId);
+      setSelectedDepartment(deptId);
+    }
+  }, [user, form]);
 
   const onSubmit = async (data: ProposalFormValues) => {
     try {
@@ -322,14 +330,9 @@ export default function NewProposalPage() {
                     <FormItem>
                       <FormLabel className="required">Department</FormLabel>
                       <Select
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          setSelectedDepartment(value);
-                          // Reset dependent fields
-                          form.setValue("program", "");
-                          form.setValue("bannerProgram", "");
-                        }}
+                        onValueChange={field.onChange}
                         defaultValue={field.value}
+                        disabled={true}
                       >
                         <FormControl>
                           <SelectTrigger className="transition-all hover:border-primary/50">
@@ -337,21 +340,14 @@ export default function NewProposalPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {isDepartmentsLoading ? (
-                            <div className="p-2">
-                              <Skeleton className="w-full h-8" />
-                              <Skeleton className="mt-2 w-full h-8" />
-                            </div>
-                          ) : (
-                            departments.map((dept: DepartmentWithPrograms) => (
-                              <SelectItem
-                                key={dept.id}
-                                value={dept.id.toString()}
-                              >
-                                {dept.name} ({dept.abbreviation})
-                              </SelectItem>
-                            ))
-                          )}
+                          {departments.map((dept: DepartmentWithPrograms) => (
+                            <SelectItem
+                              key={dept.id}
+                              value={dept.id.toString()}
+                            >
+                              {dept.name} ({dept.abbreviation})
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -368,7 +364,7 @@ export default function NewProposalPage() {
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        disabled={!selectedDepartment}
+                        disabled={true}
                       >
                         <FormControl>
                           <SelectTrigger className="transition-all hover:border-primary/50">
@@ -376,20 +372,14 @@ export default function NewProposalPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {isDepartmentsLoading ? (
-                            <div className="p-2">
-                              <Skeleton className="w-full h-8" />
-                            </div>
-                          ) : (
-                            selectedDepartmentData?.academicPrograms.map(
-                              (program: Program) => (
-                                <SelectItem
-                                  key={program.id}
-                                  value={program.id.toString()}
-                                >
-                                  {program.name} ({program.abbreviation})
-                                </SelectItem>
-                              )
+                          {selectedDepartmentData?.academicPrograms.map(
+                            (program: Program) => (
+                              <SelectItem
+                                key={program.id}
+                                value={program.id.toString()}
+                              >
+                                {program.name} ({program.abbreviation})
+                              </SelectItem>
                             )
                           )}
                         </SelectContent>
@@ -412,7 +402,7 @@ export default function NewProposalPage() {
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        disabled={!selectedDepartment}
+                        disabled={true}
                       >
                         <FormControl>
                           <SelectTrigger className="transition-all hover:border-primary/50">
@@ -420,20 +410,14 @@ export default function NewProposalPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {isDepartmentsLoading ? (
-                            <div className="p-2">
-                              <Skeleton className="w-full h-8" />
-                            </div>
-                          ) : (
-                            selectedDepartmentData?.bannerPrograms.map(
-                              (program: Program) => (
-                                <SelectItem
-                                  key={program.id}
-                                  value={program.id.toString()}
-                                >
-                                  {program.name} ({program.abbreviation})
-                                </SelectItem>
-                              )
+                          {selectedDepartmentData?.bannerPrograms.map(
+                            (program: Program) => (
+                              <SelectItem
+                                key={program.id}
+                                value={program.id.toString()}
+                              >
+                                {program.name} ({program.abbreviation})
+                              </SelectItem>
                             )
                           )}
                         </SelectContent>

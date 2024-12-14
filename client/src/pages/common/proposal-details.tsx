@@ -198,6 +198,12 @@ export default function ProposalDetailsPage() {
     gcTime: 0,
   });
 
+  alert(
+    `proposal.status: ${proposal?.status}, user.id: ${user?.id} ${
+      proposal?.user.id === user?.id
+    } ${proposal?.id}`
+  );
+
   const updateStatusMutation = useMutation({
     mutationFn: async ({
       status,
@@ -726,22 +732,36 @@ export default function ProposalDetailsPage() {
                   )}
 
                   {/* Action Buttons */}
-                  {isCurrentApprover() && (
-                    <div className="flex space-x-4">
-                      <Button
-                        onClick={() => setShowApproveDialog(true)}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => setShowReturnDialog(true)}
-                      >
-                        Return
-                      </Button>
-                    </div>
-                  )}
+                  <div className="flex space-x-4">
+                    {isCurrentApprover() && (
+                      <>
+                        <Button
+                          onClick={() => setShowApproveDialog(true)}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => setShowReturnDialog(true)}
+                        >
+                          Return
+                        </Button>
+                      </>
+                    )}
+                    {proposal.status === "RETURNED" &&
+                      proposal.user.id === user?.id && (
+                        <Button
+                          onClick={() =>
+                            navigate(`/staff/proposals/${proposal.id}/resubmit`)
+                          }
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          <ArrowUpCircle className="mr-2 w-4 h-4" />
+                          Resubmit Proposal
+                        </Button>
+                      )}
+                  </div>
                 </CardContent>
               </Card>
             </div>

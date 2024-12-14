@@ -147,7 +147,7 @@ export default function CalendarPage() {
               height="calc(100vh - 320px)"
               selectable={true}
               selectMirror={true}
-              dayMaxEvents={true}
+              dayMaxEvents={3}
               select={handleDateSelect}
               eventClick={handleEventClick}
               eventContent={(eventInfo) => {
@@ -195,7 +195,7 @@ export default function CalendarPage() {
               }}
               views={{
                 dayGridMonth: {
-                  dayMaxEventRows: 4,
+                  dayMaxEventRows: 3,
                   dayHeaderFormat: { weekday: "short" },
                 },
                 timeGridWeek: {
@@ -204,7 +204,7 @@ export default function CalendarPage() {
                 multiMonthYear: {
                   multiMonthMaxColumns: 3,
                   duration: { years: 1 },
-                  dayMaxEventRows: 2,
+                  dayMaxEventRows: 3,
                   showNonCurrentDates: false,
                   dayHeaderFormat: { weekday: "short" },
                 },

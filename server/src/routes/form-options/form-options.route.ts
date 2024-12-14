@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getCreateNewProposalFormOptions } from "../../controllers/form-options.controller.js";
-import { authenticateToken } from "@/middleware/auth.middleware.js";
+import { authenticateToken } from "../../middleware/auth.middleware.js";
 
 const router = Router();
 

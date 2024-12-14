@@ -48,7 +48,7 @@ const createEmailTemplate = ({
   ">
     <!-- Logo Section -->
     <div style="text-align: center; margin-bottom: 24px;">
-      <img src="${process.env.FRONTEND_URL}/logo.png" alt="Logo" style="height: 40px;">
+      <img src="${process.env.FRONTEND_URL}/umdc-cec-logo.webp" alt="Logo" style="height: 40px;">
     </div>
 
     <div style="

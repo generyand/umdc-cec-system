@@ -198,24 +198,32 @@ export default function NewProposalPage({
   // Populate form with initial data if resubmitting
   useEffect(() => {
     if (mode === "resubmit" && proposalData) {
-      console.log("Proposal Data:", proposalData);
+      console.log("Setting form data for resubmit:", proposalData);
 
-      form.reset({
-        title: proposalData?.title || "",
-        description: proposalData?.description || "",
-        department: proposalData?.department?.id?.toString() || "",
-        program: proposalData?.program?.id?.toString() || "",
-        bannerProgram: proposalData?.bannerProgram?.id?.toString() || "",
-        partnerCommunity: proposalData?.partnerCommunity?.id?.toString() || "",
-        targetBeneficiaries: proposalData?.targetBeneficiaries || "",
-        targetArea: proposalData?.targetArea || "",
-        targetDate: proposalData?.targetDate 
+      const formValues = {
+        title: proposalData.title || "",
+        description: proposalData.description || "",
+        department: proposalData.department?.id?.toString(),
+        program: proposalData.program?.id?.toString(),
+        bannerProgram: proposalData.bannerProgram?.id?.toString(),
+        partnerCommunity: proposalData.community?.id?.toString(),
+        targetBeneficiaries: proposalData.targetBeneficiaries || "",
+        targetArea: proposalData.targetArea || "",
+        targetDate: proposalData.targetDate 
           ? new Date(proposalData.targetDate) 
           : undefined,
-        venue: proposalData?.venue || "",
-        budget: proposalData?.budget?.toString() || "",
+        venue: proposalData.venue || "",
+        budget: proposalData.budget?.toString() || "",
         attachments: undefined,
-      });
+      };
+
+      console.log("Form values being set:", formValues);
+      form.reset(formValues);
+
+      // Verify the values were set
+      setTimeout(() => {
+        console.log("Current form values:", form.getValues());
+      }, 0);
     }
   }, [mode, proposalData, form]);
 
@@ -426,11 +434,12 @@ export default function NewProposalPage({
                       <FormLabel>Department</FormLabel>
                       <FormControl>
                         <Input
-                          value={formOptions?.userDepartment?.name || ""}
-                          disabled
-                          className="bg-muted"
+                          {...field}
+                          disabled={true}
+                          value={field.value || proposalData?.department?.id?.toString() || ""}
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -443,11 +452,12 @@ export default function NewProposalPage({
                       <FormLabel>Program</FormLabel>
                       <FormControl>
                         <Input
-                          value={formOptions?.userProgram?.name || ""}
-                          disabled
-                          className="bg-muted"
+                          {...field}
+                          disabled={true}
+                          value={field.value || proposalData?.program?.id?.toString() || ""}
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -461,13 +471,12 @@ export default function NewProposalPage({
                       <FormLabel>Banner Program</FormLabel>
                       <FormControl>
                         <Input
-                          value={
-                            formOptions?.userBannerProgram?.abbreviation || ""
-                          }
-                          disabled
-                          className="bg-muted"
+                          {...field}
+                          disabled={true}
+                          value={field.value || proposalData?.bannerProgram?.id?.toString() || ""}
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

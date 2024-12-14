@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../utils/errors.js";
 import { Decimal } from "@prisma/client/runtime/library";
 import { createClient } from "@supabase/supabase-js";
+import { NotificationService } from "@/services/notification.service.js";
 
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
   console.error("Missing Supabase environment variables");
@@ -19,16 +20,6 @@ const supabase = createClient(
     },
   }
 );
-
-// Add multer types
-// interface RequestWithFiles extends Request {
-//   files?: Express.Multer.File[];
-// }
-
-// // Add this interface to extend the Request type
-// interface MulterRequest extends Request {
-//   files: Express.Multer.File[];
-// }
 
 // Get all project proposals
 export const getAllProposals: RequestHandler = async (req, res) => {
@@ -253,7 +244,6 @@ export const createProposal: RequestHandler = async (req, res) => {
     const newProposal = await prisma.projectProposal.create({
       data: {
         ...data,
-        // Create the approval records for each position in the flow
         approvals: {
           create: [
             {
@@ -280,6 +270,42 @@ export const createProposal: RequestHandler = async (req, res) => {
         approvals: true,
       },
     });
+
+    // Find CEC HEAD users to notify
+    const cecHeadUsers = await prisma.user.findMany({
+      where: {
+        position: "CEC_HEAD",
+        status: "ACTIVE",
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+      },
+    });
+
+    console.log("🔍 CEC HEAD users:", cecHeadUsers);
+
+    // Create notifications for CEC HEAD users
+    if (cecHeadUsers.length > 0) {
+      await NotificationService.createBulkNotifications(
+        cecHeadUsers.map((user) => ({
+          title: "New Proposal Requires Review",
+          content: `A new proposal "${newProposal.title}" has been submitted and requires your review as CEC Head.`,
+          type: "PROPOSAL_STATUS",
+          userId: user.id,
+          priority: "HIGH",
+          proposalId: newProposal.id,
+          departmentId: newProposal.departmentId,
+          actionUrl: `/proposals/${newProposal.id}/review`,
+          actionLabel: "Review Proposal",
+        }))
+      );
+
+      console.log("✅ Notifications sent to CEC HEAD users");
+    } else {
+      console.warn("⚠️ No active CEC HEAD users found for notification");
+    }
 
     // Handle file uploads if present
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {

@@ -2,6 +2,7 @@ import { Request, Response, RequestHandler } from "express";
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../utils/errors.js";
 import { getNextApprovalStep } from "../utils/approval.utils.js";
+import { NotificationService } from "@/services/notification.service.js";
 
 // Get all proposals that need the current user's approval
 export const getProposalsForApproval: RequestHandler = async (req, res) => {
@@ -185,93 +186,6 @@ export const getProposalsForApproval: RequestHandler = async (req, res) => {
   }
 };
 
-// Get specific proposal approval details
-// export const getProposalApprovalById: RequestHandler = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     console.log(`📃 Fetching approval details for proposal ID: ${id}`);
-
-//     const proposal = await prisma.projectProposal.findUnique({
-//       where: { id: parseInt(id) },
-//       include: {
-//         user: {
-//           select: {
-//             firstName: true,
-//             lastName: true,
-//             department: {
-//               select: {
-//                 name: true,
-//               },
-//             },
-//           },
-//         },
-//         approvals: {
-//           include: {
-//             approver: {
-//               select: {
-//                 firstName: true,
-//                 lastName: true,
-//                 position: true,
-//               },
-//             },
-//           },
-//         },
-//       },
-//     });
-
-//     if (!proposal) {
-//       console.log(`❌ Proposal with ID ${id} not found`);
-//       throw new ApiError(404, "Proposal not found");
-//     }
-
-//     console.log("✅ Successfully fetched proposal details");
-//     res.status(200).json({
-//       success: true,
-//       message: "Proposal details fetched successfully",
-//       data: proposal,
-//     });
-//   } catch (error) {
-//     console.error("❌ Error fetching proposal details:", error);
-//     if (error instanceof ApiError) throw error;
-//     throw new ApiError(500, "Failed to fetch proposal details");
-//   }
-// };
-
-// // Get approval history for a proposal
-// export const getApprovalHistory: RequestHandler = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     console.log(`📃 Fetching approval history for proposal ID: ${id}`);
-
-//     const approvalHistory = await prisma.projectApproval.findMany({
-//       where: { proposalId: parseInt(id) },
-//       include: {
-//         approver: {
-//           select: {
-//             firstName: true,
-//             lastName: true,
-//             position: true,
-//           },
-//         },
-//       },
-//       orderBy: {
-//         createdAt: "asc",
-//       },
-//     });
-
-//     console.log("✅ Successfully fetched approval history");
-//     res.status(200).json({
-//       success: true,
-//       message: "Approval history fetched successfully",
-//       data: approvalHistory,
-//     });
-//   } catch (error) {
-//     console.error("❌ Error fetching approval history:", error);
-//     if (error instanceof ApiError) throw error;
-//     throw new ApiError(500, "Failed to fetch approval history");
-//   }
-// };
-
 // // Approve a proposal
 export const approveProposal: RequestHandler = async (req, res) => {
   try {
@@ -345,52 +259,139 @@ export const approveProposal: RequestHandler = async (req, res) => {
       // Determine and set next approval step
       const nextStep = getNextApprovalStep(user.position!);
 
-      // If there's no next step, this is the final approval
-      if (!nextStep) {
-        // First update the proposal status
-        const approvedProposal = await prisma.projectProposal.update({
-          where: { id: proposal.id },
-          data: {
-            status: "APPROVED",
-            currentApprovalStep: user.position!,
-          },
-        });
-
-        // Then create the activity
-        await prisma.activity.create({
-          data: {
-            title: proposal.title,
-            description: proposal.description,
-            targetDate: proposal.targetDate,
-            status: "UPCOMING",
-            departmentId: proposal.departmentId,
-            partnerCommunityId: proposal.communityId!,
-            proposalId: proposal.id,
-            bannerProgramId: proposal.bannerProgramId || undefined,
-          },
-        });
-
-        console.log("✅ Activity created for approved proposal:", proposal.id);
-        return approvedProposal;
-      } else {
-        // Check if the proposal was resubmitted
-        if (proposal.status === "RESUBMITTED") {
-          // If resubmitted, set status back to PENDING and update current step
-          return await prisma.projectProposal.update({
+      // After determining next step
+      const result = await (async () => {
+        if (!nextStep) {
+          // Final approval case
+          const approvedProposal = await prisma.projectProposal.update({
             where: { id: proposal.id },
             data: {
-              status: "PENDING",
-              currentApprovalStep: nextStep,
+              status: "APPROVED",
+              currentApprovalStep: user.position!,
             },
           });
-        } else {
-          // If not resubmitted, just update the current step
-          return await prisma.projectProposal.update({
-            where: { id: proposal.id },
-            data: { currentApprovalStep: nextStep },
+
+          // Create activity
+          await prisma.activity.create({
+            data: {
+              title: proposal.title,
+              description: proposal.description,
+              targetDate: proposal.targetDate,
+              status: "UPCOMING",
+              departmentId: proposal.departmentId,
+              partnerCommunityId: proposal.communityId!,
+              proposalId: proposal.id,
+              bannerProgramId: proposal.bannerProgramId || undefined,
+            },
           });
+
+          // Create final approval notification
+          await NotificationService.createNotification({
+            title: "Proposal Fully Approved! 🎉",
+            content: `Your proposal "${proposal.title}" has been fully approved and is now ready for implementation.`,
+            type: "PROPOSAL_STATUS",
+            userId: proposal.userId,
+            priority: "HIGH",
+            proposalId: proposal.id,
+            departmentId: proposal.departmentId,
+            actionUrl: `/proposals/${proposal.id}`,
+            actionLabel: "View Proposal",
+          });
+
+          console.log("🔍 Notification created successfully");
+
+          return approvedProposal;
+        } else {
+          // Get the next approver(s) for notification
+          const nextApprovers = await prisma.user.findMany({
+            where: { position: nextStep },
+            select: { id: true, firstName: true, lastName: true },
+          });
+
+          if (proposal.status === "RESUBMITTED") {
+            const updatedProposal = await prisma.projectProposal.update({
+              where: { id: proposal.id },
+              data: {
+                status: "PENDING",
+                currentApprovalStep: nextStep,
+              },
+            });
+
+            // Notify proposal owner of progress
+            await NotificationService.createNotification({
+              title: "Proposal Approved by Current Reviewer",
+              content: `Your resubmitted proposal "${proposal.title}" has been approved by ${user.position} and moved to the next step.`,
+              type: "PROPOSAL_STATUS",
+              userId: proposal.userId,
+              priority: "HIGH",
+              proposalId: proposal.id,
+              departmentId: proposal.departmentId,
+              actionUrl: `/proposals/${proposal.id}`,
+              actionLabel: "View Progress",
+            });
+
+            console.log("🔍 Notification created successfully");
+
+            // Notify next approvers
+            await NotificationService.createBulkNotifications(
+              nextApprovers.map((approver) => ({
+                title: "Resubmitted Proposal Needs Review",
+                content: `A resubmitted proposal "${proposal.title}" requires your review as ${nextStep}.`,
+                type: "PROPOSAL_STATUS",
+                userId: approver.id,
+                priority: "HIGH",
+                proposalId: proposal.id,
+                departmentId: proposal.departmentId,
+                actionUrl: `/proposals/${proposal.id}/review`,
+                actionLabel: "Review Proposal",
+              }))
+            );
+
+            console.log("🔍 Notification created successfully");
+
+            return updatedProposal;
+          } else {
+            const updatedProposal = await prisma.projectProposal.update({
+              where: { id: proposal.id },
+              data: { currentApprovalStep: nextStep },
+            });
+
+            // Notify proposal owner of progress
+            await NotificationService.createNotification({
+              title: "Proposal Moves to Next Step",
+              content: `Your proposal "${proposal.title}" has been approved by ${user.position} and moved to the next approval step.`,
+              type: "PROPOSAL_STATUS",
+              userId: proposal.userId,
+              priority: "HIGH",
+              proposalId: proposal.id,
+              departmentId: proposal.departmentId,
+              actionUrl: `/proposals/${proposal.id}`,
+              actionLabel: "View Progress",
+            });
+
+            // Notify next approvers
+            await NotificationService.createBulkNotifications(
+              nextApprovers.map((approver) => ({
+                title: "New Proposal Needs Review",
+                content: `A proposal "${proposal.title}" requires your review as ${nextStep}.`,
+                type: "PROPOSAL_STATUS",
+                userId: approver.id,
+                priority: "HIGH",
+                proposalId: proposal.id,
+                departmentId: proposal.departmentId,
+                actionUrl: `/proposals/${proposal.id}/review`,
+                actionLabel: "Review Proposal",
+              }))
+            );
+
+            console.log("🔍 Notification created successfully");
+
+            return updatedProposal;
+          }
         }
-      }
+      })();
+
+      return result;
     });
 
     console.log("📊 Proposal updated:", updatedProposal);

@@ -18,7 +18,7 @@ import approvalsRoutes from "./routes/approvals/approvals.route.js";
 import { scheduleActivityStatusUpdates } from "./jobs/updateActivityStatus.js";
 import testRoutes from "./routes/tests/test.routes.js";
 import formOptionsRoutes from "./routes/form-options/form-options.route.js";
-
+import notificationsRoutes from "./routes/notifications/notifications.route.js";
 async function createServer() {
   const app = express();
 
@@ -45,6 +45,7 @@ async function createServer() {
   app.use("/api/approvals", approvalsRoutes);
   app.use("/api/tests", testRoutes);
   app.use("/api/form-options", formOptionsRoutes);
+  app.use("/api/notifications", notificationsRoutes);
 
   app.use(errorHandler);
 

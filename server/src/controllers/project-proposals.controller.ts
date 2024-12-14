@@ -297,7 +297,7 @@ export const createProposal: RequestHandler = async (req, res) => {
           priority: "HIGH",
           proposalId: newProposal.id,
           departmentId: newProposal.departmentId,
-          actionUrl: `/proposals/${newProposal.id}/review`,
+          actionUrl: `/admin/community-engagement/project-proposals/${newProposal.id}`,
           actionLabel: "Review Proposal",
         }))
       );

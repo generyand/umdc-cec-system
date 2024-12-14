@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -48,24 +48,10 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
 import { AxiosError } from "axios";
 import { useAuth } from "@/hooks/use-auth";
 import { projectProposalsService } from "@/services/api/project-proposals.service";
-
-interface Program {
-  id: number;
-  name: string;
-  abbreviation: string;
-}
-
-interface DepartmentWithPrograms {
-  id: number;
-  name: string;
-  abbreviation: string;
-  academicPrograms: Program[];
-  bannerPrograms: Program[];
-}
+import { formOptionsApi } from "@/services/api/form-options.service";
 
 const proposalFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
@@ -98,37 +84,20 @@ const proposalFormSchema = z.object({
 
 type ProposalFormValues = z.infer<typeof proposalFormSchema>;
 
-const partnerCommunities = [
-  {
-    value: "1",
-    label: "Barangay San Miguel",
-  },
-  {
-    value: "2",
-    label: "Barangay Dawis",
-  },
-  {
-    value: "3",
-    label: "Barangay Ruparan",
-  },
-];
-
 export default function NewProposalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
   const navigate = useNavigate();
   const { token, user } = useAuth();
 
-  // Fetch departments data
-  const { data: departmentsData, isLoading: isDepartmentsLoading } = useQuery({
-    queryKey: ["departmentPrograms"],
-    queryFn: () => projectProposalsService.getDepartmentPrograms(),
+  // Fetch form options data
+  const { data, isLoading: isFormOptionsLoading } = useQuery({
+    queryKey: ["formOptions"],
+    queryFn: formOptionsApi.getCreateNewProposalFormOptions,
   });
 
-  const departments = departmentsData?.data || [];
-  const selectedDepartmentData = departments.find(
-    (dept: DepartmentWithPrograms) => dept.id.toString() === selectedDepartment
-  );
+  const formOptions = data?.data;
+
+  console.log(formOptions);
 
   const handleFileDrop = useCallback(
     (
@@ -169,9 +138,9 @@ export default function NewProposalPage() {
     defaultValues: {
       title: "",
       description: "",
-      department: user?.departmentId?.toString() || "",
-      program: "",
-      bannerProgram: "",
+      department: formOptions?.data?.userDepartment?.id.toString() || "",
+      program: formOptions?.data?.userProgram?.id.toString() || "",
+      bannerProgram: formOptions?.data?.userBannerProgram?.id.toString() || "",
       partnerCommunity: "",
       targetBeneficiaries: "",
       targetArea: "",
@@ -181,14 +150,6 @@ export default function NewProposalPage() {
       attachments: undefined,
     },
   });
-
-  useEffect(() => {
-    if (user?.departmentId) {
-      const deptId = user.departmentId.toString();
-      form.setValue("department", deptId);
-      setSelectedDepartment(deptId);
-    }
-  }, [user, form]);
 
   const onSubmit = async (data: ProposalFormValues) => {
     try {
@@ -328,29 +289,14 @@ export default function NewProposalPage() {
                   name="department"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="required">Department</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={true}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="transition-all hover:border-primary/50">
-                            <SelectValue placeholder="Select department" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {departments.map((dept: DepartmentWithPrograms) => (
-                            <SelectItem
-                              key={dept.id}
-                              value={dept.id.toString()}
-                            >
-                              {dept.name} ({dept.abbreviation})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
+                      <FormLabel>Department</FormLabel>
+                      <FormControl>
+                        <Input
+                          value={formOptions?.userDepartment?.name || ""}
+                          disabled
+                          className="bg-muted"
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -360,31 +306,14 @@ export default function NewProposalPage() {
                   name="program"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="required">Program</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={true}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="transition-all hover:border-primary/50">
-                            <SelectValue placeholder="Select program" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {selectedDepartmentData?.academicPrograms.map(
-                            (program: Program) => (
-                              <SelectItem
-                                key={program.id}
-                                value={program.id.toString()}
-                              >
-                                {program.name} ({program.abbreviation})
-                              </SelectItem>
-                            )
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
+                      <FormLabel>Program</FormLabel>
+                      <FormControl>
+                        <Input
+                          value={formOptions?.userProgram?.name || ""}
+                          disabled
+                          className="bg-muted"
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -395,34 +324,16 @@ export default function NewProposalPage() {
                   name="bannerProgram"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="required">Banner Program</FormLabel>
-                      <FormDescription>
-                        Select the banner program for this proposal.
-                      </FormDescription>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={true}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="transition-all hover:border-primary/50">
-                            <SelectValue placeholder="Select banner program" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {selectedDepartmentData?.bannerPrograms.map(
-                            (program: Program) => (
-                              <SelectItem
-                                key={program.id}
-                                value={program.id.toString()}
-                              >
-                                {program.name} ({program.abbreviation})
-                              </SelectItem>
-                            )
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
+                      <FormLabel>Banner Program</FormLabel>
+                      <FormControl>
+                        <Input
+                          value={
+                            formOptions?.userBannerProgram?.abbreviation || ""
+                          }
+                          disabled
+                          className="bg-muted"
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -435,25 +346,22 @@ export default function NewProposalPage() {
                       <FormLabel className="required">
                         Partner Community
                       </FormLabel>
-                      <FormDescription>
-                        Select the partner community for this proposal.
-                      </FormDescription>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="transition-all hover:border-primary/50">
+                          <SelectTrigger>
                             <SelectValue placeholder="Select partner community" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {partnerCommunities.map((community) => (
+                          {formOptions?.partnerCommunities.map((community) => (
                             <SelectItem
-                              key={community.value}
-                              value={community.value}
+                              key={community.id}
+                              value={community.id.toString()}
                             >
-                              {community.label}
+                              {community.name}
                             </SelectItem>
                           ))}
                         </SelectContent>

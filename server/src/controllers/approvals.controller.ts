@@ -294,7 +294,7 @@ export const approveProposal: RequestHandler = async (req, res) => {
             priority: "HIGH",
             proposalId: proposal.id,
             departmentId: proposal.departmentId,
-            actionUrl: `/proposals/${proposal.id}`,
+            actionUrl: `/staff/proposals/${proposal.id}`,
             actionLabel: "View Proposal",
           });
 
@@ -313,41 +313,35 @@ export const approveProposal: RequestHandler = async (req, res) => {
               where: { id: proposal.id },
               data: {
                 status: "PENDING",
-                currentApprovalStep: nextStep,
+                currentApprovalStep: user.position!,
               },
             });
 
             // Notify proposal owner of progress
             await NotificationService.createNotification({
               title: "Proposal Approved by Current Reviewer",
-              content: `Your resubmitted proposal "${proposal.title}" has been approved by ${user.position} and moved to the next step.`,
+              content: `Your resubmitted proposal "${proposal.title}" has been approved by ${user.position}.`,
               type: "PROPOSAL_STATUS",
               userId: proposal.userId,
               priority: "HIGH",
               proposalId: proposal.id,
               departmentId: proposal.departmentId,
-              actionUrl: `/proposals/${proposal.id}`,
+              actionUrl: `/staff/proposals/${proposal.id}`,
               actionLabel: "View Progress",
             });
 
-            console.log("🔍 Notification created successfully");
-
-            // Notify next approvers
-            await NotificationService.createBulkNotifications(
-              nextApprovers.map((approver) => ({
-                title: "Resubmitted Proposal Needs Review",
-                content: `A resubmitted proposal "${proposal.title}" requires your review as ${nextStep}.`,
-                type: "PROPOSAL_STATUS",
-                userId: approver.id,
-                priority: "HIGH",
-                proposalId: proposal.id,
-                departmentId: proposal.departmentId,
-                actionUrl: `/proposals/${proposal.id}/review`,
-                actionLabel: "Review Proposal",
-              }))
-            );
-
-            console.log("🔍 Notification created successfully");
+            // Notify the same approver (not the next step)
+            await NotificationService.createNotification({
+              title: "Resubmitted Proposal Ready for Review",
+              content: `The proposal "${proposal.title}" has been resubmitted and requires your review.`,
+              type: "PROPOSAL_STATUS",
+              userId: userId!,
+              priority: "HIGH",
+              proposalId: proposal.id,
+              departmentId: proposal.departmentId,
+              actionUrl: `/admin/community-engagement/project-proposals/${proposal.id}`,
+              actionLabel: "Review Proposal",
+            });
 
             return updatedProposal;
           } else {
@@ -365,7 +359,7 @@ export const approveProposal: RequestHandler = async (req, res) => {
               priority: "HIGH",
               proposalId: proposal.id,
               departmentId: proposal.departmentId,
-              actionUrl: `/proposals/${proposal.id}`,
+              actionUrl: `/staff/proposals/${proposal.id}`,
               actionLabel: "View Progress",
             });
 
@@ -379,7 +373,7 @@ export const approveProposal: RequestHandler = async (req, res) => {
                 priority: "HIGH",
                 proposalId: proposal.id,
                 departmentId: proposal.departmentId,
-                actionUrl: `/proposals/${proposal.id}/review`,
+                actionUrl: `/admin/community-engagement/project-proposals/${proposal.id}`,
                 actionLabel: "Review Proposal",
               }))
             );
@@ -517,7 +511,7 @@ export const returnProposal: RequestHandler = async (req, res) => {
         },
         data: {
           status: "RETURNED",
-          approverUserId: userId,
+          approverUserId: userId!,
           comment,
           approvedAt: new Date(),
         },

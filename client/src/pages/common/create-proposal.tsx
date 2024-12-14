@@ -101,7 +101,7 @@ export default function NewProposalPage({
   const { token, user } = useAuth();
   const proposalData = initialData?.data?.data;
 
-  console.log("proposalData", proposalData);
+  // console.log("proposalData", proposalData);
 
   // Fetch form options data
   const { data, isLoading: isFormOptionsLoading } = useQuery({
@@ -197,27 +197,27 @@ export default function NewProposalPage({
 
   // Populate form with initial data if resubmitting
   useEffect(() => {
-    if (mode === "resubmit" && initialData) {
+    if (mode === "resubmit" && proposalData) {
+      console.log("Proposal Data:", proposalData);
+
       form.reset({
-        title: proposalData.title,
-        description: proposalData.description,
-        department: proposalData.department?.id,
-        program: proposalData.program?.id,
-        bannerProgram: proposalData.bannerProgram?.id,
-        partnerCommunity: proposalData.community?.id.toString(),
-        targetBeneficiaries: proposalData.targetBeneficiaries,
-        targetArea: proposalData.targetArea,
-        targetDate: proposalData.targetDate
-          ? new Date(proposalData.targetDate)
+        title: proposalData?.title || "",
+        description: proposalData?.description || "",
+        department: proposalData?.department?.id?.toString() || "",
+        program: proposalData?.program?.id?.toString() || "",
+        bannerProgram: proposalData?.bannerProgram?.id?.toString() || "",
+        partnerCommunity: proposalData?.partnerCommunity?.id?.toString() || "",
+        targetBeneficiaries: proposalData?.targetBeneficiaries || "",
+        targetArea: proposalData?.targetArea || "",
+        targetDate: proposalData?.targetDate 
+          ? new Date(proposalData.targetDate) 
           : undefined,
-        venue: proposalData.venue,
-        budget: proposalData.budget,
-        attachments: proposalData.attachments,
+        venue: proposalData?.venue || "",
+        budget: proposalData?.budget?.toString() || "",
+        attachments: undefined,
       });
     }
-
-    console.log("Partner Community ID", proposalData?.community?.id);
-  }, [initialData, mode, form]);
+  }, [mode, proposalData, form]);
 
   // console.log("Mode:", mode);
   // console.log("Initial Data:", initialData);

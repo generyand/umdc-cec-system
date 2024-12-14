@@ -155,10 +155,6 @@ export default function ProposalDetailsPage() {
       return response.data.data;
     },
     enabled: !!id,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-    staleTime: 0,
-    gcTime: 0,
   });
 
   // alert(
@@ -236,7 +232,7 @@ export default function ProposalDetailsPage() {
   };
 
   const formatStatus = (status: string | undefined) => {
-    if (!status) return "Unknown";
+    if (!status || typeof status !== 'string') return "Unknown";
     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   };
 

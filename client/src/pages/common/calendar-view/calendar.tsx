@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -34,25 +34,10 @@ export default function CalendarPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
-  const {
-    data: activitiesResponse,
-    isLoading,
-    // error,
-  } = useQuery({
+  const { data: activitiesResponse, isLoading } = useQuery({
     queryKey: ["activities"],
     queryFn: activitiesApi.getActivities,
   });
-
-  // const { mutate: createActivity } = useMutation({
-  //   mutationFn: activitiesApi.createActivity,
-  //   onSuccess: () => {
-  //     console.log("Activity created successfully");
-  //     // Optionally refetch activities or update state
-  //   },
-  //   onError: (error) => {
-  //     console.error("Error creating activity:", error);
-  //   },
-  // });
 
   useEffect(() => {
     if (activitiesResponse && activitiesResponse.success) {

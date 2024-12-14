@@ -11,6 +11,12 @@ import { cn } from "@/lib/utils";
 import { activitiesApi } from "@/services/api/activities.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import "./calendar.css";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Event {
   id: string;
@@ -121,103 +127,132 @@ export default function CalendarPage() {
       ) : (
         <div className="rounded-xl border shadow bg-card text-card-foreground">
           <div className="p-6">
-            <FullCalendar
-              plugins={[
-                dayGridPlugin,
-                timeGridPlugin,
-                interactionPlugin,
-                multiMonthPlugin,
-                listPlugin,
-              ]}
-              initialView="dayGridMonth"
-              headerToolbar={{
-                left: "prev,next today",
-                center: "title",
-                right:
-                  "multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay,listMonth",
-              }}
-              events={events.map((event) => ({
-                ...event,
-                id: String(event.id),
-                extendedProps: {
-                  description: event.description,
-                  proposalId: event.extendedProps?.proposalId,
-                },
-              }))}
-              height="calc(100vh - 320px)"
-              selectable={true}
-              selectMirror={true}
-              dayMaxEvents={3}
-              select={handleDateSelect}
-              eventClick={handleEventClick}
-              eventContent={(eventInfo) => {
-                return (
-                  <div
-                    className={cn(
-                      "rounded-md border-none transition-opacity hover:opacity-80 p-1",
-                      selectedEvent?.id === eventInfo.event.id &&
-                        "ring-2 ring-primary"
-                    )}
-                  >
-                    <div className="font-semibold">{eventInfo.event.title}</div>
-                    {eventInfo.view.type === "dayGridMonth" && (
-                      <div className="text-xs">
-                        {eventInfo.event.extendedProps?.description}
-                      </div>
-                    )}
-                  </div>
-                );
-              }}
-              firstDay={1}
-              weekends={true}
-              editable={true}
-              droppable={true}
-              slotMinTime="06:00:00"
-              slotMaxTime="22:00:00"
-              allDaySlot={true}
-              allDayText="All Day"
-              slotDuration="00:30:00"
-              slotLabelInterval="01:00"
-              slotLabelFormat={{
-                hour: "numeric",
-                minute: "2-digit",
-                meridiem: "short",
-              }}
-              eventTimeFormat={{
-                hour: "numeric",
-                minute: "2-digit",
-                meridiem: "short",
-              }}
-              dayHeaderFormat={{
-                weekday: "short",
-                day: "numeric",
-                omitCommas: true,
-              }}
-              views={{
-                dayGridMonth: {
-                  dayMaxEventRows: 3,
-                  dayHeaderFormat: { weekday: "short" },
-                },
-                timeGridWeek: {
-                  dayHeaderFormat: { weekday: "short", day: "numeric" },
-                },
-                multiMonthYear: {
-                  multiMonthMaxColumns: 3,
-                  duration: { years: 1 },
-                  dayMaxEventRows: 3,
-                  showNonCurrentDates: false,
-                  dayHeaderFormat: { weekday: "short" },
-                },
-                listMonth: {
-                  listDayFormat: {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
+            <TooltipProvider>
+              <FullCalendar
+                plugins={[
+                  dayGridPlugin,
+                  timeGridPlugin,
+                  interactionPlugin,
+                  multiMonthPlugin,
+                  listPlugin,
+                ]}
+                initialView="dayGridMonth"
+                headerToolbar={{
+                  left:
+                    window.innerWidth < 768 ? "prev,next" : "prev,next today",
+                  center: "title",
+                  right:
+                    window.innerWidth < 768
+                      ? "dayGridMonth,listMonth"
+                      : "multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+                }}
+                events={events.map((event) => ({
+                  ...event,
+                  id: String(event.id),
+                  extendedProps: {
+                    description: event.description,
+                    proposalId: event.extendedProps?.proposalId,
                   },
-                  listDaySideFormat: { weekday: "long" },
-                },
-              }}
-            />
+                }))}
+                height="calc(100vh - 320px)"
+                selectable={true}
+                selectMirror={true}
+                dayMaxEvents={3}
+                select={handleDateSelect}
+                eventClick={handleEventClick}
+                eventContent={(eventInfo) => {
+                  return (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div
+                          className={cn(
+                            "rounded-md border-none transition-all hover:opacity-80",
+                            "overflow-hidden max-h-full",
+                            selectedEvent?.id === eventInfo.event.id &&
+                              "ring-2 ring-primary"
+                          )}
+                        >
+                          <div className="text-sm font-semibold truncate">
+                            {eventInfo.event.title}
+                          </div>
+                          {eventInfo.view.type === "dayGridMonth" && (
+                            <div className="text-xs truncate opacity-75">
+                              {eventInfo.event.extendedProps?.description}
+                            </div>
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="font-semibold">{eventInfo.event.title}</p>
+                        <p className="text-xs">
+                          {eventInfo.event.extendedProps?.description}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                }}
+                firstDay={1}
+                weekends={true}
+                editable={true}
+                droppable={true}
+                slotMinTime="06:00:00"
+                slotMaxTime="22:00:00"
+                allDaySlot={true}
+                allDayText="All Day"
+                slotDuration="00:30:00"
+                slotLabelInterval="01:00"
+                slotLabelFormat={{
+                  hour: "numeric",
+                  minute: "2-digit",
+                  meridiem: "short",
+                }}
+                eventTimeFormat={{
+                  hour: "numeric",
+                  minute: "2-digit",
+                  meridiem: "short",
+                }}
+                dayHeaderFormat={{
+                  weekday: "short",
+                  day: "numeric",
+                  omitCommas: true,
+                }}
+                views={{
+                  dayGridMonth: {
+                    dayMaxEventRows: window.innerWidth < 768 ? 2 : 3,
+                    dayMaxEvents: window.innerWidth < 768 ? 2 : 3,
+                  },
+                  timeGridWeek: {
+                    dayMaxEvents: true,
+                    slotEventOverlap: false,
+                  },
+                  multiMonthYear: {
+                    multiMonthMaxColumns: window.innerWidth < 768 ? 1 : 3,
+                    duration: { years: 1 },
+                    dayMaxEventRows: 3,
+                    showNonCurrentDates: false,
+                  },
+                  listMonth: {
+                    listDayFormat: {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    },
+                    listDaySideFormat: { weekday: "long" },
+                  },
+                }}
+                handleWindowResize={true}
+                windowResizeDelay={100}
+                aspectRatio={1.8}
+                loading={(isLoading) => {
+                  console.log("Calendar loading:", isLoading);
+                }}
+                lazyFetching={true}
+                eventMaxStack={3}
+                // weekNumbers={true}
+                // weekText="Week "
+                // navLinks={true}
+              />
+            </TooltipProvider>
           </div>
         </div>
       )}

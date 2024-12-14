@@ -175,3 +175,47 @@
   @apply bg-primary/90 shadow-none outline-none ring-0;
   box-shadow: none !important;
 }
+
+/* Add these to your calendar.css */
+@media (max-width: 768px) {
+  .fc {
+    --fc-page-bg-color: var(--background);
+    --fc-neutral-bg-color: var(--background);
+  }
+
+  .fc .fc-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.2rem;
+  }
+
+  .fc .fc-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+  }
+
+  .fc .fc-daygrid-event {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Improve event visibility */
+.fc-event {
+  transition: all 0.2s ease;
+}
+
+.fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Better scrolling on mobile */
+.fc-scroller {
+  -webkit-overflow-scrolling: touch;
+}

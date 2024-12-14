@@ -39,6 +39,31 @@ enum ApprovalStatus {
   RESUBMITTED
 }
 
+enum NotificationType {
+  PROPOSAL_STATUS      // For proposal approval flow updates
+  ACTIVITY_REMINDER    // For upcoming activities
+  DEADLINE_ALERT       // For approaching deadlines
+  SYSTEM_UPDATE       // For system-wide announcements
+  ASSIGNMENT          // For task/role assignments
+  DOCUMENT_UPDATE     // For document updates/submissions
+  FEEDBACK           // For feedback/comments received
+  COMMUNITY_UPDATE    // For partner community updates
+  RESOURCE_ALERT     // For resource allocation/budget updates
+  COMPLIANCE         // For compliance-related notifications
+}
+
+enum NotificationPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
 model User {
   id                 String            @id @default(cuid())
   email              String            @unique
@@ -59,6 +84,7 @@ model User {
   academicProgram    AcademicProgram?  @relation(fields: [academicProgramId], references: [id])
   projectProposals   ProjectProposal[]
   approvals         ProjectApproval[]
+  notifications    Notification[]
 
   @@index([email])
   @@index([departmentId])
@@ -80,6 +106,7 @@ model Department {
   projectProposals ProjectProposal[]
   bannerPrograms   BannerProgram[]
   activities       Activity[]
+  notifications    Notification[]
 
   @@map("departments")
 }
@@ -99,6 +126,7 @@ model AcademicProgram {
   bannerProgram    BannerProgram?    @relation(fields: [bannerProgramId], references: [id])
   projectProposals ProjectProposal[]
   users            User[]
+  notifications    Notification[]
 
   @@index([departmentId])
   @@index([bannerProgramId])
@@ -121,6 +149,7 @@ model BannerProgram {
   academicPrograms AcademicProgram[] // New relation field
   projectProposals ProjectProposal[]
   activities       Activity[]
+  notifications    Notification[]
 
   // Metadata
   createdAt DateTime @default(now())
@@ -163,6 +192,7 @@ model ProjectProposal {
   activities  Activity[] // Add this relation field
   approvals          ProjectApproval[]
   currentApprovalStep UserPosition     @default(CEC_HEAD)
+  notifications    Notification[]
 
   @@index([departmentId])
   @@index([programId])
@@ -225,6 +255,7 @@ model Activity {
   // Add these new fields
   bannerProgramId   Int?
   bannerProgram     BannerProgram? @relation(fields: [bannerProgramId], references: [id])
+  notifications    Notification[]
 
   @@index([departmentId])
   @@index([partnerCommunityId])
@@ -283,6 +314,7 @@ model PartnerCommunity {
   // Relationships
   projectProposals  ProjectProposal[]
   activities        Activity[]
+  notifications    Notification[]
 
   @@index([status])
   @@index([communityType])
@@ -326,4 +358,62 @@ model ProjectApproval {
   @@index([proposalId])
   @@index([approverUserId])
   @@map("project_approvals")
+}
+
+model Notification {
+  id          String            @id @default(cuid())
+  title       String
+  content     String
+  type        NotificationType
+  priority    NotificationPriority @default(MEDIUM)
+  status      NotificationStatus   @default(UNREAD)
+  
+  // Links to related entities
+  userId      String            
+  user        User             @relation(fields: [userId], references: [id])
+  
+  // Optional relations based on notification type
+  proposalId  Int?             
+  proposal    ProjectProposal? @relation(fields: [proposalId], references: [id])
+  activityId  Int?             
+  activity    Activity?        @relation(fields: [activityId], references: [id])
+  
+  // Department relation
+  departmentId Int?            
+  department   Department?     @relation(fields: [departmentId], references: [id])
+
+  // Academic Program relation
+  academicProgramId Int?
+  academicProgram   AcademicProgram? @relation(fields: [academicProgramId], references: [id])
+
+  // Banner Program relation
+  bannerProgramId  Int?
+  bannerProgram    BannerProgram? @relation(fields: [bannerProgramId], references: [id])
+
+  // Partner Community relation
+  partnerCommunityId Int?
+  partnerCommunity   PartnerCommunity? @relation(fields: [partnerCommunityId], references: [id])
+  
+  // Action data
+  actionUrl   String?          
+  actionLabel String?          
+  
+  // Metadata
+  createdAt   DateTime         @default(now())
+  readAt      DateTime?        
+  expiresAt   DateTime?        
+  
+  // For batch notifications
+  groupId     String?         
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([departmentId])
+  @@index([academicProgramId])
+  @@index([bannerProgramId])
+  @@index([partnerCommunityId])
+  @@index([proposalId])
+  @@index([activityId])
+  @@map("notifications")
 }

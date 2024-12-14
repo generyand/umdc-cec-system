@@ -85,7 +85,17 @@ const proposalFormSchema = z.object({
 
 type ProposalFormValues = z.infer<typeof proposalFormSchema>;
 
-export default function NewProposalPage() {
+interface NewProposalPageProps {
+  mode?: "create" | "resubmit";
+  initialData?: any; // Type this properly based on your proposal interface
+  proposalId?: string;
+}
+
+export default function NewProposalPage({
+  mode = "create",
+  initialData,
+  proposalId,
+}: NewProposalPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { token, user } = useAuth();
@@ -182,6 +192,17 @@ export default function NewProposalPage() {
     }
   }, [selectedPartnerCommunityId, formOptions?.partnerCommunities, form]);
 
+  // Populate form with initial data if resubmitting
+  useEffect(() => {
+    if (mode === "resubmit" && initialData) {
+      form.reset({
+        title: initialData.title,
+        description: initialData.description,
+        // ... populate other fields
+      });
+    }
+  }, [initialData, mode, form]);
+
   const onSubmit = async (data: ProposalFormValues) => {
     try {
       setIsSubmitting(true);
@@ -207,9 +228,17 @@ export default function NewProposalPage() {
         });
       }
 
-      await projectProposalsService.createProposal(formData, token || "");
-
-      toast.success("Proposal created successfully");
+      if (mode === "resubmit") {
+        await projectProposalsService.resubmitProposal(
+          proposalId,
+          formData,
+          token || ""
+        );
+        toast.success("Proposal resubmitted successfully");
+      } else {
+        await projectProposalsService.createProposal(formData, token || "");
+        toast.success("Proposal created successfully");
+      }
 
       // Navigate based on user role
       if (user?.role === "ADMIN" || user?.role === "SUPER_ADMIN") {
@@ -306,7 +335,7 @@ export default function NewProposalPage() {
           Back to Proposals
         </Button>
         <h1 className="text-3xl font-bold tracking-tight">
-          Create New Proposal
+          {mode === "resubmit" ? "Resubmit Proposal" : "Create New Proposal"}
         </h1>
         <p className="mt-2 text-muted-foreground">
           Fill out the form below to submit a new extension program proposal.
@@ -740,8 +769,10 @@ export default function NewProposalPage() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Creating...
+                      {mode === "resubmit" ? "Resubmitting..." : "Creating..."}
                     </>
+                  ) : mode === "resubmit" ? (
+                    "Resubmit Proposal"
                   ) : (
                     "Create Proposal"
                   )}

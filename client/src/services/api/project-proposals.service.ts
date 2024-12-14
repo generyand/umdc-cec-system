@@ -112,4 +112,16 @@ export const projectProposalsService = {
       },
     });
   },
+
+  resubmitProposal: async (
+    id: string,
+    data: CreateProposalData,
+    token: string
+  ) => {
+    return await api.post(`/api/project-proposals/${id}/resubmit`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
 };

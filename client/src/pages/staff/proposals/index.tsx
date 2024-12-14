@@ -350,7 +350,9 @@ export default function StaffProposalsPage() {
                                 {formatPosition(proposal.currentApprovalStep)}
                               </span>
                             ) : proposal.status === "APPROVED" ? (
-                              <span className="text-green-600">Approved</span>
+                              <span className="text-green-600">
+                                Fully Approved
+                              </span>
                             ) : null}
                             <div className="text-xs text-muted-foreground">
                               {getApprovalProgress(proposal.approvals).progress}

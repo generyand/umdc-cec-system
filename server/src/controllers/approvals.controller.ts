@@ -373,11 +373,23 @@ export const approveProposal: RequestHandler = async (req, res) => {
         console.log("✅ Activity created for approved proposal:", proposal.id);
         return approvedProposal;
       } else {
-        // If there are more approval steps, just update the current step
-        return await prisma.projectProposal.update({
-          where: { id: proposal.id },
-          data: { currentApprovalStep: nextStep },
-        });
+        // Check if the proposal was resubmitted
+        if (proposal.status === "RESUBMITTED") {
+          // If resubmitted, set status back to PENDING and update current step
+          return await prisma.projectProposal.update({
+            where: { id: proposal.id },
+            data: {
+              status: "PENDING",
+              currentApprovalStep: nextStep,
+            },
+          });
+        } else {
+          // If not resubmitted, just update the current step
+          return await prisma.projectProposal.update({
+            where: { id: proposal.id },
+            data: { currentApprovalStep: nextStep },
+          });
+        }
       }
     });
 

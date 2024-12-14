@@ -58,7 +58,7 @@ interface Proposal {
   description: string;
   targetDate: Date;
   budget: number;
-  status: "PENDING" | "APPROVED" | "RETURNED";
+  status: "PENDING" | "APPROVED" | "RETURNED" | "RESUBMITTED";
   currentStep: UserPosition;
   createdAt: Date;
   submittedBy: {
@@ -277,6 +277,7 @@ export default function ApprovalsPage() {
                 <SelectItem value="PENDING">Pending</SelectItem>
                 <SelectItem value="APPROVED">Approved</SelectItem>
                 <SelectItem value="RETURNED">Returned</SelectItem>
+                <SelectItem value="RESUBMITTED">Resubmitted</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -329,7 +330,14 @@ export default function ApprovalsPage() {
                               Awaiting {formatPosition(proposal.currentStep)}
                             </span>
                           ) : proposal.status === "APPROVED" ? (
-                            <span className="text-green-600">Approved</span>
+                            <span className="text-green-600">
+                              Fully Approved
+                            </span>
+                          ) : proposal.status === "RESUBMITTED" ? (
+                            <span className="text-blue-600">
+                              Resubmitted to{" "}
+                              {formatPosition(proposal.currentStep)}
+                            </span>
                           ) : null}
                           <div className="text-xs text-muted-foreground">
                             {getApprovalProgress(proposal).progress}

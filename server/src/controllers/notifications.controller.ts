@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
-import { prisma } from "@/lib/prisma.js";
-import { ApiError } from "@/utils/errors.js";
+import { prisma } from "../lib/prisma.js";
+import { ApiError } from "../utils/errors.js";
 
 type NotificationStatus = "UNREAD" | "READ" | "ARCHIVED";
 

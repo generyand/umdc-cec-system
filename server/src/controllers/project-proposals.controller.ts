@@ -3,7 +3,7 @@ import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../utils/errors.js";
 import { Decimal } from "@prisma/client/runtime/library";
 import { createClient } from "@supabase/supabase-js";
-import { NotificationService } from "@/services/notification.service.js";
+import { NotificationService } from "../services/notification.service.js";
 
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
   console.error("Missing Supabase environment variables");

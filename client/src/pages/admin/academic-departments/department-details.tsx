@@ -57,6 +57,10 @@ export default function DepartmentPage() {
     return <div>Department not found</div>;
   }
 
+  const activeActivitiesCount = departmentData.activities.filter(
+    activity => activity.status !== "CANCELLED"
+  ).length;
+
   const stats = [
     {
       icon: UsersIcon,
@@ -87,7 +91,7 @@ export default function DepartmentPage() {
       iconColor: "text-green-500",
       iconBgColor: "bg-green-100",
       title: "Activities",
-      value: departmentData.activities.length,
+      value: activeActivitiesCount,
       unit: "activities",
     },
   ];

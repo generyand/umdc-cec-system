@@ -59,6 +59,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/use-auth"; // Import the auth hook
 
 // Map logos to department abbreviations using imported URLs
 const departmentLogos: Record<string, string> = {
@@ -343,7 +344,10 @@ function StatsCardSkeleton() {
   );
 }
 
-export default function DepartmentsPage() {
+export default function AcademicDepartmentsPage() {
+  const { user } = useAuth(); // Get the current user
+  const isSuperAdmin = user?.role === "SUPER_ADMIN"; // Check if user is super admin
+
   const {
     data: departmentsData,
     refetch,
@@ -492,16 +496,18 @@ export default function DepartmentsPage() {
               Generate Report
             </Button>
 
-            <DepartmentFormModal
-              mode="create"
-              onSuccess={() => refetch()}
-              trigger={
-                <Button>
-                  <Plus className="mr-2 w-4 h-4" />
-                  Add Department
-                </Button>
-              }
-            />
+            {isSuperAdmin && ( // Only render if user is super admin
+              <DepartmentFormModal
+                mode="create"
+                onSuccess={() => refetch()}
+                trigger={
+                  <Button>
+                    <Plus className="mr-2 w-4 h-4" />
+                    Add Department
+                  </Button>
+                }
+              />
+            )}
           </div>
         </div>
 

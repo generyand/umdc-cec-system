@@ -43,11 +43,11 @@ const navigationItems: NavItem[] = [
     href: "/staff/department-overview",
     icon: Building,
   },
-  {
-    title: "Programs & Projects",
-    href: "/staff/programs-projects",
-    icon: FolderKanban,
-  },
+  // {
+  //   title: "Programs & Projects",
+  //   href: "/staff/programs-projects",
+  //   icon: FolderKanban,
+  // },
   {
     title: "Proposals",
     href: "#",

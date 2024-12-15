@@ -28,24 +28,24 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   const quickLinks = [
-    {
-      title: "Create Proposal",
-      description: "Start a new extension proposal",
-      href: "/admin/community-engagement/project-proposals/new",
-      icon: FilePlus,
-    },
+    // {
+    //   title: "Create Proposal",
+    //   description: "Start a new extension proposal",
+    //   href: "/admin/community-engagement/project-proposals/new",
+    //   icon: FilePlus,
+    // },
     {
       title: "Extension Manual",
       description: "Guidelines and procedures",
       href: "/admin/documents/manual",
       icon: BookOpen,
     },
-    {
-      title: "Forms & Templates",
-      description: "Downloadable resources",
-      href: "/admin/documents/templates",
-      icon: FolderPlus,
-    },
+    // {
+    //   title: "Forms & Templates",
+    //   description: "Downloadable resources",
+    //   href: "/admin/documents/templates",
+    //   icon: FolderPlus,
+    // },
     {
       title: "Calendar",
       description: "Extension activities schedule",

@@ -27,7 +27,7 @@ import SettingsPage from "@/pages/common/settings";
 
 // Academic Department Pages
 import AcademicDepartmentsPage from "@/pages/admin/academic-departments";
-import DepartmentPage from "@/pages/admin/academic-departments/department";
+import DepartmentPage from "@/pages/admin/academic-departments/department-details";
 
 // Community Engagement Pages
 import PartnershipsAndLinkagesPage from "@/pages/admin/community-engagement/partnerships-and-linkages";

@@ -38,13 +38,7 @@ import {
 } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Link } from "react-router-dom";
 import { bannerProgramsApi } from "@/services/api/banner-programs.service";
 import {
@@ -53,134 +47,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-const MOCK_PROGRAM = {
-  id: 10,
-  name: "Baranggay at UM Magka-agapay sa Tamang Impormasyon para sa Kaunlaran",
-  abbreviation: "BUMATI KA",
-  description: "Technology literacy and information dissemination program.",
-  yearStarted: 2012,
-  status: "ACTIVE",
-  departmentId: 6,
-  createdAt: "2024-12-09T15:05:39.174Z",
-  updatedAt: "2024-12-09T15:05:39.174Z",
-  department: {
-    id: 6,
-    name: "Department of Technical Programs",
-    abbreviation: "DTP"
-  },
-  academicPrograms: [
-    {
-      id: 16,
-      name: "Bachelor of Science in Information Technology",
-      abbreviation: "BSIT",
-      totalStudents: 200
-    }
-  ],
-  activities: [
-    {
-      id: 20,
-      title: "This is a New Proposal",
-      description: "Description for the new Proposal",
-      targetDate: "2025-01-03T16:00:00.000Z",
-      status: "CANCELLED",
-      partnerCommunity: {
-        name: "Barangay Dawis",
-        communityType: "Barangay",
-        address: "Dawis, Digos City, Davao del Sur"
-      }
-    },
-    {
-      id: 22,
-      title: "Add napud tag proposal baiii",
-      description: "ljkasldkfjl;asdjf;laksjdfa",
-      targetDate: "2024-12-27T16:00:00.000Z",
-      status: "UPCOMING",
-      partnerCommunity: {
-        name: "Barangay Dawis",
-        communityType: "Barangay",
-        address: "Dawis, Digos City, Davao del Sur"
-      }
-    },
-    {
-      id: 23,
-      title: "asdfasdfasdasd",
-      description: "asdfefwaefasdfasdfaasdfasdf",
-      targetDate: "2024-12-20T16:00:00.000Z",
-      status: "UPCOMING",
-      partnerCommunity: {
-        name: "Barangay Aplaya",
-        communityType: "Barangay",
-        address: "Aplaya, Digos City, Davao del Sur"
-      }
-    },
-    {
-      id: 19,
-      title: "Testing for Creating New Proposal",
-      description: "Gi usab na nakong description para goods",
-      targetDate: "2024-12-19T16:00:00.000Z",
-      status: "UPCOMING",
-      partnerCommunity: {
-        name: "Barangay Dawis",
-        communityType: "Barangay",
-        address: "Dawis, Digos City, Davao del Sur"
-      }
-    },
-    {
-      id: 21,
-      title: "This is a Brand New Proposal",
-      description: "A new Proposal for poijasdpofijaposdf",
-      targetDate: "2024-12-17T16:00:00.000Z",
-      status: "UPCOMING",
-      partnerCommunity: {
-        name: "Barangay San Miguel",
-        communityType: "Barangay",
-        address: "San Miguel, Digos City, Davao del Sur"
-      }
-    },
-    {
-      id: 17,
-      title: "Creating a proposal",
-      description: "Description for creating a proposal",
-      targetDate: "2024-12-15T16:00:00.000Z",
-      status: "UPCOMING",
-      partnerCommunity: {
-        name: "Barangay Dawis",
-        communityType: "Barangay",
-        address: "Dawis, Digos City, Davao del Sur"
-      }
-    },
-    {
-      id: 16,
-      title: "New Proposal to Test Resubmission",
-      description: "This is a description for the resubmission of proposal",
-      targetDate: "2024-12-14T16:00:00.000Z",
-      status: "ONGOING",
-      partnerCommunity: {
-        name: "Barangay Dawis",
-        communityType: "Barangay",
-        address: "Dawis, Digos City, Davao del Sur"
-      }
-    },
-    {
-      id: 18,
-      title: "A new proposal",
-      description: "description for new proposal",
-      targetDate: "2024-12-14T16:00:00.000Z",
-      status: "ONGOING",
-      partnerCommunity: {
-        name: "Barangay Dawis",
-        communityType: "Barangay",
-        address: "Dawis, Digos City, Davao del Sur"
-      }
-    }
-  ],
-  stats: {
-    activeActivities: 7,
-    completedActivities: 0,
-    totalAcademicPrograms: 1
-  }
-};
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -219,7 +85,7 @@ function ActivitiesList({
   icon 
 }: { 
   title: string; 
-  activities: typeof MOCK_PROGRAM.activities; 
+  activities: any;
   icon: React.ReactNode;
 }) {
   return (
@@ -372,10 +238,6 @@ export default function BannerProgramDetailsPage() {
             </TooltipProvider>
             <p className="text-muted-foreground">{program.description}</p>
           </div>
-          <Button>
-            <Edit className="mr-2 w-4 h-4" />
-            Edit Program
-          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -415,30 +277,75 @@ export default function BannerProgramDetailsPage() {
         />
       </div>
 
-      {/* Activities Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <ActivitiesList
-          title="Upcoming Activities"
-          activities={groupedActivities.upcoming.sort((a, b) => 
-            new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime()
-          )}
-          icon={<Calendar className="h-5 w-5 text-blue-500" />}
-        />
-        <ActivitiesList
-          title="Ongoing Activities"
-          activities={groupedActivities.ongoing.sort((a, b) => 
-            new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime()
-          )}
-          icon={<PlayCircle className="h-5 w-5 text-yellow-500" />}
-        />
-        <ActivitiesList
-          title="Completed Activities"
-          activities={groupedActivities.completed.sort((a, b) => 
-            new Date(b.targetDate).getTime() - new Date(a.targetDate).getTime() // Reverse sort for completed
-          )}
-          icon={<CheckCircle className="h-5 w-5 text-emerald-500" />}
-        />
-      </div>
+      <Tabs defaultValue="activities" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="activities">Activities</TabsTrigger>
+          <TabsTrigger value="academic-programs">Academic Programs</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="activities">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <ActivitiesList
+              title="Upcoming Activities"
+              activities={groupedActivities.upcoming.sort((a, b) => 
+                new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime()
+              )}
+              icon={<Calendar className="h-5 w-5 text-blue-500" />}
+            />
+            <ActivitiesList
+              title="Ongoing Activities"
+              activities={groupedActivities.ongoing.sort((a, b) => 
+                new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime()
+              )}
+              icon={<PlayCircle className="h-5 w-5 text-yellow-500" />}
+            />
+            <ActivitiesList
+              title="Completed Activities"
+              activities={groupedActivities.completed.sort((a, b) => 
+                new Date(b.targetDate).getTime() - new Date(a.targetDate).getTime()
+              )}
+              icon={<CheckCircle className="h-5 w-5 text-emerald-500" />}
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="academic-programs">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg font-semibold">Academic Programs</CardTitle>
+                <Badge variant="secondary">{program.academicPrograms.length}</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Program Name</TableHead>
+                    <TableHead>Abbreviation</TableHead>
+                    <TableHead>Total Students</TableHead>
+                    {/* <TableHead className="w-[100px]">Actions</TableHead> */}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {program.academicPrograms.map((program) => (
+                    <TableRow key={program.id}>
+                      <TableCell className="font-medium">{program.name}</TableCell>
+                      <TableCell>{program.abbreviation}</TableCell>
+                      <TableCell>{program.totalStudents}</TableCell>
+                      {/* <TableCell>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </TableCell> */}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

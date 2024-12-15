@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { departmentsApi } from "@/services/api/departments.service";
 import { DepartmentSkeleton } from "@/components/admin/academic-departments/department-skeleton";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,6 +16,9 @@ import {
   CalendarClock,
   ChevronRight,
   Calendar,
+  MoreHorizontal,
+  FileText,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -88,6 +91,99 @@ export default function DepartmentPage() {
       unit: "activities",
     },
   ];
+
+  function ActivityCard({ activity }: { activity: any }) {
+    const navigate = useNavigate();
+
+    const getBadgeVariant = (status: string) => {
+      switch (status) {
+        case "UPCOMING":
+          return "default";
+        case "ONGOING":
+          return "secondary";
+        case "COMPLETED":
+          return "success";
+        default:
+          return "default";
+      }
+    };
+
+    return (
+      <Card 
+        className="overflow-hidden transition-all hover:shadow-md cursor-pointer group"
+        onClick={() => navigate(`/admin/events-and-activities/activity-management/${activity.id}`)}
+      >
+        <CardContent className="p-4">
+          <div className="space-y-3">
+            {/* Status Badge */}
+            <div className="flex items-center justify-between">
+              <Badge 
+                variant={getBadgeVariant(activity.status)}
+                className="w-fit"
+              >
+                {activity.status}
+              </Badge>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Title */}
+            <h4 className="font-medium line-clamp-2 group-hover:text-primary transition-colors">
+              {activity.title}
+            </h4>
+
+            {/* Description */}
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {activity.description}
+            </p>
+
+            {/* Banner Program (if exists) */}
+            {activity.bannerProgram && (
+              <div className="flex items-start gap-2 text-sm">
+                <FileText className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">{activity.bannerProgram.abbreviation}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {activity.bannerProgram.name}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Partner Community */}
+            {activity.partnerCommunity && (
+              <div className="flex items-start gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">{activity.partnerCommunity.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {activity.partnerCommunity.address}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Date */}
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Calendar className="h-4 w-4" />
+              {new Date(activity.targetDate).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="mx-auto space-y-8 w-full">
@@ -350,79 +446,29 @@ export default function DepartmentPage() {
                 <div className="flex gap-2 items-center">
                   <h2 className="text-xl font-semibold">Upcoming Activities</h2>
                   <span className="px-2 py-0.5 text-xs font-medium text-muted-foreground bg-muted rounded-full">
-                    {
-                      departmentData.activities.filter(
-                        (activity) => new Date(activity.targetDate) > new Date()
-                      ).length
-                    }
+                    {departmentData.activities.filter(activity => activity.status === "UPCOMING").length}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Scheduled activities and events
                 </p>
               </div>
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
             </div>
           </div>
           <div className="overflow-y-auto flex-1 p-6 scrollbar-thin">
-            {departmentData.activities.filter(
-              (activity) => new Date(activity.targetDate) > new Date()
-            ).length > 0 ? (
+            {departmentData.activities.filter(activity => activity.status === "UPCOMING").length > 0 ? (
               <div className="space-y-4">
                 {departmentData.activities
-                  .filter(
-                    (activity) => new Date(activity.targetDate) > new Date()
-                  )
+                  .filter(activity => activity.status === "UPCOMING")
+                  .sort((a, b) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime())
                   .map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="p-4 rounded-lg border transition-all hover:border-primary/20 hover:shadow-sm"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 mr-4 space-y-1 min-w-0">
-                          <h4 className="font-medium">{activity.title}</h4>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {activity.description}
-                          </p>
-                          {activity.bannerProgram && (
-                            <div className="flex gap-2 items-center mt-2">
-                              <Badge
-                                variant="outline"
-                                className="max-w-min text-xs"
-                              >
-                                {activity.bannerProgram.abbreviation}
-                              </Badge>
-                              <span className="text-sm text-muted-foreground">
-                                {activity.bannerProgram.name}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex gap-2 items-center text-muted-foreground shrink-0">
-                          <Calendar className="w-4 h-4" />
-                          <time className="text-sm">
-                            {new Date(activity.targetDate).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "long",
-                                day: "numeric",
-                                year: "numeric",
-                              }
-                            )}
-                          </time>
-                        </div>
-                      </div>
-                    </div>
+                    <ActivityCard key={activity.id} activity={activity} />
                   ))}
               </div>
             ) : (
               <div className="flex flex-col justify-center items-center p-8 text-center">
                 <CalendarClock className="mb-4 w-12 h-12 text-muted-foreground/50" />
-                <h3 className="text-lg font-semibold">
-                  No Upcoming Activities
-                </h3>
+                <h3 className="text-lg font-semibold">No Upcoming Activities</h3>
                 <p className="text-sm text-muted-foreground">
                   There are no scheduled activities at the moment.
                 </p>
@@ -439,83 +485,23 @@ export default function DepartmentPage() {
                 <div className="flex gap-2 items-center">
                   <h2 className="text-xl font-semibold">Ongoing Activities</h2>
                   <span className="px-2 py-0.5 text-xs font-medium text-muted-foreground bg-muted rounded-full">
-                    {
-                      departmentData.activities.filter((activity) => {
-                        const today = new Date();
-                        const startDate = new Date(activity.targetDate);
-                        const endDate = new Date(activity.targetDate);
-                        return startDate <= today && today <= endDate;
-                      }).length
-                    }
+                    {departmentData.activities.filter(activity => activity.status === "ONGOING").length}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Currently running activities
                 </p>
               </div>
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
             </div>
           </div>
           <div className="overflow-y-auto flex-1 p-6 scrollbar-thin">
-            {departmentData.activities.filter((activity) => {
-              const today = new Date();
-              const startDate = new Date(activity.targetDate);
-              const endDate = new Date(activity.targetDate);
-              return startDate <= today && today <= endDate;
-            }).length > 0 ? (
+            {departmentData.activities.filter(activity => activity.status === "ONGOING").length > 0 ? (
               <div className="space-y-4">
                 {departmentData.activities
-                  .filter((activity) => {
-                    const today = new Date();
-                    const startDate = new Date(activity.targetDate);
-                    const endDate = new Date(activity.targetDate);
-                    return startDate <= today && today <= endDate;
-                  })
+                  .filter(activity => activity.status === "ONGOING")
+                  .sort((a, b) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime())
                   .map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="p-4 rounded-lg border-2 transition-all border-primary/20 hover:border-primary/40 hover:shadow-sm bg-primary/5"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 mr-4 space-y-1 min-w-0">
-                          <div className="flex gap-2 items-center">
-                            <div className="w-2 h-2 rounded-full animate-pulse bg-primary" />
-                            <h4 className="font-medium">{activity.title}</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {activity.description}
-                          </p>
-                          {activity.bannerProgram && (
-                            <div className="flex gap-2 items-center mt-2">
-                              <Badge
-                                variant="outline"
-                                className="max-w-min text-xs"
-                              >
-                                {activity.bannerProgram.abbreviation}
-                              </Badge>
-                              <span className="text-sm text-muted-foreground">
-                                {activity.bannerProgram.name}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex gap-2 items-center text-muted-foreground shrink-0">
-                          <Calendar className="w-4 h-4" />
-                          <time className="text-sm">
-                            {new Date(activity.targetDate).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "long",
-                                day: "numeric",
-                                year: "numeric",
-                              }
-                            )}
-                          </time>
-                        </div>
-                      </div>
-                    </div>
+                    <ActivityCard key={activity.id} activity={activity} />
                   ))}
               </div>
             ) : (
@@ -536,90 +522,31 @@ export default function DepartmentPage() {
             <div className="flex justify-between items-center">
               <div>
                 <div className="flex gap-2 items-center">
-                  <h2 className="text-xl font-semibold">
-                    Completed Activities
-                  </h2>
+                  <h2 className="text-xl font-semibold">Completed Activities</h2>
                   <span className="px-2 py-0.5 text-xs font-medium text-muted-foreground bg-muted rounded-full">
-                    {
-                      departmentData.activities.filter(
-                        (activity) =>
-                          new Date(activity.targetDate) <= new Date()
-                      ).length
-                    }
+                    {departmentData.activities.filter(activity => activity.status === "COMPLETED").length}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Past activities and events
                 </p>
               </div>
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
             </div>
           </div>
           <div className="overflow-y-auto flex-1 p-6 scrollbar-thin">
-            {departmentData.activities.filter(
-              (activity) => new Date(activity.targetDate) <= new Date()
-            ).length > 0 ? (
+            {departmentData.activities.filter(activity => activity.status === "COMPLETED").length > 0 ? (
               <div className="space-y-4">
                 {departmentData.activities
-                  .filter(
-                    (activity) => new Date(activity.targetDate) <= new Date()
-                  )
+                  .filter(activity => activity.status === "COMPLETED")
+                  .sort((a, b) => new Date(b.targetDate).getTime() - new Date(a.targetDate).getTime())
                   .map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="p-4 rounded-lg border border-dashed transition-all hover:border-primary/20 hover:shadow-sm bg-muted/30"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 mr-4 space-y-1 min-w-0">
-                          <h4 className="font-medium text-muted-foreground">
-                            {activity.title}
-                          </h4>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {activity.description}
-                          </p>
-                          {activity.bannerProgram && (
-                            <div className="flex gap-2 items-center mt-2">
-                              <Badge variant="outline" className="text-xs">
-                                {activity.bannerProgram.abbreviation}
-                              </Badge>
-                              <span className="text-sm text-muted-foreground">
-                                {activity.bannerProgram.name}
-                              </span>
-                            </div>
-                          )}
-                          {activity.partnerCommunity && (
-                            <div className="flex gap-2 items-center mt-2">
-                              <span className="text-sm text-muted-foreground">
-                                Partner: {activity.partnerCommunity.name}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex gap-2 items-center text-muted-foreground shrink-0">
-                          <Calendar className="w-4 h-4" />
-                          <time className="text-sm">
-                            {new Date(activity.targetDate).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "long",
-                                day: "numeric",
-                                year: "numeric",
-                              }
-                            )}
-                          </time>
-                        </div>
-                      </div>
-                    </div>
+                    <ActivityCard key={activity.id} activity={activity} />
                   ))}
               </div>
             ) : (
               <div className="flex flex-col justify-center items-center p-8 text-center">
                 <CalendarCheck className="mb-4 w-12 h-12 text-muted-foreground/50" />
-                <h3 className="text-lg font-semibold">
-                  No Completed Activities
-                </h3>
+                <h3 className="text-lg font-semibold">No Completed Activities</h3>
                 <p className="text-sm text-muted-foreground">
                   There are no completed activities to display.
                 </p>

@@ -82,9 +82,40 @@ export async function getBannerProgramById(
     const bannerProgram = await prisma.bannerProgram.findUnique({
       where: { id: Number(id) },
       include: {
-        department: true,
-        academicPrograms: true,
-        projectProposals: true,
+        department: {
+          select: {
+            id: true,
+            name: true,
+            abbreviation: true,
+          },
+        },
+        academicPrograms: {
+          select: {
+            id: true,
+            name: true,
+            abbreviation: true,
+            totalStudents: true,
+          },
+        },
+        activities: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            targetDate: true,
+            status: true,
+            partnerCommunity: {
+              select: {
+                name: true,
+                communityType: true,
+                address: true,
+              },
+            },
+          },
+          orderBy: {
+            targetDate: 'desc',
+          },
+        },
       },
     });
 
@@ -96,10 +127,24 @@ export async function getBannerProgramById(
       return;
     }
 
+    // Calculate some statistics
+    const stats = {
+      activeActivities: bannerProgram.activities.filter(
+        a => a.status === 'UPCOMING' || a.status === 'ONGOING'
+      ).length,
+      completedActivities: bannerProgram.activities.filter(
+        a => a.status === 'COMPLETED'
+      ).length,
+      totalAcademicPrograms: bannerProgram.academicPrograms.length,
+    };
+
     res.status(200).json({
       success: true,
       message: "Banner program retrieved successfully",
-      data: bannerProgram,
+      data: {
+        ...bannerProgram,
+        stats,
+      },
     });
   } catch (error) {
     res.status(500).json({

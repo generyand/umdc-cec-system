@@ -150,11 +150,15 @@ export function Sidebar({ className }: SidebarProps) {
       href: "#",
       icon: Handshake,
       children: [
-        {
-          title: "Project Proposals",
-          href: "/admin/community-engagement/project-proposals",
-          icon: FileText,
-        },
+        ...(user?.role === UserRole.SUPER_ADMIN
+          ? [
+              {
+                title: "Project Proposals",
+                href: "/admin/community-engagement/project-proposals",
+                icon: FileText,
+              },
+            ]
+          : []),
         {
           title: "Banner Programs",
           href: "/admin/community-engagement/banner-programs",

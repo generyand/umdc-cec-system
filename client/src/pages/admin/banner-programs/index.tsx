@@ -341,7 +341,7 @@ const BannerProgramsPage = () => {
                         {program.activeProjects}
                       </span>
                       <span className="text-sm text-muted-foreground">
-                        ongoing
+                        upcoming/ongoing
                       </span>
                     </div>
                   </div>

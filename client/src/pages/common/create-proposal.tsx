@@ -85,23 +85,10 @@ const proposalFormSchema = z.object({
 
 type ProposalFormValues = z.infer<typeof proposalFormSchema>;
 
-interface NewProposalPageProps {
-  mode?: "create" | "resubmit";
-  initialData?: any; // Type this properly based on your proposal interface
-  proposalId?: string;
-}
-
-export default function NewProposalPage({
-  mode = "create",
-  initialData,
-  proposalId,
-}: NewProposalPageProps) {
+export default function NewProposalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { token, user } = useAuth();
-  const proposalData = initialData?.data?.data;
-
-  // console.log("proposalData", proposalData);
 
   // Fetch form options data
   const { data, isLoading: isFormOptionsLoading } = useQuery({
@@ -111,7 +98,7 @@ export default function NewProposalPage({
 
   const formOptions = data?.data;
 
-  // console.log(formOptions);
+  console.log(formOptions);
 
   const handleFileDrop = useCallback(
     (
@@ -195,41 +182,6 @@ export default function NewProposalPage({
     }
   }, [selectedPartnerCommunityId, formOptions?.partnerCommunities, form]);
 
-  // Populate form with initial data if resubmitting
-  useEffect(() => {
-    if (mode === "resubmit" && proposalData) {
-      console.log("Setting form data for resubmit:", proposalData);
-
-      const formValues = {
-        title: proposalData.title || "",
-        description: proposalData.description || "",
-        department: proposalData.department?.id?.toString(),
-        program: proposalData.program?.id?.toString(),
-        bannerProgram: proposalData.bannerProgram?.id?.toString(),
-        partnerCommunity: proposalData.community?.id?.toString(),
-        targetBeneficiaries: proposalData.targetBeneficiaries || "",
-        targetArea: proposalData.targetArea || "",
-        targetDate: proposalData.targetDate 
-          ? new Date(proposalData.targetDate) 
-          : undefined,
-        venue: proposalData.venue || "",
-        budget: proposalData.budget?.toString() || "",
-        attachments: undefined,
-      };
-
-      console.log("Form values being set:", formValues);
-      form.reset(formValues);
-
-      // Verify the values were set
-      setTimeout(() => {
-        console.log("Current form values:", form.getValues());
-      }, 0);
-    }
-  }, [mode, proposalData, form]);
-
-  // console.log("Mode:", mode);
-  // console.log("Initial Data:", initialData);
-
   const onSubmit = async (data: ProposalFormValues) => {
     try {
       setIsSubmitting(true);
@@ -255,17 +207,9 @@ export default function NewProposalPage({
         });
       }
 
-      if (mode === "resubmit") {
-        await projectProposalsService.resubmitProposal(
-          proposalId || "",
-          formData,
-          token || ""
-        );
-        toast.success("Proposal resubmitted successfully");
-      } else {
-        await projectProposalsService.createProposal(formData, token || "");
-        toast.success("Proposal created successfully");
-      }
+      await projectProposalsService.createProposal(formData, token || "");
+
+      toast.success("Proposal created successfully");
 
       // Navigate based on user role
       if (user?.role === "ADMIN" || user?.role === "SUPER_ADMIN") {
@@ -362,7 +306,7 @@ export default function NewProposalPage({
           Back to Proposals
         </Button>
         <h1 className="text-3xl font-bold tracking-tight">
-          {mode === "resubmit" ? "Resubmit Proposal" : "Create New Proposal"}
+          Create New Proposal
         </h1>
         <p className="mt-2 text-muted-foreground">
           Fill out the form below to submit a new extension program proposal.
@@ -434,12 +378,11 @@ export default function NewProposalPage({
                       <FormLabel>Department</FormLabel>
                       <FormControl>
                         <Input
-                          {...field}
-                          disabled={true}
-                          value={field.value || proposalData?.department?.id?.toString() || ""}
+                          value={formOptions?.userDepartment?.name || ""}
+                          disabled
+                          className="bg-muted"
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -452,12 +395,11 @@ export default function NewProposalPage({
                       <FormLabel>Program</FormLabel>
                       <FormControl>
                         <Input
-                          {...field}
-                          disabled={true}
-                          value={field.value || proposalData?.program?.id?.toString() || ""}
+                          value={formOptions?.userProgram?.name || ""}
+                          disabled
+                          className="bg-muted"
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -471,12 +413,13 @@ export default function NewProposalPage({
                       <FormLabel>Banner Program</FormLabel>
                       <FormControl>
                         <Input
-                          {...field}
-                          disabled={true}
-                          value={field.value || proposalData?.bannerProgram?.id?.toString() || ""}
+                          value={
+                            formOptions?.userBannerProgram?.abbreviation || ""
+                          }
+                          disabled
+                          className="bg-muted"
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -491,7 +434,6 @@ export default function NewProposalPage({
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        value={field.value}
                         defaultValue={field.value}
                       >
                         <FormControl>
@@ -798,10 +740,8 @@ export default function NewProposalPage({
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      {mode === "resubmit" ? "Resubmitting..." : "Creating..."}
+                      Creating...
                     </>
-                  ) : mode === "resubmit" ? (
-                    "Resubmit Proposal"
                   ) : (
                     "Create Proposal"
                   )}
@@ -814,5 +754,3 @@ export default function NewProposalPage({
     </motion.div>
   );
 }
-
-// Add this to your global CSS

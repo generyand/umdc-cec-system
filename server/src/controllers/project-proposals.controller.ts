@@ -338,13 +338,12 @@ export const createProposal: RequestHandler = async (req, res) => {
         // Upload files
         const attachments = await Promise.all(
           req.files.map(async (file) => {
+            // Log the file object to see its structure
+            console.log("File object:", file);
+
             const fileName = `${Date.now()}-${file.originalname}`;
             const filePath = `proposals/${newProposal.id}/${fileName}`;
 
-            console.log("Attempting to upload file:", fileName);
-
-            // Upload to Supabase with error logging
-            // @ts-ignore for now
             const { data, error } = await supabase.storage
               .from("project-proposal-attachments")
               .upload(filePath, file.buffer, {
@@ -353,29 +352,17 @@ export const createProposal: RequestHandler = async (req, res) => {
               });
 
             if (error) {
-              console.error("❌ Detailed upload error:", {
-                error,
-                fileName,
-                filePath,
-                fileSize: file.size,
-                mimeType: file.mimetype,
-              });
-              throw new ApiError(
-                500,
-                `Failed to upload file: ${error.message}`
-              );
+              console.error("Upload error:", error);
+              throw new ApiError(500, `Failed to upload file: ${error.message}`);
             }
 
-            console.log("✅ File uploaded successfully:", filePath);
-
-            // Get public URL
             const {
               data: { publicUrl },
             } = supabase.storage
               .from("project-proposal-attachments")
               .getPublicUrl(filePath);
 
-            // Create attachment record
+            // Create new attachment record
             return prisma.projectAttachment.create({
               data: {
                 proposalId: newProposal.id,
@@ -642,10 +629,21 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
 
     // Parse the form data if it's coming as a string
     const proposalData =
-      typeof req.body.data === "string" ? JSON.parse(req.body.data) : req.body;
+      typeof req.body.data === "string" ? JSON.parse(req.body.data) : req.body.data;
 
     console.log("🔄 Starting resubmission for proposal:", proposalId);
-    console.log("📝 Updated proposal data:", proposalData);
+    console.log("📝 Raw proposal data:", req.body);
+    console.log("📝 Parsed proposal data:", proposalData);
+    console.log("📝 Files:", proposalData.files);
+
+    if (!proposalData) {
+      throw new ApiError(400, "No proposal data provided");
+    }
+
+    // Validate required fields
+    if (!proposalData.budget) {
+      throw new ApiError(400, "Budget is required");
+    }
 
     // Get the proposal and check if it exists
     const proposal = await prisma.projectProposal.findUnique({
@@ -702,6 +700,9 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
         // Upload new files
         const attachments = await Promise.all(
           req.files.map(async (file) => {
+            // Log the file object to see its structure
+            console.log("File object:", file);
+
             const fileName = `${Date.now()}-${file.originalname}`;
             const filePath = `proposals/${proposal.id}/${fileName}`;
 
@@ -713,10 +714,8 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
               });
 
             if (error) {
-              throw new ApiError(
-                500,
-                `Failed to upload file: ${error.message}`
-              );
+              console.error("Upload error:", error);
+              throw new ApiError(500, `Failed to upload file: ${error.message}`);
             }
 
             const {
@@ -759,11 +758,27 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
       return await prisma.projectProposal.update({
         where: { id: proposal.id },
         data: {
-          ...proposalData, // Update with new form data
+          title: proposalData.title,
+          description: proposalData.description,
+          department: {
+            connect: { id: parseInt(proposalData.department) }
+          },
+          program: {
+            connect: { id: parseInt(proposalData.program) }
+          },
+          bannerProgram: {
+            connect: { id: proposalData.bannerProgram }
+          },
+          community: {
+            connect: { id: parseInt(proposalData.partnerCommunity) }
+          },
+          targetBeneficiaries: proposalData.targetBeneficiaries,
+          targetArea: proposalData.targetArea,
+          targetDate: new Date(proposalData.targetDate),
+          venue: proposalData.venue,
+          budget: new Decimal(proposalData.budget),
           status: "RESUBMITTED",
           currentApprovalStep: returnedApproval.approverPosition,
-          budget: new Decimal(proposalData.budget),
-          targetDate: new Date(proposalData.targetDate),
         },
         include: {
           approvals: {

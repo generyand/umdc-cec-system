@@ -13,9 +13,13 @@ import {
   type Notification,
 } from "@/services/api/notifications.service";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export function Notifications() {
+  const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
@@ -55,7 +59,7 @@ export function Notifications() {
   const unreadCount = data?.unreadCount ?? 0;
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button
           className="relative p-2 rounded-full transition-colors hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
@@ -97,6 +101,7 @@ export function Notifications() {
               <NotificationItem
                 key={notification.id}
                 notification={notification}
+                onNavigate={() => setOpen(false)}
               />
             ))
           ) : (
@@ -118,16 +123,77 @@ export function Notifications() {
   );
 }
 
-function NotificationItem({ notification }: { notification: Notification }) {
+function NotificationItem({ notification, onNavigate }: { notification: Notification; onNavigate: () => void }) {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  
+  const markAsReadMutation = useMutation({
+    mutationFn: notificationsApi.markAsRead,
+    onMutate: async (notificationIds: string[]) => {
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+
+      const previousData = queryClient.getQueryData<{
+        notifications: Notification[];
+        unreadCount: number;
+      }>(["notifications"]);
+
+      queryClient.setQueryData(
+        ["notifications"],
+        (old: typeof previousData) =>
+          old && {
+            ...old,
+            notifications: old.notifications.map((notification) =>
+              notificationIds.includes(notification.id)
+                ? { ...notification, status: NotificationStatus.READ }
+                : notification
+            ),
+            unreadCount: Math.max(0, old.unreadCount - notificationIds.length),
+          }
+      );
+
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(["notifications"], context.previousData);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  const handleClick = () => {
+    if (notification.status === NotificationStatus.UNREAD) {
+      markAsReadMutation.mutate([notification.id]);
+    }
+    // Close the dropdown first
+    onNavigate();
+    // Then navigate if there's an action URL
+    if (notification.actionUrl) {
+      setTimeout(() => {
+        navigate(notification.actionUrl!);
+      }, 0);
+    }
+  };
+
   return (
     <div
       className={cn(
-        "flex flex-col gap-1 px-4 py-2 hover:bg-gray-100 transition-colors",
+        "flex flex-col gap-1 px-4 py-2 hover:bg-gray-100 transition-colors cursor-pointer",
         notification.status === NotificationStatus.UNREAD && "bg-accent/10"
       )}
+      onClick={handleClick}
     >
       {notification.actionUrl ? (
-        <Link to={notification.actionUrl} className="flex flex-col gap-1">
+        <Link 
+          to={notification.actionUrl} 
+          className="flex flex-col gap-1"
+          onClick={(e) => {
+            e.preventDefault();
+            handleClick();
+          }}
+        >
           <NotificationContent notification={notification} />
         </Link>
       ) : (

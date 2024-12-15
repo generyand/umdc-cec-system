@@ -705,11 +705,11 @@ export default function ProposalDetailsPage() {
                       </>
                     )}
                     {proposal.status === "RETURNED" &&
-                      proposal.user.id === user?.id && (
+                      proposal?.user?.id === user?.id && (
                         <Button
                           onClick={() =>
                             navigate(
-                              `/staff/proposals/edit-proposal/${proposal.id}`
+                              `/staff/proposals/edit-for-resubmission/${proposal.id}`
                             )
                           }
                           className="bg-blue-600 hover:bg-blue-700"
@@ -751,9 +751,9 @@ export default function ProposalDetailsPage() {
                                     // Hide line after current step or if returned
                                     opacity:
                                       proposal.status === "RETURNED" &&
-                                      APPROVAL_SEQUENCE.indexOf(
-                                        step.role as ApprovalRole
-                                      ) >=
+                                        APPROVAL_SEQUENCE.indexOf(
+                                          step.role as ApprovalRole
+                                        ) >=
                                         APPROVAL_SEQUENCE.indexOf(
                                           proposal.currentApprovalStep as ApprovalRole
                                         )
@@ -767,10 +767,10 @@ export default function ProposalDetailsPage() {
                                     step.status === "APPROVED"
                                       ? "complete"
                                       : step.status === "RETURNED"
-                                      ? "pending" // Reset to pending state if returned
-                                      : step.status === "PENDING"
-                                      ? "pending"
-                                      : "inProgress"
+                                        ? "pending" // Reset to pending state if returned
+                                        : step.status === "PENDING"
+                                          ? "pending"
+                                          : "inProgress"
                                   }
                                 />
                               )}
@@ -782,19 +782,18 @@ export default function ProposalDetailsPage() {
                                   step.status === "APPROVED"
                                     ? "approved"
                                     : step.status === "RETURNED"
-                                    ? "returned" // Add new animation state for returned
-                                    : "animate"
+                                      ? "returned" // Add new animation state for returned
+                                      : "animate"
                                 }
                                 className="relative z-10"
                               >
                                 <div
-                                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                    step.status === "APPROVED"
-                                      ? "bg-green-100 text-green-600 ring-2 ring-green-600"
-                                      : step.status === "RETURNED"
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center ${step.status === "APPROVED"
+                                    ? "bg-green-100 text-green-600 ring-2 ring-green-600"
+                                    : step.status === "RETURNED"
                                       ? "bg-red-100 text-red-600 ring-2 ring-red-600"
                                       : "bg-gray-100 text-gray-600 ring-2 ring-gray-300"
-                                  }`}
+                                    }`}
                                 >
                                   {index + 1}
                                 </div>
@@ -815,7 +814,7 @@ export default function ProposalDetailsPage() {
                                   )}
                                   {step.status === "PENDING" &&
                                     step.role ===
-                                      proposal.currentApprovalStep &&
+                                    proposal.currentApprovalStep &&
                                     proposal.status !== "RETURNED" && (
                                       <p className="mt-1 text-xs text-amber-600">
                                         Note: Approval estimation is within 3
@@ -825,15 +824,14 @@ export default function ProposalDetailsPage() {
                                     )}
                                 </div>
                                 <span
-                                  className={`px-2 py-1 text-xs font-medium rounded-full inline-flex items-center gap-1 ${
-                                    step.status === "APPROVED"
-                                      ? "bg-green-100 text-green-600"
-                                      : step.status === "RETURNED"
+                                  className={`px-2 py-1 text-xs font-medium rounded-full inline-flex items-center gap-1 ${step.status === "APPROVED"
+                                    ? "bg-green-100 text-green-600"
+                                    : step.status === "RETURNED"
                                       ? "bg-red-100 text-red-600"
                                       : step.status === "RESUBMITTED"
-                                      ? "bg-blue-100 text-blue-600"
-                                      : "bg-gray-100 text-gray-600"
-                                  }`}
+                                        ? "bg-blue-100 text-blue-600"
+                                        : "bg-gray-100 text-gray-600"
+                                    }`}
                                 >
                                   {step.status === "APPROVED" ? (
                                     <Check className="w-3 h-3" />

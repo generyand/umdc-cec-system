@@ -103,6 +103,8 @@ export const markAsRead: RequestHandler = async (req, res) => {
       },
     });
 
+    console.log("Notifications marked as read:", notificationIds);
+
     res.status(200).json({
       success: true,
       message: "Notifications marked as read",

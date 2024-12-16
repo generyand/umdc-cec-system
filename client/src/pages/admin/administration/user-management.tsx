@@ -33,6 +33,9 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  ChevronRight,
+  Info,
+  Building2,
 } from "lucide-react";
 import {
   Form,
@@ -59,7 +62,11 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { UserPosition, UserRole } from "@/types/user.types";
-import axios from "axios";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Department {
   id: number;
@@ -78,6 +85,7 @@ interface User {
   department: Department | null;
   contactNumber: string | null;
   status: "ACTIVE" | "INACTIVE";
+  bannerProgram: BannerProgram | null;
 }
 
 interface BannerProgram {
@@ -251,7 +259,7 @@ export default function UserManagementPage() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Department</TableHead>
+                <TableHead className="min-w-[250px]">Department & Program</TableHead>
                 <TableHead>Position</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Contact</TableHead>
@@ -757,7 +765,7 @@ export default function UserManagementPage() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Department</TableHead>
+              <TableHead className="min-w-[250px]">Department & Program</TableHead>
               <TableHead>Position</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Contact</TableHead>
@@ -772,7 +780,34 @@ export default function UserManagementPage() {
                   {`${user.firstName} ${user.lastName}`}
                 </TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.department?.name ?? "—"}</TableCell>
+                <TableCell>
+                  {user.department ? (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 font-medium text-sm">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        {user.department.name}
+                      </div>
+                      {user.bannerProgram && user.position === "FOCAL_PERSON" && (
+                        <div className="flex items-center text-xs text-muted-foreground pl-6">
+                          <ChevronRight className="h-3 w-3 mr-1 shrink-0" />
+                          <span className="font-medium truncate">
+                            {user.bannerProgram.abbreviation}
+                          </span>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-3 w-3 ml-1 text-muted-foreground/50 hover:text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-[200px]">
+                              <p className="text-xs">{user.bannerProgram.name}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </TableCell>
                 <TableCell>
                   {user.position ? formatPosition(user.position) : "—"}
                 </TableCell>

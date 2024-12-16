@@ -23,7 +23,6 @@ interface ResubmitProposalData {
   title: string;
   description: string;
   department: string;
-  program: string;
   bannerProgram: string;
   partnerCommunity: string;
   targetBeneficiaries: string;

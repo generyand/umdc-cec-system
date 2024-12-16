@@ -70,18 +70,17 @@ const proposalFormSchema = z.object({
   budget: z.string().regex(/^\d+$/, "Must be a valid number"),
   attachments: z
     .custom<FileList>()
-    .nullable()
-    .optional()
+    .refine((files) => files && files.length > 0, "Please upload at least one document")
     .refine((files) => {
-      if (!files) return true;
+      if (!files) return false;
       return files.length > 0;
     }, "Please upload at least one document")
     .refine((files) => {
-      if (!files) return true;
+      if (!files) return false;
       return Array.from(files).every((file) => file.size <= 5 * 1024 * 1024);
     }, "Each file must be less than 5MB")
     .refine((files) => {
-      if (!files) return true;
+      if (!files) return false;
       return Array.from(files).every((file) => file.type === "application/pdf");
     }, "Only PDF files are allowed"),
 });
@@ -699,7 +698,7 @@ console.log("Community ID:", proposalData?.community?.id);
                                 "flex flex-col justify-center items-center p-6 w-full rounded-lg border-2 border-dashed",
                                 "transition-colors duration-200 ease-in-out",
                                 "hover:border-primary/50",
-                                "cursor-pointer"
+                                "cursor-pointer",
                               )}
                               onClick={() =>
                                 document.getElementById("file-upload")?.click()

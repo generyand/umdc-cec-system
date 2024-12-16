@@ -353,6 +353,11 @@ export default function StaffProposalsPage() {
                               <span className="text-green-600">
                                 Fully Approved
                               </span>
+                            ) : proposal.status === "RESUBMITTED" ? (
+                              <span className="text-blue-600">
+                                Resubmitted to{" "}
+                                {formatPosition(proposal.currentApprovalStep)}
+                              </span>
                             ) : null}
                             <div className="text-xs text-muted-foreground">
                               {getApprovalProgress(proposal.approvals).progress}

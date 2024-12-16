@@ -20,6 +20,21 @@ interface CreateProposalData {
   attachments: FileList;
 }
 
+interface ResubmitProposalData {
+  title: string;
+  description: string;
+  department: string;
+  program: string;
+  bannerProgram: string;
+  partnerCommunity: string;
+  targetBeneficiaries: string;
+  targetArea: string;
+  targetDate: Date;
+  venue: string;
+  budget: string;
+  files?: File[];
+}
+
 type ProposalStatus = "PENDING" | "APPROVED" | "RETURNED";
 
 export const projectProposalsService = {
@@ -113,15 +128,43 @@ export const projectProposalsService = {
     });
   },
 
-  resubmitProposal: async (
-    id: string,
-    data: CreateProposalData,
-    token: string
-  ) => {
-    return await api.post(`/api/project-proposals/${id}/resubmit`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  resubmitProposal: async (id: string, data: ResubmitProposalData, token: string) => {
+    console.log("Service Input Data:", data);
+
+    try {
+      const formData = new FormData();
+      
+      // Add files directly to FormData, not nested in data
+      if (data.files) {
+        data.files.forEach((file) => {
+          formData.append('files', file);
+        });
+      }
+
+      // Remove files from the data object before sending
+      const { files, ...dataWithoutFiles } = data;
+      
+      // Add the rest of the data
+      formData.append('data', JSON.stringify(dataWithoutFiles));
+
+      const response = await api.put(
+        `/api/project-proposals/${id}/resubmit`, 
+        formData,  // Send formData directly
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      console.log("FormData:", formData);
+      
+      console.log("API Response:", response);
+      return response;
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
+    }
   },
 };

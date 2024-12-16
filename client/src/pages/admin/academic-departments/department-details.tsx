@@ -232,12 +232,6 @@ export default function DepartmentPage() {
             {departmentData.department.description}
           </p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline">Download Report</Button>
-          <Button className="flex gap-2 items-center">
-            Create New Program <ArrowUpRight className="w-4 h-4" />
-          </Button>
-        </div>
       </div>
 
       {/* Quick Stats */}

@@ -34,9 +34,9 @@ export default function StaffHomePage() {
       icon: FileText,
     },
     {
-      title: "My Projects",
+      title: "Forms & Templates",
       description: "View and manage your projects",
-      href: "/staff/projects",
+      href: "/staff/documents/forms-and-templates",
       icon: ClipboardList,
     },
     {

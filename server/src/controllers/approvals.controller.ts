@@ -461,7 +461,22 @@ export const returnProposal: RequestHandler = async (req, res) => {
     // 2. Get the proposal
     const proposal = await prisma.projectProposal.findUnique({
       where: { id: parseInt(id) },
-      include: { approvals: true },
+      include: { 
+        approvals: true,
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true
+          }
+        },
+        department: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      },
     });
 
     if (!proposal) {
@@ -517,6 +532,23 @@ export const returnProposal: RequestHandler = async (req, res) => {
         },
       });
       console.log("✅ Approval record updated");
+
+      // Create notification for the proposal owner
+      await prisma.notification.create({
+        data: {
+          title: "Proposal Returned for Revision",
+          content: `Your proposal "${proposal.title}" has been returned by ${user?.position} for revision. Comment: ${comment}`,
+          type: "PROPOSAL_STATUS",
+          priority: "HIGH",
+          status: "UNREAD",
+          userId: proposal.user.id,
+          proposalId: proposal.id,
+          departmentId: proposal.departmentId,
+          actionUrl: `/staff/proposals/${proposal.id}`,
+          actionLabel: "View Proposal",
+          groupId: `proposal-${proposal.id}-return`,
+        },
+      });
 
       // Update proposal status while explicitly keeping the same approval step
       console.log("📝 Updating proposal status...");

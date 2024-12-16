@@ -248,12 +248,10 @@ const App = () => {
             <Route path="proposals/new" element={<NewProposalPage />} />
             <Route path="proposals" element={<StaffProposalsPage />} />
             <Route path="proposals/:id" element={<ProposalDetailsPage />} />
-            <Route
-              path="proposals/edit-proposal/:proposalId"
-              element={<ResubmitProposalPage />}
-            />
+            <Route path="proposals/edit-for-resubmission/:id" element={<ResubmitProposalPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="calendar" element={<CalendarPage />} />
+
           </Route>
 
           {/* Public routes */}

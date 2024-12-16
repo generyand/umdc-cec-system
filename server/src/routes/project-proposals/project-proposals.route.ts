@@ -52,6 +52,6 @@ router.get(
 router.get("/user/:userId", authenticateToken, getProposalsByUser);
 
 // Resubmit proposal
-router.post("/:id/resubmit", authenticateToken, resubmitProposal);
+router.put("/:id/resubmit", authenticateToken, upload.array("files"), resubmitProposal);
 
 export default router;

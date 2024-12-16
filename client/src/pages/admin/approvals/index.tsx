@@ -179,7 +179,7 @@ export default function ApprovalsPage() {
     ).length;
 
     return {
-      progress: `${approvedSteps}/${totalSteps} steps`,
+      progress: `${approvedSteps + 1 === totalSteps ? totalSteps : approvedSteps}/${totalSteps} steps`,
       currentApprover: proposal.currentStep,
     };
   };

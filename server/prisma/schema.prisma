@@ -82,6 +82,8 @@ model User {
   department         Department?       @relation(fields: [departmentId], references: [id])
   academicProgramId  Int?
   academicProgram    AcademicProgram?  @relation(fields: [academicProgramId], references: [id])
+  bannerProgramId    Int?             // Changed from String to Int
+  bannerProgram      BannerProgram?   @relation(fields: [bannerProgramId], references: [id])
   projectProposals   ProjectProposal[]
   approvals         ProjectApproval[]
   notifications    Notification[]
@@ -89,6 +91,7 @@ model User {
   @@index([email])
   @@index([departmentId])
   @@index([academicProgramId])
+  @@index([bannerProgramId])
   @@map("users")
 }
 
@@ -150,6 +153,7 @@ model BannerProgram {
   projectProposals ProjectProposal[]
   activities       Activity[]
   notifications    Notification[]
+  users            User[]   // Add this opposite relation
 
   // Metadata
   createdAt DateTime @default(now())

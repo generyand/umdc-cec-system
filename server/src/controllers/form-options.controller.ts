@@ -13,7 +13,7 @@ export const getCreateNewProposalFormOptions: RequestHandler = async (
       throw new ApiError(401, "User not authenticated");
     }
 
-    // Get user with their department and academic program
+    // Get user with their department and banner program directly
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -24,18 +24,11 @@ export const getCreateNewProposalFormOptions: RequestHandler = async (
             abbreviation: true,
           },
         },
-        academicProgram: {
+        bannerProgram: {
           select: {
             id: true,
             name: true,
             abbreviation: true,
-            bannerProgram: {
-              select: {
-                id: true,
-                name: true,
-                abbreviation: true,
-              },
-            },
           },
         },
       },
@@ -67,12 +60,7 @@ export const getCreateNewProposalFormOptions: RequestHandler = async (
           name: user.department?.name,
           abbreviation: user.department?.abbreviation,
         },
-        userProgram: {
-          id: user.academicProgram?.id,
-          name: user.academicProgram?.name,
-          abbreviation: user.academicProgram?.abbreviation,
-        },
-        userBannerProgram: user.academicProgram?.bannerProgram || null,
+        userBannerProgram: user.bannerProgram || null,
         partnerCommunities: partnerCommunities.map((community) => ({
           id: community.id,
           name: community.name,

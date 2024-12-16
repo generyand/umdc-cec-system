@@ -66,7 +66,7 @@ export const getCreateNewProposalFormOptions: RequestHandler = async (
           name: community.name,
           type: community.communityType,
           address: community.address,
-          label: `${community.name} (${community.communityType})`,
+          // label: `${community.name} (${community.communityType})`,
         })),
       },
     });

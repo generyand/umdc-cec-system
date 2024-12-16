@@ -223,11 +223,6 @@ export const createProposal: RequestHandler = async (req, res) => {
           id: Number(proposalData.department),
         },
       },
-      program: {
-        connect: {
-          id: Number(proposalData.program),
-        },
-      },
       community: {
         connect: {
           id: Number(partnerCommunity),
@@ -265,7 +260,6 @@ export const createProposal: RequestHandler = async (req, res) => {
       },
       include: {
         department: true,
-        program: true,
         user: true,
         community: true,
         bannerProgram: true,
@@ -383,7 +377,6 @@ export const createProposal: RequestHandler = async (req, res) => {
             where: { id: newProposal.id },
             include: {
               department: true,
-              program: true,
               user: true,
               community: true,
               attachments: true,
@@ -795,12 +788,6 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
           description: proposalData.description,
           department: {
             connect: { id: parseInt(proposalData.department) }
-          },
-          program: {
-            connect: { id: parseInt(proposalData.program) }
-          },
-          bannerProgram: {
-            connect: { id: proposalData.bannerProgram }
           },
           community: {
             connect: { id: parseInt(proposalData.partnerCommunity) }

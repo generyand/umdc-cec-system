@@ -433,7 +433,7 @@ export default function NewProposalPage() {
                         <SelectContent>
                           {formOptions?.partnerCommunities.map((community) => (
                             <SelectItem key={community.id} value={community.id.toString()}>
-                              {community.label}
+                              {community.name}
                             </SelectItem>
                           ))}
                         </SelectContent>

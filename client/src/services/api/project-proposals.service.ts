@@ -4,7 +4,6 @@ interface CreateProposalData {
   title: string;
   description: string;
   department: string;
-  program: string;
   bannerProgram: {
     connect: {
       id: number;
@@ -46,7 +45,6 @@ export const projectProposalsService = {
       title: data.title,
       description: data.description,
       department: data.department,
-      program: data.program,
       bannerProgram: data.bannerProgram,
       partnerCommunity: data.partnerCommunity,
       targetBeneficiaries: data.targetBeneficiaries,

@@ -58,7 +58,6 @@ const proposalFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
   description: z.string().min(20, "Description must be at least 20 characters"),
   department: z.string().min(1, "Please select a department"),
-  program: z.string().min(1, "Please select a program"),
   bannerProgram: z.string().min(1, "Please select a banner program"),
   partnerCommunity: z.string().min(1, "Please select a partner community"),
   targetBeneficiaries: z.string().min(5, "Please specify target beneficiaries"),
@@ -140,7 +139,6 @@ export default function NewProposalPage() {
       title: "",
       description: "",
       department: "",
-      program: "",
       bannerProgram: "",
       partnerCommunity: "",
       targetBeneficiaries: "",
@@ -155,15 +153,12 @@ export default function NewProposalPage() {
   // Update form values when formOptions loads
   useEffect(() => {
     if (formOptions) {
-      form.setValue(
-        "department",
-        formOptions.userDepartment?.id.toString() || ""
-      );
-      form.setValue("program", formOptions.userProgram?.id.toString() || "");
-      form.setValue(
-        "bannerProgram",
-        formOptions.userBannerProgram?.id.toString() || ""
-      );
+      if (formOptions.userDepartment) {
+        form.setValue("department", formOptions.userDepartment.id.toString());
+      }
+      if (formOptions.userBannerProgram) {
+        form.setValue("bannerProgram", formOptions.userBannerProgram.id.toString());
+      }
     }
   }, [formOptions, form]);
 
@@ -369,13 +364,13 @@ export default function NewProposalPage() {
                   />
                 </div>
 
-                {/* Department and Program - Side by side */}
+                {/* Department and Banner Program - Side by side */}
                 <FormField
                   control={form.control}
                   name="department"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Department</FormLabel>
+                      <FormLabel className="required">Department</FormLabel>
                       <FormControl>
                         <Input
                           value={formOptions?.userDepartment?.name || ""}
@@ -383,47 +378,32 @@ export default function NewProposalPage() {
                           className="bg-muted"
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="program"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Program</FormLabel>
-                      <FormControl>
-                        <Input
-                          value={formOptions?.userProgram?.name || ""}
-                          disabled
-                          className="bg-muted"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                {/* Banner Program and Partner Community - Side by side */}
                 <FormField
                   control={form.control}
                   name="bannerProgram"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Banner Program</FormLabel>
+                      <FormLabel className="required">Banner Program</FormLabel>
                       <FormControl>
                         <Input
                           value={
-                            formOptions?.userBannerProgram?.abbreviation || ""
+                            formOptions?.userBannerProgram?.abbreviation || "No Banner Program Assigned"
                           }
                           disabled
                           className="bg-muted"
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
+                {/* Partner Community and Target Beneficiaries - Side by side */}
                 <FormField
                   control={form.control}
                   name="partnerCommunity"
@@ -433,21 +413,27 @@ export default function NewProposalPage() {
                         Partner Community
                       </FormLabel>
                       <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Update target area when partner community changes
+                          const selectedCommunity = formOptions?.partnerCommunities.find(
+                            (community) => community.id.toString() === value
+                          );
+                          if (selectedCommunity) {
+                            form.setValue("targetArea", selectedCommunity.address);
+                          }
+                        }}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select partner community" />
+                            <SelectValue placeholder="Select a partner community" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {formOptions?.partnerCommunities.map((community) => (
-                            <SelectItem
-                              key={community.id}
-                              value={community.id.toString()}
-                            >
-                              {community.name}
+                            <SelectItem key={community.id} value={community.id.toString()}>
+                              {community.label}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -457,7 +443,6 @@ export default function NewProposalPage() {
                   )}
                 />
 
-                {/* Target Beneficiaries and Target Area - Side by side */}
                 <FormField
                   control={form.control}
                   name="targetBeneficiaries"

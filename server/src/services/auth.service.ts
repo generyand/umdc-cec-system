@@ -21,6 +21,7 @@ interface RegisterParams {
   firstName: string;
   lastName: string;
   departmentId: number | null;
+  bannerProgramId: number | null;
   role: UserRole;
   position?: UserPosition;
   contactNumber?: string;
@@ -37,6 +38,7 @@ export const authService = {
     firstName,
     lastName,
     departmentId,
+    bannerProgramId,
     role,
     position,
     contactNumber,
@@ -44,13 +46,15 @@ export const authService = {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const normalizedDepartmentId = departmentId === 0 ? null : departmentId;
+    const normalizedBannerProgramId = bannerProgramId === 0 ? null : bannerProgramId;
 
     const user = await prisma.user.create({
       data: {
         email,
         firstName,
         lastName,
-        departmentId,
+        departmentId: normalizedDepartmentId,
+        bannerProgramId: normalizedBannerProgramId,
         contactNumber,
         role,
         position,
@@ -62,6 +66,14 @@ export const authService = {
         firstName: true,
         lastName: true,
         departmentId: true,
+        bannerProgramId: true,
+        bannerProgram: {
+          select: {
+            id: true,
+            name: true,
+            abbreviation: true,
+          }
+        },
         contactNumber: true,
         role: true,
         position: true,

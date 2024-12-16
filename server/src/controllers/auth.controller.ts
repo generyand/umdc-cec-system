@@ -17,6 +17,7 @@ export const register: Handler = async (req, res, next) => {
       role,
       position,
       contactNumber,
+      bannerProgramId,
     } = req.body;
 
     console.log("🔍 Registering user:", req.body);
@@ -25,6 +26,7 @@ export const register: Handler = async (req, res, next) => {
 
     // Convert 'none' departmentId to null
     const normalizedDepartmentId = departmentId === 0 ? null : departmentId;
+    const normalizedBannerProgramId = bannerProgramId === 0 ? null : bannerProgramId;
 
     // Check if email exists first
     const existingUser = await prisma.user.findUnique({
@@ -51,6 +53,7 @@ export const register: Handler = async (req, res, next) => {
       departmentId: normalizedDepartmentId,
       role,
       position,
+      bannerProgramId: normalizedBannerProgramId,
       contactNumber,
     });
 

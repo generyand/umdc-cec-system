@@ -76,7 +76,7 @@ interface ApprovalParams {
 
 interface ReturnParams {
   proposalId: number;
-  comment: string;  // Required for returns
+  comment: string;
 }
 
 export default function ApprovalsPage() {

@@ -24,7 +24,8 @@ async function createServer() {
 
   app.use(
     cors({
-      origin: process.env.FRONTEND_URL || "http://localhost:5173",
+      // origin: process.env.FRONTEND_URL || "http://localhost:5173",
+      origin: true,
       credentials: true,
     })
   );
@@ -59,7 +60,7 @@ async function bootstrap() {
     const app = await createServer();
     const config = initializeConfig();
 
-    const server = app.listen(config.port, () => {
+    const server = app.listen(Number(config.port), "0.0.0.0", () => {
       console.log(`🚀 Server is running on port ${config.port}`);
     });
 

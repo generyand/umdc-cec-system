@@ -3,6 +3,8 @@ import {
   Mail,
   Lock,
   User,
+  Eye,
+  EyeOff,
   // ... other icons
 } from "lucide-react";
 
@@ -11,5 +13,7 @@ export const Icons = {
   mail: Mail,
   lock: Lock,
   user: User,
+  eye: Eye,
+  eyeOff: EyeOff,
   // ... other icon mappings
 };

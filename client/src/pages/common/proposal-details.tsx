@@ -473,7 +473,7 @@ export default function ProposalDetailsPage() {
                     </h1>
                     <div className="flex items-center text-sm text-gray-600">
                       <span className="font-medium">
-                        {proposal.user.firstName} {proposal.user.lastName}
+                        {proposal?.user?.firstName} {proposal?.user?.lastName}
                       </span>
                       <span className="mx-2">•</span>
                       <span>

@@ -308,80 +308,46 @@ export const approveProposal: RequestHandler = async (req, res) => {
             select: { id: true, firstName: true, lastName: true },
           });
 
-          if (proposal.status === "RESUBMITTED") {
-            const updatedProposal = await prisma.projectProposal.update({
-              where: { id: proposal.id },
-              data: {
-                status: "PENDING",
-                currentApprovalStep: nextStep,
-              },
-            });
+          // Always update to PENDING status when moving to next step
+          const updatedProposal = await prisma.projectProposal.update({
+            where: { id: proposal.id },
+            data: { 
+              status: "PENDING",  // Always set to PENDING when moving to next step
+              currentApprovalStep: nextStep 
+            },
+          });
 
-            // Notify proposal owner of progress
-            await NotificationService.createNotification({
-              title: "Proposal Approved by Current Reviewer",
-              content: `Your resubmitted proposal "${proposal.title}" has been approved by ${user.position}.`,
-              type: "PROPOSAL_STATUS",
-              userId: proposal.userId,
-              priority: "HIGH",
-              proposalId: proposal.id,
-              departmentId: proposal.departmentId,
-              actionUrl: `/staff/proposals/${proposal.id}`,
-              actionLabel: "View Progress",
-            });
+          // Notify proposal owner of progress
+          await NotificationService.createNotification({
+            title: "Proposal Moves to Next Step",
+            content: `Your proposal "${proposal.title}" has been approved by ${user.position} and moved to the next approval step.`,
+            type: "PROPOSAL_STATUS",
+            userId: proposal.userId,
+            priority: "HIGH",
+            proposalId: proposal.id,
+            departmentId: proposal.departmentId,
+            actionUrl: `/staff/proposals/${proposal.id}`,
+            actionLabel: "View Progress",
+          });
 
-            // Notify the same approver (not the next step)
-            await NotificationService.createNotification({
-              title: "Resubmitted Proposal Ready for Review",
-              content: `The proposal "${proposal.title}" has been resubmitted and requires your review.`,
+          // Notify next approvers
+          await NotificationService.createBulkNotifications(
+            nextApprovers.map((approver) => ({
+              title: "New Proposal Needs Review",
+              content: `A proposal "${proposal.title}" requires your review as ${nextStep}.`,
               type: "PROPOSAL_STATUS",
-              userId: userId!,
+              userId: approver.id,
               priority: "HIGH",
               proposalId: proposal.id,
               departmentId: proposal.departmentId,
               actionUrl: `/admin/community-engagement/project-proposals/${proposal.id}`,
               actionLabel: "Review Proposal",
-            });
+            }))
+          );
 
-            return updatedProposal;
-          } else {
-            const updatedProposal = await prisma.projectProposal.update({
-              where: { id: proposal.id },
-              data: { currentApprovalStep: nextStep },
-            });
+          console.log("🔍 Notification created successfully");
 
-            // Notify proposal owner of progress
-            await NotificationService.createNotification({
-              title: "Proposal Moves to Next Step",
-              content: `Your proposal "${proposal.title}" has been approved by ${user.position} and moved to the next approval step.`,
-              type: "PROPOSAL_STATUS",
-              userId: proposal.userId,
-              priority: "HIGH",
-              proposalId: proposal.id,
-              departmentId: proposal.departmentId,
-              actionUrl: `/staff/proposals/${proposal.id}`,
-              actionLabel: "View Progress",
-            });
-
-            // Notify next approvers
-            await NotificationService.createBulkNotifications(
-              nextApprovers.map((approver) => ({
-                title: "New Proposal Needs Review",
-                content: `A proposal "${proposal.title}" requires your review as ${nextStep}.`,
-                type: "PROPOSAL_STATUS",
-                userId: approver.id,
-                priority: "HIGH",
-                proposalId: proposal.id,
-                departmentId: proposal.departmentId,
-                actionUrl: `/admin/community-engagement/project-proposals/${proposal.id}`,
-                actionLabel: "Review Proposal",
-              }))
-            );
-
-            console.log("🔍 Notification created successfully");
-
-            return updatedProposal;
-          }
+          return updatedProposal;
         }
       })();
 

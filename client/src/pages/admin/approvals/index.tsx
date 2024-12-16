@@ -68,6 +68,17 @@ interface Proposal {
   approvalFlow: ApprovalFlow[];
 }
 
+// First, define interfaces for the mutation parameters
+interface ApprovalParams {
+  proposalId: number;
+  comment?: string;
+}
+
+interface ReturnParams {
+  proposalId: number;
+  comment: string;  // Required for returns
+}
+
 export default function ApprovalsPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -104,9 +115,9 @@ export default function ApprovalsPage() {
     page * itemsPerPage
   );
 
-  const approveMutation = useMutation({
-    mutationFn: (proposalId: string) =>
-      approvalsApi.approveProposal(Number(proposalId)),
+  const approveProposalMutation = useMutation({
+    mutationFn: ({ proposalId, comment }: ApprovalParams) =>
+      approvalsApi.approveProposal(proposalId, comment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["approvals"] });
       toast.success("Proposal approved successfully");
@@ -117,13 +128,13 @@ export default function ApprovalsPage() {
     },
   });
 
-  const rejectMutation = useMutation({
-    mutationFn: (proposalId: string) =>
-      approvalsApi.returnProposal(Number(proposalId), "RETURNED"),
+  const returnProposalMutation = useMutation({
+    mutationFn: ({ proposalId, comment }: ReturnParams) =>
+      approvalsApi.returnProposal(proposalId, comment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["approvals"] });
       toast.success("Proposal returned successfully");
-    },
+    }, 
     onError: (error) => {
       toast.error("Failed to return proposal. Please try again.");
       console.error("Error returning proposal:", error);
@@ -404,14 +415,15 @@ export default function ApprovalsPage() {
                                       <Button
                                         className="bg-green-600 hover:bg-green-700"
                                         onClick={() => {
-                                          approveMutation.mutate(
-                                            proposal.id.toString()
-                                          );
+                                          approveProposalMutation.mutate({
+                                            proposalId: Number(proposal.id),
+                                            comment: comment.trim() || undefined
+                                          });
                                           setComment("");
                                         }}
-                                        disabled={approveMutation.isPending}
+                                        disabled={approveProposalMutation.isPending}
                                       >
-                                        {approveMutation.isPending
+                                        {approveProposalMutation.isPending
                                           ? "Approving..."
                                           : "Approve"}
                                       </Button>
@@ -459,17 +471,18 @@ export default function ApprovalsPage() {
                                       <Button
                                         variant="destructive"
                                         onClick={() => {
-                                          rejectMutation.mutate(
-                                            proposal.id.toString()
-                                          );
+                                          returnProposalMutation.mutate({
+                                            proposalId: Number(proposal.id),
+                                            comment: comment.trim()
+                                          });
                                           setComment("");
                                         }}
                                         disabled={
-                                          rejectMutation.isPending ||
+                                          returnProposalMutation.isPending ||
                                           !comment.trim()
                                         }
                                       >
-                                        {rejectMutation.isPending
+                                        {returnProposalMutation.isPending
                                           ? "Returning..."
                                           : "Return"}
                                       </Button>

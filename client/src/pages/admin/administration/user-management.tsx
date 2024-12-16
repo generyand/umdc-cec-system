@@ -41,6 +41,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import {
   Select,
@@ -58,11 +59,13 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { UserPosition, UserRole } from "@/types/user.types";
+import axios from "axios";
 
 interface Department {
   id: number;
   name: string;
   abbreviation: string;
+  bannerPrograms: BannerProgram[];
 }
 
 interface User {
@@ -77,9 +80,20 @@ interface User {
   status: "ACTIVE" | "INACTIVE";
 }
 
-interface UsersResponse {
-  users: User[];
-  departments: Department[];
+interface BannerProgram {
+  id: number;
+  name: string;
+  abbreviation: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  data: {
+    users: User[];
+    departments: Department[];
+    bannerPrograms: BannerProgram[];
+  };
 }
 
 const userFormSchema = z.object({
@@ -88,20 +102,28 @@ const userFormSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   role: z.enum(["SUPER_ADMIN", "ADMIN", "STAFF"] as [UserRole, ...UserRole[]]),
-  position: z
-    .enum([
-      "CEC_HEAD",
-      "CEC_OFFICE_ASSISTANT",
-      "CEC_COORDINATOR",
-      "VP_DIRECTOR",
-      "DEAN",
-      "PROGRAM_HEAD",
-      "FOCAL_PERSON",
-      "CHIEF_OPERATION_OFFICER",
-    ] as [UserPosition, ...UserPosition[]])
-    .nullable(),
+  position: z.enum([
+    "CEC_HEAD",
+    "CEC_OFFICE_ASSISTANT",
+    "CEC_COORDINATOR",
+    "VP_DIRECTOR",
+    "DEAN",
+    "PROGRAM_HEAD",
+    "FOCAL_PERSON",
+    "CHIEF_OPERATION_OFFICER",
+  ] as [UserPosition, ...UserPosition[]]).nullable(),
   departmentId: z.number(),
   contactNumber: z.string().optional(),
+  bannerProgramId: z.number().nullable(),
+}).superRefine((data, ctx) => {
+  // Add validation for banner program
+  if (data.position === "FOCAL_PERSON" && (!data.bannerProgramId || data.bannerProgramId === 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Banner Program is required for Focal Persons",
+      path: ["bannerProgramId"],
+    });
+  }
 });
 
 export default function UserManagementPage() {
@@ -114,7 +136,7 @@ export default function UserManagementPage() {
 
   type UserFormValues = z.infer<typeof userFormSchema>;
 
-  const form = useForm<UserFormValues>({
+  const form = useForm<z.infer<typeof userFormSchema>>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
       firstName: "",
@@ -125,16 +147,18 @@ export default function UserManagementPage() {
       position: null,
       departmentId: 0,
       contactNumber: "",
+      bannerProgramId: null,
     },
   });
 
-  const { data, isLoading, error } = useQuery<UsersResponse>({
+  const { data, isLoading, error } = useQuery<ApiResponse>({
     queryKey: ["users"],
     queryFn: getUsers,
   });
 
-  const users = data?.users ?? [];
-  const departments = data?.departments ?? [];
+  const users = data?.data.users ?? [];
+  const departments = data?.data.departments ?? [];
+  const bannerPrograms = data?.data.bannerPrograms ?? [];
 
   const queryClient = useQueryClient();
 
@@ -172,6 +196,7 @@ export default function UserManagementPage() {
       firstName: string;
       lastName: string;
       departmentId: number | null;
+      bannerProgramId: number | null;
       role: UserRole;
       position?: UserPosition;
       contactNumber?: string;
@@ -193,11 +218,12 @@ export default function UserManagementPage() {
   });
 
   const onSubmit = async (data: UserFormValues) => {
-    const { departmentId, ...restData } = data;
+    const { departmentId, bannerProgramId, ...restData } = data;
 
     addUserMutation.mutate({
       ...restData,
       departmentId: departmentId === 0 ? null : departmentId,
+      bannerProgramId: bannerProgramId === 0 ? null : bannerProgramId,
       position: restData.position ?? undefined,
       password: data.password,
     });
@@ -413,51 +439,29 @@ export default function UserManagementPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Department</FormLabel>
-                      <FormControl>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="radio"
-                              id="dept-none"
-                              {...field}
-                              value={0}
-                              checked={field.value === 0}
-                              onChange={() => field.onChange(0)}
-                              className="w-4 h-4 border-gray-300 text-primary focus:ring-primary"
-                            />
-                            <label
-                              htmlFor="dept-none"
-                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
-                              None
-                            </label>
-                          </div>
-                          {departments.map((department) => (
-                            <div
-                              key={department.id}
-                              className="flex items-center space-x-2"
-                            >
-                              <input
-                                type="radio"
-                                id={`dept-${department.id}`}
-                                {...field}
-                                value={department.id}
-                                checked={field.value === department.id}
-                                onChange={(e) =>
-                                  field.onChange(Number(e.target.value))
-                                }
-                                className="w-4 h-4 border-gray-300 text-primary focus:ring-primary"
-                              />
-                              <label
-                                htmlFor={`dept-${department.id}`}
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                              >
-                                {department.abbreviation}
-                              </label>
-                            </div>
+                      <Select
+                        onValueChange={(value) => {
+                          const newDeptId = parseInt(value);
+                          field.onChange(newDeptId);
+                          // Reset banner program when department changes
+                          form.setValue("bannerProgramId", null);
+                        }}
+                        value={field.value?.toString() ?? "0"}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a department" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="0">None</SelectItem>
+                          {departments.map((dept) => (
+                            <SelectItem key={dept.id} value={dept.id.toString()}>
+                              {dept.name} ({dept.abbreviation})
+                            </SelectItem>
                           ))}
-                        </div>
-                      </FormControl>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -535,6 +539,60 @@ export default function UserManagementPage() {
                       <FormMessage />
                     </FormItem>
                   )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="bannerProgramId"
+                  render={({ field }) => {
+                    const selectedDeptId = form.watch("departmentId");
+                    const selectedDepartment = departments.find(dept => dept.id === selectedDeptId);
+                    const availableBannerPrograms = selectedDepartment?.bannerPrograms ?? [];
+                    const isFocalPerson = form.watch("position") === "FOCAL_PERSON";
+
+                    return (
+                      <FormItem>
+                        <FormLabel>Banner Program</FormLabel>
+                        <Select
+                          onValueChange={(value) =>
+                            field.onChange(value === "0" ? null : parseInt(value))
+                          }
+                          value={field.value?.toString() ?? "0"}
+                          disabled={!isFocalPerson || !selectedDeptId || selectedDeptId === 0}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder={
+                                !selectedDeptId || selectedDeptId === 0
+                                  ? "Select a department first"
+                                  : availableBannerPrograms.length === 0
+                                  ? "No banner programs available"
+                                  : "Select a banner program"
+                              } />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="0">None</SelectItem>
+                            {availableBannerPrograms.map((program) => (
+                              <SelectItem key={program.id} value={program.id.toString()}>
+                                {program.name} ({program.abbreviation})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          {!isFocalPerson 
+                            ? "Only available for Focal Persons"
+                            : !selectedDeptId || selectedDeptId === 0
+                            ? "Please select a department first"
+                            : availableBannerPrograms.length === 0
+                            ? "No banner programs available for this department"
+                            : "Select a banner program for this department"}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 <DialogFooter>

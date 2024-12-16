@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { authService } from "../services/auth.service.js";
@@ -192,11 +192,7 @@ export const updateUserRole = async (
   }
 };
 
-export const getUsers = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getUsers: RequestHandler = async (req, res) => {
   try {
     const [users, departments] = await Promise.all([
       prisma.user.findMany({
@@ -222,13 +218,36 @@ export const getUsers = async (
           id: true,
           name: true,
           abbreviation: true,
+          bannerPrograms: {  // Include banner programs for each department
+            select: {
+              id: true,
+              name: true,
+              abbreviation: true,
+            },
+          },
         },
       }),
     ]);
 
-    res.json({ users, departments });
+    res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      data: {
+        users,
+        departments: departments.map(dept => ({
+          ...dept,
+          bannerPrograms: dept.bannerPrograms.sort((a, b) => 
+            a.name.localeCompare(b.name)
+          ),
+        })),
+      },
+    });
   } catch (error) {
-    next(error);
+    console.error("Error fetching users:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch users",
+    });
   }
 };
 

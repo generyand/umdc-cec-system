@@ -59,7 +59,6 @@ const proposalFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
   description: z.string().min(20, "Description must be at least 20 characters"),
   department: z.string().optional(),
-  program: z.string().optional(),
   bannerProgram: z.string().optional(),
   partnerCommunity: z.string().min(1, "Please select a partner community"),
   targetBeneficiaries: z.string().min(5, "Please specify target beneficiaries"),
@@ -112,7 +111,7 @@ export default function ResubmitProposalPage() {
 
   const proposalData = initialProposalData?.data?.data;
 
-  // console.log(initialProposalData);
+  console.log(initialProposalData);
 
   // console.log(formOptions);
 
@@ -158,7 +157,6 @@ export default function ResubmitProposalPage() {
       title: "",
       description: "",
       department: "",
-      program: "",
       bannerProgram: "",
       partnerCommunity: "",
       targetBeneficiaries: "",
@@ -177,7 +175,6 @@ export default function ResubmitProposalPage() {
         "department",
         formOptions.userDepartment?.id.toString() || ""
       );
-      form.setValue("program", formOptions.userProgram?.id.toString() || "");
       form.setValue(
         "bannerProgram",
         formOptions.userBannerProgram?.id.toString() || ""
@@ -210,7 +207,6 @@ console.log("Community ID:", proposalData?.community?.id);
         title: proposalData.title || "",
         description: proposalData.description || "",
         department: proposalData.department?.id?.toString() || "",
-        program: proposalData.program?.id?.toString() || "",
         bannerProgram: proposalData.bannerProgram?.id?.toString() || "",
         partnerCommunity: proposalData.community?.id?.toString() || "",
         targetBeneficiaries: proposalData.targetBeneficiaries || "",
@@ -244,7 +240,6 @@ console.log("Community ID:", proposalData?.community?.id);
         title: data.title,
         description: data.description,
         department: data.department || formOptions?.userDepartment?.id.toString() || "",
-        program: data.program || formOptions?.userProgram?.id.toString() || "",
         bannerProgram: data.bannerProgram || formOptions?.userBannerProgram?.id,
         partnerCommunity: data.partnerCommunity,
         targetBeneficiaries: data.targetBeneficiaries,
@@ -437,22 +432,7 @@ console.log("Community ID:", proposalData?.community?.id);
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="program"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Program</FormLabel>
-                      <FormControl>
-                        <Input
-                          value={formOptions?.userProgram?.name || ""}
-                          disabled
-                          className="bg-muted"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                
 
                 {/* Banner Program and Partner Community - Side by side */}
                 <FormField

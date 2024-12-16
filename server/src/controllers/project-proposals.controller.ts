@@ -104,11 +104,6 @@ export const getProposalById: RequestHandler = async (req, res) => {
             name: true,
           },
         },
-        program: {
-          select: {
-            name: true,
-          },
-        },
         user: {
           select: {
             id: true,

@@ -738,6 +738,39 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
         );
       }
 
+      // Find the current approver based on the position
+      const currentApprover = await prisma.user.findFirst({
+        where: {
+          position: returnedApproval.approverPosition,
+          status: "ACTIVE",
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          position: true,
+        },
+      });
+
+      if (currentApprover) {
+        // Create notification for the current approver
+        await prisma.notification.create({
+          data: {
+            title: "Proposal Resubmitted for Review",
+            content: `A proposal "${proposalData.title}" has been resubmitted and requires your review.`,
+            type: "PROPOSAL_STATUS",
+            priority: "HIGH",
+            status: "UNREAD",
+            userId: currentApprover.id,
+            proposalId: proposal.id,
+            departmentId: parseInt(proposalData.department),
+            actionUrl: `/admin/community-engagement/project-proposals/${proposal.id}`,
+            actionLabel: "Review Proposal",
+            groupId: `proposal-${proposal.id}-resubmission`,
+          },
+        });
+      }
+
       // 2. Update the existing approval record
       await prisma.projectApproval.update({
         where: {

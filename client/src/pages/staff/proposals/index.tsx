@@ -49,7 +49,7 @@ const getApprovalProgress = (approvals: Array<any>) => {
   const approvedSteps = approvals.filter((a) => a.status === "APPROVED").length;
 
   return {
-    progress: `${approvedSteps}/${totalSteps} steps`,
+    progress: `${approvedSteps + 1 === totalSteps ? totalSteps : approvedSteps}/${totalSteps} steps`,
   };
 };
 

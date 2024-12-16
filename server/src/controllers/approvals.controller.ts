@@ -313,7 +313,7 @@ export const approveProposal: RequestHandler = async (req, res) => {
               where: { id: proposal.id },
               data: {
                 status: "PENDING",
-                currentApprovalStep: user.position!,
+                currentApprovalStep: nextStep,
               },
             });
 

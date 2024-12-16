@@ -8,15 +8,8 @@ import {
   updateProposal,
   deleteProposal,
   updateProposalStatus,
-  getDepartmentsWithPrograms,
   getProposalsByUser,
   resubmitProposal,
-  //   getProposalsByDepartment,
-  //   getProposalsByStatus,
-  //   getProposalsByUser,
-  //   updateProposalStatus,
-  //   addProposalAttachments,
-  //   removeProposalAttachment,
 } from "../../controllers/project-proposals.controller.js";
 import multer from "multer";
 
@@ -40,13 +33,6 @@ router.delete("/:id", authenticateToken, deleteProposal);
 
 // Update proposal status
 router.patch("/:id/status", authenticateToken, updateProposalStatus);
-
-// Get departments with minimal program info. Used for dropdowns in proposal form.
-router.get(
-  "/dropdown-options/departments",
-  authenticateToken,
-  getDepartmentsWithPrograms
-);
 
 // Get proposals by user
 router.get("/user/:userId", authenticateToken, getProposalsByUser);

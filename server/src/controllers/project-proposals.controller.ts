@@ -41,12 +41,6 @@ export const getAllProposals: RequestHandler = async (req, res) => {
             abbreviation: true,
           },
         },
-        program: {
-          select: {
-            name: true,
-            abbreviation: true,
-          },
-        },
         user: {
           select: {
             firstName: true,
@@ -421,7 +415,6 @@ export const updateProposal = async (req: Request, res: Response) => {
       },
       include: {
         department: true,
-        program: true,
         user: true,
         community: true,
       },
@@ -480,69 +473,7 @@ export const updateProposalStatus = async (req: Request, res: Response) => {
 };
 
 // Get departments with minimal program info. Used for dropdowns in proposal form.
-export const getDepartmentsWithPrograms: RequestHandler = async (req, res) => {
-  try {
-    const departments = await prisma.department.findMany({
-      where: {
-        status: "ACTIVE",
-      },
-      select: {
-        id: true,
-        name: true,
-        abbreviation: true,
-        academicPrograms: {
-          where: {
-            status: "ACTIVE",
-          },
-          select: {
-            id: true,
-            name: true,
-            abbreviation: true,
-          },
-        },
-        bannerPrograms: {
-          where: {
-            status: "ACTIVE",
-          },
-          select: {
-            id: true,
-            name: true,
-            abbreviation: true,
-          },
-        },
-      },
-    });
 
-    const transformedDepartments = departments.map((department) => {
-      console.log(`Department ${department.name} programs:`, {
-        academic: department.academicPrograms?.length || 0,
-        banner: department.bannerPrograms?.length || 0,
-      });
-
-      return {
-        id: department.id,
-        name: department.name,
-        abbreviation: department.abbreviation,
-        bannerPrograms: department.bannerPrograms,
-        academicPrograms: department.academicPrograms,
-      };
-    });
-
-    // console.log(
-    //   `✅ Successfully fetched ${transformedDepartments.length} departments`
-    // );
-
-    res.status(200).json({
-      success: true,
-      message: "Departments with programs fetched successfully",
-      data: transformedDepartments,
-    });
-  } catch (error) {
-    console.error("❌ Error fetching departments with programs:", error);
-    if (error instanceof ApiError) throw error;
-    throw new ApiError(500, "Failed to fetch departments with programs");
-  }
-};
 
 // Get proposals by user
 export const getProposalsByUser: RequestHandler = async (req, res) => {

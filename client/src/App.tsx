@@ -46,7 +46,7 @@ import BannerProgramDetailsPage from "@/pages/admin/banner-programs/banner-progr
 import UserManagementPage from "@/pages/admin/administration/user-management";
 
 // Document Pages
-import ExtensionManual from "@/pages/extension-manual";
+import ExtensionManual from "@/pages/common/extension-manual";
 
 // Error Pages
 import UnauthorizedPage from "@/pages/unauth-page";
@@ -251,6 +251,7 @@ const App = () => {
             <Route path="proposals/edit-for-resubmission/:id" element={<ResubmitProposalPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="calendar" element={<CalendarPage />} />
+            <Route path="documents/manual" element={<ExtensionManual />} />
 
           </Route>
 

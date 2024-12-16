@@ -10,6 +10,19 @@ const ExtensionManual = () => {
   return (
     <div className="min-h-screen p-6">
       <header className="mb-8">
+        {/* Logos Container */}
+        <div className="flex justify-center items-center gap-8 mb-6">
+          <img 
+            src="/src/assets/images/umdc-logo.png" 
+            alt="University of Mindanao Logo" 
+            className="h-24 w-auto"
+          />
+          <img 
+            src="/src/assets/images/cec-logo.png" 
+            alt="Community Extension Center Logo" 
+            className="h-24 w-auto"
+          />
+        </div>
         <h1 className="text-3xl font-bold text-center">
           Community Extension Center Manual
         </h1>

@@ -83,35 +83,36 @@ function CollapsibleSection({
       <button
         onClick={onToggle}
         className={cn(
-          "flex items-center w-full transition-all duration-200",
+          "flex items-center w-full",
           "px-3 py-2.5 text-sm rounded-md",
-          "hover:bg-accent/50 active:bg-accent/70",
           collapsed ? "justify-center" : "justify-between gap-2",
           isExpanded
-            ? "bg-accent/40 text-foreground font-medium"
-            : "text-muted-foreground",
-          "group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            ? "text-primary font-semibold"
+            : "text-muted-foreground hover:text-accent",
+          "group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
         )}
       >
         <div className={cn("flex items-center min-w-0", !collapsed && "gap-3")}>
           <Icon
             className={cn(
-              "w-4 h-4 shrink-0 transition-transform duration-200",
-              "group-hover:text-foreground",
-              isExpanded && "text-foreground",
-              !isExpanded && "text-muted-foreground",
-              !collapsed && "group-hover:scale-105"
+              "w-4 h-4 shrink-0",
+              isExpanded ? "text-primary" : "text-muted-foreground group-hover:text-accent",
+              !collapsed && "group-hover:scale-110"
             )}
           />
-          {!collapsed && <span className="truncate">{title}</span>}
+          {!collapsed && (
+            <span className="truncate group-hover:text-accent">
+              {title}
+            </span>
+          )}
         </div>
         {!collapsed && (
           <ChevronDown
             className={cn(
-              "w-4 h-4 shrink-0 transition-transform duration-200",
+              "w-4 h-4 shrink-0 transition-transform duration-300",
               isExpanded && "transform rotate-180",
-              "text-muted-foreground group-hover:text-foreground",
-              isExpanded && "text-foreground"
+              "text-muted-foreground group-hover:text-accent",
+              isExpanded && "text-primary"
             )}
           />
         )}
@@ -120,9 +121,7 @@ function CollapsibleSection({
         <div
           className={cn(
             "pl-4 mt-1 space-y-1",
-            "relative before:absolute before:left-3 before:top-1 before:bottom-2",
-            "before:w-px before:bg-accent/60",
-            "duration-200 animate-in slide-in-from-top-2"
+            "duration-300 animate-in slide-in-from-top-2"
           )}
         >
           {children}

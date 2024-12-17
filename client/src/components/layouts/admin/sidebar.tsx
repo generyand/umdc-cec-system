@@ -101,8 +101,6 @@ function CollapsibleSection({
         <div
           className={cn(
             "pl-4 mt-1 space-y-1",
-            "relative before:absolute before:left-3 before:top-1 before:bottom-2",
-            "before:w-px before:bg-accent/60",
             "animate-in slide-in-from-top-2"
           )}
         >

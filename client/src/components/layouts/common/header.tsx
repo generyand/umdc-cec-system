@@ -21,7 +21,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
 import { User, LogOut, Settings } from "lucide-react";
 import umdcLogo from "@/assets/images/umdc-logo.png";
-import cecLogo from "@/assets/images/cec-logo.png";
+import cecLogo from "@/assets/images/cec-logo.webp";
 import { Notifications } from "@/components/layouts/common/notifications";
 
 export function Header() {
@@ -73,9 +73,9 @@ export function Header() {
           to={
             user?.role === "ADMIN"
               ? "/admin"
-              : user?.role === "STAFF"
-              ? "/staff"
-              : "/dashboard"
+              : user?.role === "SUPER_ADMIN"
+              ? "/admin"
+              : "/staff"
           }
           className="flex gap-3 items-center transition-opacity hover:opacity-90"
         >

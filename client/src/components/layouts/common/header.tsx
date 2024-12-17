@@ -21,7 +21,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
 import { User, LogOut, Settings } from "lucide-react";
 import umdcLogo from "@/assets/images/umdc-logo.png";
-import cecLogo from "@/assets/images/cec-logo.png";
+import cecLogo from "@/assets/images/cec-logo.webp";
 import { Notifications } from "@/components/layouts/common/notifications";
 
 export function Header() {
@@ -67,15 +67,15 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 mx-auto">
-      <div className="container flex justify-between items-center px-4 mx-auto h-16">
+      <div className=" flex justify-between items-center px-2 mx-auto h-16">
         {/* Logo Section */}
         <Link
           to={
             user?.role === "ADMIN"
               ? "/admin"
-              : user?.role === "STAFF"
-              ? "/staff"
-              : "/dashboard"
+              : user?.role === "SUPER_ADMIN"
+              ? "/admin"
+              : "/staff"
           }
           className="flex gap-3 items-center transition-opacity hover:opacity-90"
         >

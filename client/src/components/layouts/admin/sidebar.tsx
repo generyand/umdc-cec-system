@@ -5,25 +5,17 @@ import { useState } from "react";
 import {
   LucideIcon,
   Home,
-  // LayoutDashboard,
   Building2,
   Users,
-  // BarChart3,
   ChevronDown,
   Handshake,
   School,
-  // BookOpen,
   FileText,
-  // TrendingUp,
   Flag,
   Settings,
   UserCog,
-  // Building,
   CheckSquare,
-  // History,
   Bell,
-  // FileBox,
-  // Wrench,
   Calendar,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -63,35 +55,36 @@ function CollapsibleSection({
       <button
         onClick={onToggle}
         className={cn(
-          "flex items-center w-full transition-all duration-200",
+          "flex items-center w-full",
           "px-3 py-2.5 text-sm rounded-md",
-          "hover:bg-accent/50 active:bg-accent/70",
           collapsed ? "justify-center" : "justify-between gap-2",
           isExpanded
-            ? "bg-accent/40 text-foreground font-medium"
-            : "text-muted-foreground",
-          "group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            ? "bg-primary/20 text-primary font-semibold shadow-md"
+            : "text-muted-foreground hover:text-accent",
+          "group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
         )}
       >
         <div className={cn("flex items-center min-w-0", !collapsed && "gap-3")}>
           <Icon
             className={cn(
-              "w-4 h-4 shrink-0 transition-transform duration-200",
-              "group-hover:text-foreground",
-              isExpanded && "text-foreground",
-              !isExpanded && "text-muted-foreground",
-              !collapsed && "group-hover:scale-105"
+              "w-4 h-4 shrink-0",
+              isExpanded ? "text-primary" : "text-muted-foreground group-hover:text-accent",
+              !collapsed && "group-hover:scale-110"
             )}
           />
-          {!collapsed && <span className="truncate">{title}</span>}
+          {!collapsed && (
+            <span className="truncate group-hover:text-accent">
+              {title}
+            </span>
+          )}
         </div>
         {!collapsed && (
           <ChevronDown
             className={cn(
-              "w-4 h-4 shrink-0 transition-transform duration-200",
+              "w-4 h-4 shrink-0 transition-transform duration-300",
               isExpanded && "transform rotate-180",
-              "text-muted-foreground group-hover:text-foreground",
-              isExpanded && "text-foreground"
+              "text-muted-foreground group-hover:text-accent",
+              isExpanded && "text-primary"
             )}
           />
         )}
@@ -100,9 +93,7 @@ function CollapsibleSection({
         <div
           className={cn(
             "pl-4 mt-1 space-y-1",
-            "relative before:absolute before:left-3 before:top-1 before:bottom-2",
-            "before:w-px before:bg-accent/60",
-            "duration-200 animate-in slide-in-from-top-2"
+            "duration-300 animate-in slide-in-from-top-2"
           )}
         >
           {children}
@@ -116,17 +107,13 @@ function CollapsibleSection({
 export function Sidebar({ className }: SidebarProps) {
   const { user } = useAuth();
 
-  // Helper function to check if user can access approvals
-
   const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
 
   const canAccessApprovals = () => {
     if (!user || !user.position) return false;
 
-    // Super Admin always has access
     if (isSuperAdmin) return true;
 
-    // Check for specific positions using the enum
     const approverPositions = [
       UserPosition.CEC_HEAD,
       UserPosition.VP_DIRECTOR,
@@ -136,10 +123,8 @@ export function Sidebar({ className }: SidebarProps) {
     return approverPositions.includes(user.position);
   };
 
-  // Navigation Configuration
   const navigationItems: NavItem[] = [
     { title: "Home", href: "/admin", icon: Home },
-    // { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     {
       title: "Academic Departments",
       href: "/admin/academic-departments",
@@ -191,16 +176,6 @@ export function Sidebar({ className }: SidebarProps) {
           href: "/admin/events-and-activities/activity-management",
           icon: CheckSquare,
         },
-        // {
-        //   title: "Activity Reports",
-        //   href: "/admin/events-and-activities/reports",
-        //   icon: FileText,
-        // },
-        // {
-        //   title: "Activity History",
-        //   href: "/admin/events-and-activities/history",
-        //   icon: History,
-        // },
       ],
     },
     {
@@ -217,11 +192,6 @@ export function Sidebar({ className }: SidebarProps) {
               },
             ]
           : []),
-        // {
-        //   title: "Department Settings",
-        //   href: "/admin/administration/department-settings",
-        //   icon: Building,
-        // },
         ...(canAccessApprovals()
           ? [
               {
@@ -231,11 +201,6 @@ export function Sidebar({ className }: SidebarProps) {
               },
             ]
           : []),
-        // {
-        //   title: "Activity Logs",
-        //   href: "/admin/administration/activity-logs",
-        //   icon: History,
-        // },
         {
           title: "Announcements",
           href: "/admin/administration/announcements",
@@ -252,6 +217,10 @@ export function Sidebar({ className }: SidebarProps) {
     setExpandedSection((current) =>
       current === sectionTitle ? null : sectionTitle
     );
+  };
+
+  const handleLinkClick = (sectionTitle: string | null) => {
+    setExpandedSection(sectionTitle);
   };
 
   const renderNavItem = (item: NavItem) => {
@@ -287,6 +256,7 @@ export function Sidebar({ className }: SidebarProps) {
         collapsed={!isOpen}
         href={item.href}
         icon={item.icon}
+        onClick={() => handleLinkClick(null)}
       >
         {item.title}
       </NavLink>

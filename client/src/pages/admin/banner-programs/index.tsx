@@ -188,10 +188,6 @@ const BannerProgramsPage = () => {
             programs
           </p>
         </div>
-        <Button size="sm" className="w-full md:w-auto">
-          <PlusCircle className="mr-2 w-4 h-4" />
-          New Program
-        </Button>
       </div>
 
       {/* Search and Filters Card */}

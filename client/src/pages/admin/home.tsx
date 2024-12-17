@@ -28,24 +28,13 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   const quickLinks = [
-    // {
-    //   title: "Create Proposal",
-    //   description: "Start a new extension proposal",
-    //   href: "/admin/community-engagement/project-proposals/new",
-    //   icon: FilePlus,
-    // },
     {
       title: "Extension Manual",
       description: "Guidelines and procedures",
       href: "/admin/documents/manual",
       icon: BookOpen,
     },
-    // {
-    //   title: "Forms & Templates",
-    //   description: "Downloadable resources",
-    //   href: "/admin/documents/templates",
-    //   icon: FolderPlus,
-    // },
+
     {
       title: "Calendar",
       description: "Extension activities schedule",
@@ -183,15 +172,17 @@ export default function HomePage() {
           <Button
             key={link.title}
             variant="outline"
-            className="flex flex-col items-start p-6 space-y-3 h-auto rounded-lg transition-transform transform hover:scale-105 hover:shadow-lg hover:bg-primary/10 hover:border-primary"
+            className="group flex flex-col items-start p-6 space-y-3 h-auto rounded-lg transition-all duration-300 hover:scale-102 hover:shadow-md border-muted-foreground/20"
             onClick={() => navigate(link.href)}
           >
-            <div className="p-3 rounded-full bg-primary/20">
-              <link.icon className="w-6 h-6 text-primary" />
+            <div className="p-3 rounded-full bg-primary/10 transition-colors duration-300 group-hover:bg-primary/10">
+              <link.icon className="w-6 h-6 text-primary transition-colors duration-300 group-hover:text-primary/80" />
             </div>
             <div className="text-left">
-              <div className="font-semibold text-primary">{link.title}</div>
-              <div className="mt-1 text-sm text-muted-foreground">
+              <div className="font-semibold text-primary/90 transition-colors duration-300 group-hover:text-primary">
+                {link.title}
+              </div>
+              <div className="mt-1 text-sm text-muted-foreground/80">
                 {link.description}
               </div>
             </div>

@@ -119,15 +119,16 @@
 }
 
 .fc .fc-list-event {
-  @apply border-none bg-blue-600;
+  @apply border-none;
 }
 
+/* Add hover styles for list items */
 .fc .fc-list-event:hover td {
-  @apply bg-muted/50;
+  @apply bg-muted/30;
 }
 
 .fc .fc-list-event-title {
-  @apply font-medium text-white;
+  @apply font-medium;
 }
 
 .fc .fc-list-day-cushion {
@@ -135,7 +136,7 @@
 }
 
 .fc .fc-list-event-time {
-  @apply text-white;
+  /* removed text-white */
 }
 
 /* Dark mode adjustments for list view */

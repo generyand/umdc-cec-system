@@ -33,7 +33,7 @@ export function NavLink({
         collapsed ? "justify-center w-10 mx-auto" : "justify-start w-full",
         !collapsed && "gap-3",
         isActive
-          ? "bg-primary/10 text-primary font-medium shadow-sm"
+          ? "text-primary font-medium shadow-sm"
           : "text-muted-foreground hover:text-accent",
         isChild && !collapsed && ["text-[13px]", "hover:pl-10 transition-all"],
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",

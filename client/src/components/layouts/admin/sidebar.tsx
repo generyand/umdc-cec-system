@@ -59,7 +59,7 @@ function CollapsibleSection({
           "px-3 py-2.5 text-sm rounded-md",
           collapsed ? "justify-center" : "justify-between gap-2",
           isExpanded
-            ? "bg-primary/20 text-primary font-semibold shadow-md"
+            ? "text-primary font-semibold"
             : "text-muted-foreground hover:text-accent",
           "group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
         )}

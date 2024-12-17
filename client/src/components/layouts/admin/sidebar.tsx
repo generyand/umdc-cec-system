@@ -5,25 +5,17 @@ import { useState } from "react";
 import {
   LucideIcon,
   Home,
-  // LayoutDashboard,
   Building2,
   Users,
-  // BarChart3,
   ChevronDown,
   Handshake,
   School,
-  // BookOpen,
   FileText,
-  // TrendingUp,
   Flag,
   Settings,
   UserCog,
-  // Building,
   CheckSquare,
-  // History,
   Bell,
-  // FileBox,
-  // Wrench,
   Calendar,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -75,13 +67,13 @@ function CollapsibleSection({
         <div className={cn("flex items-center min-w-0", !collapsed && "gap-3")}>
           <Icon
             className={cn(
-              "w-4 h-4 shrink-0 transition-colors ",
+              "w-4 h-4 shrink-0",
               isExpanded ? "text-primary" : "text-muted-foreground group-hover:text-accent",
               !collapsed && "group-hover:scale-110"
             )}
           />
           {!collapsed && (
-            <span className="truncate transition-colors  group-hover:text-accent">
+            <span className="truncate group-hover:text-accent">
               {title}
             </span>
           )}
@@ -89,7 +81,7 @@ function CollapsibleSection({
         {!collapsed && (
           <ChevronDown
             className={cn(
-              "w-4 h-4 shrink-0 transition-transform",
+              "w-4 h-4 shrink-0 transition-transform duration-300",
               isExpanded && "transform rotate-180",
               "text-muted-foreground group-hover:text-accent",
               isExpanded && "text-primary"
@@ -101,7 +93,7 @@ function CollapsibleSection({
         <div
           className={cn(
             "pl-4 mt-1 space-y-1",
-            "animate-in slide-in-from-top-2"
+            "duration-300 animate-in slide-in-from-top-2"
           )}
         >
           {children}
@@ -115,17 +107,13 @@ function CollapsibleSection({
 export function Sidebar({ className }: SidebarProps) {
   const { user } = useAuth();
 
-  // Helper function to check if user can access approvals
-
   const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
 
   const canAccessApprovals = () => {
     if (!user || !user.position) return false;
 
-    // Super Admin always has access
     if (isSuperAdmin) return true;
 
-    // Check for specific positions using the enum
     const approverPositions = [
       UserPosition.CEC_HEAD,
       UserPosition.VP_DIRECTOR,
@@ -135,10 +123,8 @@ export function Sidebar({ className }: SidebarProps) {
     return approverPositions.includes(user.position);
   };
 
-  // Navigation Configuration
   const navigationItems: NavItem[] = [
     { title: "Home", href: "/admin", icon: Home },
-    // { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     {
       title: "Academic Departments",
       href: "/admin/academic-departments",
@@ -190,16 +176,6 @@ export function Sidebar({ className }: SidebarProps) {
           href: "/admin/events-and-activities/activity-management",
           icon: CheckSquare,
         },
-        // {
-        //   title: "Activity Reports",
-        //   href: "/admin/events-and-activities/reports",
-        //   icon: FileText,
-        // },
-        // {
-        //   title: "Activity History",
-        //   href: "/admin/events-and-activities/history",
-        //   icon: History,
-        // },
       ],
     },
     {
@@ -216,11 +192,6 @@ export function Sidebar({ className }: SidebarProps) {
               },
             ]
           : []),
-        // {
-        //   title: "Department Settings",
-        //   href: "/admin/administration/department-settings",
-        //   icon: Building,
-        // },
         ...(canAccessApprovals()
           ? [
               {
@@ -230,11 +201,6 @@ export function Sidebar({ className }: SidebarProps) {
               },
             ]
           : []),
-        // {
-        //   title: "Activity Logs",
-        //   href: "/admin/administration/activity-logs",
-        //   icon: History,
-        // },
         {
           title: "Announcements",
           href: "/admin/administration/announcements",
@@ -251,6 +217,10 @@ export function Sidebar({ className }: SidebarProps) {
     setExpandedSection((current) =>
       current === sectionTitle ? null : sectionTitle
     );
+  };
+
+  const handleLinkClick = (sectionTitle: string | null) => {
+    setExpandedSection(sectionTitle);
   };
 
   const renderNavItem = (item: NavItem) => {
@@ -286,6 +256,7 @@ export function Sidebar({ className }: SidebarProps) {
         collapsed={!isOpen}
         href={item.href}
         icon={item.icon}
+        onClick={() => handleLinkClick(null)}
       >
         {item.title}
       </NavLink>
@@ -297,7 +268,7 @@ export function Sidebar({ className }: SidebarProps) {
       className={cn(
         "border-r backdrop-blur",
         isOpen ? "w-[260px]" : "w-[70px]",
-        "shadow-sm  max-md:hidden",
+        "shadow-sm transition-all duration-300 max-md:hidden",
         className
       )}
     >

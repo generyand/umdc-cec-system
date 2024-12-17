@@ -130,15 +130,15 @@ export default function HomePage() {
   return (
     <div className="mx-auto space-y-8 w-full">
       {/* Welcome Section */}
-      <div className="flex flex-col gap-4 justify-between items-start p-6 bg-gradient-to-r to-transparent rounded-lg md:flex-row md:items-center from-primary/10">
+      <div className="flex flex-col gap-4 justify-between items-start p-6 bg-primary rounded-lg shadow-md md:flex-row md:items-center">
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">
+          <h1 className="text-4xl font-bold tracking-tight text-primary-foreground">
             Welcome back, {user?.firstName}! 👋
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-primary-foreground">
             {user?.department?.abbreviation || "Community Extension Center"}
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-primary-foreground">
             {new Date().toLocaleDateString("en-US", {
               weekday: "long",
               year: "numeric",
@@ -151,25 +151,25 @@ export default function HomePage() {
         {/* Quick Stats on the right */}
         <div className="flex gap-6 items-center">
           <div className="flex flex-col items-center">
-            <div className="text-2xl font-bold text-primary">4</div>
-            <div className="text-sm text-muted-foreground">Banner Programs</div>
+            <div className="text-2xl font-bold text-primary-foreground">4</div>
+            <div className="text-sm text-primary-foreground">Banner Programs</div>
           </div>
           <Separator orientation="vertical" className="h-12" />
           <div className="flex flex-col items-center">
-            <div className="text-2xl font-bold text-primary">5</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-2xl font-bold text-primary-foreground">5</div>
+            <div className="text-sm text-primary-foreground">
               Partner Communities
             </div>
           </div>
           <Separator orientation="vertical" className="h-12" />
           <div className="flex flex-col items-center">
-            <div className="text-2xl font-bold text-primary">12</div>
-            <div className="text-sm text-muted-foreground">Active Projects</div>
+            <div className="text-2xl font-bold text-primary-foreground">12</div>
+            <div className="text-sm text-primary-foreground">Active Projects</div>
           </div>
           <Separator orientation="vertical" className="h-12" />
           <div className="flex flex-col items-center">
-            <div className="text-2xl font-bold text-primary">8</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-2xl font-bold text-primary-foreground">8</div>
+            <div className="text-sm text-primary-foreground">
               Upcoming Activities
             </div>
           </div>

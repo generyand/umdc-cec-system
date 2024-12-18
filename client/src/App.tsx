@@ -63,6 +63,7 @@ import StaffDepartmentOverviewPage from "./pages/staff/department-overview";
 import StaffProposalsPage from "./pages/staff/proposals";
 import ResubmitProposalPage from "./pages/staff/proposals/resubmit-proposal";
 import FormsAndTemplatesPage from "./pages/common/forms-and-templates";
+import NumberOfBannerProgramsPerDepartmentReport from "./pages/admin/academic-departments/report";
 
 const App = () => {
   const { user, initialized } = useAuth();
@@ -160,6 +161,7 @@ const App = () => {
             <Route path="academic-departments">
               <Route index element={<AcademicDepartmentsPage />} />
               <Route path=":id" element={<DepartmentPage />} />
+              <Route path="report" element={<NumberOfBannerProgramsPerDepartmentReport />} />
             </Route>
 
             {/* Community Engagement */}

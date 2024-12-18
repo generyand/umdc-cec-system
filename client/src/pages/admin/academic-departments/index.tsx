@@ -58,7 +58,7 @@ import {
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth"; // Import the auth hook
 
 // Map logos to department abbreviations using imported URLs
@@ -347,6 +347,7 @@ function StatsCardSkeleton() {
 export default function AcademicDepartmentsPage() {
   const { user } = useAuth(); // Get the current user
   const isSuperAdmin = user?.role === "SUPER_ADMIN"; // Check if user is super admin
+  const navigate = useNavigate();
 
   const {
     data: departmentsData,
@@ -485,7 +486,7 @@ export default function AcademicDepartmentsPage() {
             <Button
               variant="outline"
               onClick={() => {
-                /* Add your report generation logic here */
+                navigate("/admin/academic-departments/report");
               }}
             >
               <FileText className="mr-2 w-4 h-4" />

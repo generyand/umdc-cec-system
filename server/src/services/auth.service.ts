@@ -110,6 +110,16 @@ export const authService = {
       throw new AuthError("Invalid credentials");
     }
 
+    const currentSchoolYear = await prisma.schoolYear.findFirst({
+      where: { isCurrent: true },
+    });
+
+    console.log("Current school year", currentSchoolYear);
+
+    if (!currentSchoolYear) {
+      throw new Error("No active school year found");
+    }
+
     const accessToken = this.generateAccessToken(user.id);
 
     return {
@@ -124,6 +134,7 @@ export const authService = {
         role: user.role,
         position: user.position,
       },
+      currentSchoolYear,
       accessToken,
     };
   },

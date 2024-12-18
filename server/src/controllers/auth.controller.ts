@@ -71,7 +71,7 @@ export const register: Handler = async (req, res, next) => {
 export const login: Handler = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const { user, accessToken } = await authService.login({
+    const { user, accessToken, currentSchoolYear } = await authService.login({
       email,
       password,
     });
@@ -79,6 +79,7 @@ export const login: Handler = async (req, res, next) => {
     res.status(200).json({
       user,
       token: accessToken,
+      currentSchoolYear,
     });
   } catch (error) {
     next(error);

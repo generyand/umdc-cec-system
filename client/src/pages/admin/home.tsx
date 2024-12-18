@@ -139,30 +139,29 @@ export default function HomePage() {
 
         {/* Quick Stats on the right */}
         <div className="flex gap-6 items-center">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center text-center min-w-[100px]">
             <div className="text-2xl font-bold text-primary-foreground">4</div>
             <div className="text-sm text-primary-foreground">Banner Programs</div>
           </div>
           <Separator orientation="vertical" className="h-12" />
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center text-center min-w-[100px]">
             <div className="text-2xl font-bold text-primary-foreground">5</div>
             <div className="text-sm text-primary-foreground">
               Partner Communities
             </div>
           </div>
           <Separator orientation="vertical" className="h-12" />
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center text-center min-w-[100px]">
             <div className="text-2xl font-bold text-primary-foreground">12</div>
             <div className="text-sm text-primary-foreground">Active Projects</div>
           </div>
           <Separator orientation="vertical" className="h-12" />
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center text-center min-w-[100px]">
             <div className="text-2xl font-bold text-primary-foreground">8</div>
             <div className="text-sm text-primary-foreground">
               Upcoming Activities
             </div>
           </div>
-          <Separator orientation="vertical" className="h-12" />
         </div>
       </div>
 

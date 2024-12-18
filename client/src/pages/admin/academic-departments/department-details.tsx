@@ -256,7 +256,7 @@ export default function DepartmentPage() {
         </div>
         
         {/* Decorative gradient */}
-        <div className="absolute right-0 top-0 -z-10 h-full w-1/2 bg-gradient-to-l from-secondary/5 to-transparent" />
+        <div className="absolute right-0 top-0 -z-10 h-full w-1/2 bg-gradient-to-l from-secondary/10 to-transparent" />
       </div>
 
       {/* Update Quick Stats styling */}

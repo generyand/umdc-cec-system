@@ -247,7 +247,7 @@ export default function NumberOfBannerProgramsPerDepartmentReport() {
           {reportData.data.departments.map((dept) => (
             <Card key={dept.id} className="print-content">
               <div className="p-6 print:p-0">
-                <h3 className="text-lg font-semibold mb-4">{dept.name} ({dept.code})</h3>
+                <h3 className="text-lg font-semibold mb-4">{dept.name}</h3>
                 <table className="print-table w-full border-collapse">
                   <thead>
                     <tr className="bg-muted/50">
@@ -271,11 +271,14 @@ export default function NumberOfBannerProgramsPerDepartmentReport() {
                     </tr>
                   </thead>
                   <tbody>
-                    {dept.academicPrograms.programs.map((program) => (
+                    {dept.academicPrograms.programs.map((program, index) => (
                       <tr key={program.id}>
-                        <td className="border px-4 py-2">
-                          {program.abbreviation}
-                        </td>
+                        {/* Only show department code in first row of the group */}
+                        {index === 0 ? (
+                          <td className="border px-4 py-2" rowSpan={dept.academicPrograms.programs.length}>
+                            {dept.code}
+                          </td>
+                        ) : null}
                         <td className="border px-4 py-2 text-center">
                           {program.status === "ACTIVE" ? program.abbreviation : "-"}
                         </td>
@@ -285,14 +288,8 @@ export default function NumberOfBannerProgramsPerDepartmentReport() {
                         <td className="border px-4 py-2 text-center">
                           {program.bannerProgramsCount}
                         </td>
-                        <td className="border px-4 py-2 text-center">
-                          {/* Add target count when available */}
-                          -
-                        </td>
-                        <td className="border px-4 py-2 text-center">
-                          {/* Add actual count when available */}
-                          -
-                        </td>
+                        <td className="border px-4 py-2 text-center">-</td>
+                        <td className="border px-4 py-2 text-center">-</td>
                         <td className="border px-4 py-2 text-center">-</td>
                       </tr>
                     ))}

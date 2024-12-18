@@ -15,7 +15,20 @@ export const getDepartmentReports: RequestHandler = async (req, res) => {
         academicPrograms: {
           select: {
             id: true,
+            name: true,
+            abbreviation: true,
             status: true,
+            bannerProgram: {
+              select: {
+                id: true,
+                activities: {
+                  select: {
+                    id: true,
+                    status: true,
+                  },
+                },
+              },
+            },
           },
         },
         bannerPrograms: {
@@ -37,6 +50,13 @@ export const getDepartmentReports: RequestHandler = async (req, res) => {
       code: dept.abbreviation,
       name: dept.name,
       academicPrograms: {
+        programs: dept.academicPrograms.map(program => ({
+          id: program.id,
+          name: program.name,
+          abbreviation: program.abbreviation,
+          status: program.status,
+          bannerProgramsCount: program.bannerProgram?.id ? 1 : 0,
+        })),
         active: dept.academicPrograms.filter((p) => p.status === "ACTIVE").length,
         inactive: dept.academicPrograms.filter((p) => p.status === "INACTIVE").length,
         total: dept.academicPrograms.length,

@@ -277,22 +277,3 @@ export const updateActivityStatus: RequestHandler = async (
     data: updatedActivity,
   });
 };
-
-// Delete an activity
-// export const deleteActivity: RequestHandler = async (req: Request, res: Response) => {
-//   try {
-//     const { id } = req.params;
-
-//     await prisma.activity.delete({
-//       where: { id: parseInt(id) },
-//     });
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Activity deleted successfully",
-//     });
-//   } catch (error) {
-//     console.error("❌ Error deleting activity:", error);
-//     throw new ApiError(500, "Failed to delete activity");
-//   }
-// };

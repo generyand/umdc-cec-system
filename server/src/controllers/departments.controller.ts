@@ -77,6 +77,7 @@ export const getDepartmentById: RequestHandler = async (
       prisma.department.findUnique({
         where: { id: departmentId },
         select: {
+          id: true,
           name: true,
           abbreviation: true,
           description: true,
@@ -101,11 +102,6 @@ export const getDepartmentById: RequestHandler = async (
               status: true,
               yearStarted: true,
               abbreviation: true,
-              // _count: {
-              //   select: {
-              //     projectProposals: true,
-              //   },
-              // },
             },
             orderBy: {
               name: "asc",
@@ -128,6 +124,7 @@ export const getDepartmentById: RequestHandler = async (
           partnerCommunity: {
             select: {
               name: true,
+              address: true,
             },
           },
           bannerProgram: {
@@ -151,6 +148,7 @@ export const getDepartmentById: RequestHandler = async (
     // Transform the data to organize it better
     const transformedData = {
       department: {
+        id: department.id,
         name: department.name,
         abbreviation: department.abbreviation,
         description: department.description,

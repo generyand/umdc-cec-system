@@ -38,8 +38,8 @@ export const departmentsApi = {
     id: number | string
   ): Promise<ServiceResponse<Department>> => {
     try {
-      console.log("Fetching department with ID:", id);
-      console.log("Request URL:", `/api/departments/${id}`);
+      // console.log("Fetching department with ID:", id);
+      // console.log("Request URL:", `/api/departments/${id}`);
 
       const response = await api.get<ServiceResponse<Department>>(
         `/api/departments/${id}`

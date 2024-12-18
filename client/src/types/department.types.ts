@@ -24,6 +24,7 @@ export interface Activity {
   status: string;
   partnerCommunity: {
     name: string;
+    address: string;
   };
   bannerProgram: {
     name: string;

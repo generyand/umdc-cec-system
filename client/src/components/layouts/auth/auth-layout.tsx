@@ -11,7 +11,7 @@ function AuthLayout() {
         {/* Background Pattern */}
         <div className="absolute inset-0 z-0">
           {/* Gradient Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-accent/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900/90" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-accent/30 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900/90" />
 
           {/* Floating Spheres */}
           <div className="absolute inset-0">
@@ -87,9 +87,9 @@ function AuthLayout() {
                 },
                 {
                   icon: "M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z",
-                  text: "Activity Analytics",
+                  text: "Profiling of Banner Program, Partner Communities and Organizations",
                   description:
-                    "Monitor and analyze program impact and outcomes",
+                    "Track and analyze the performance of banner programs, partner communities, and organizations",
                 },
                 {
                   icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",

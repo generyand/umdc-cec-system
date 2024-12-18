@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -67,113 +67,113 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="bg-transparent border-0 shadow-none">
-      <CardHeader className="space-y-1">
+    <Card className="w-full max-w-[400px] border-0 shadow-none bg-transparent">
+      <CardHeader className="space-y-4 pb-6">
         <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
         <CardDescription className="text-center">
           Enter your credentials to access your account
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pb-8">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {error && (
               <div className="p-3 text-sm rounded-md text-destructive bg-destructive/10">
                 {error}
               </div>
             )}
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email Address</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="Enter your email address"
-                      {...field}
-                      disabled={isLoading}
-                      autoComplete="email"
-                      autoCapitalize="none"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <div className="relative">
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
                       <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
+                        type="email"
+                        placeholder="Enter your email address"
                         {...field}
                         disabled={isLoading}
-                        autoComplete="current-password"
+                        autoComplete="email"
+                        autoCapitalize="none"
                       />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="text-sm font-medium text-foreground/90">
+                        Password
+                      </FormLabel>
+                      <Link
+                        to="/auth/forgot-password"
+                        className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
                       >
-                        {showPassword ? (
-                          <Icons.eyeOff className="h-4 w-4" />
-                        ) : (
-                          <Icons.eye className="h-4 w-4" />
-                        )}
-                      </Button>
+                        Forgot password?
+                      </Link>
                     </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* <div className="flex justify-end">
-              <Link
-                to="/auth/forgot-password"
-                className="text-sm font-medium text-primary hover:underline underline-offset-4"
-              >
-                Forgot password?
-              </Link>
-            </div> */}
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter your password"
+                          className="h-12 bg-white/50 border-gray-200 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 pr-10"
+                          {...field}
+                          disabled={isLoading}
+                          autoComplete="current-password"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground/60 hover:text-muted-foreground"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <Icons.eyeOff className="h-4 w-4" />
+                          ) : (
+                            <Icons.eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <Button
               type="submit"
-              className="w-full bg-primary dark:text-white"
+              className="w-full h-12 font-medium bg-primary hover:bg-primary/90 text-white transition-colors"
               disabled={isLoading}
-              size="lg"
             >
               {isLoading ? (
-                <>
-                  <Icons.spinner className="mr-2 w-4 h-4 animate-spin" />
-                  Signing in...
-                </>
+                <div className="flex items-center justify-center gap-2">
+                  <Icons.spinner className="w-4 h-4 animate-spin" />
+                  <span>Authenticating...</span>
+                </div>
               ) : (
-                "Sign in"
+                "Sign in to your account"
               )}
             </Button>
+
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                Protected by UM Digos College
+              </p>
+            </div>
           </form>
         </Form>
       </CardContent>
-      {/* <CardFooter className="flex flex-col space-y-4">
-        <div className="text-sm text-center text-muted-foreground">
-          Don't have an account?{" "}
-          <Link
-            to="/auth/register"
-            className="font-medium text-primary underline-offset-4 hover:underline"
-          >
-            Create account
-          </Link>
-        </div>
-      </CardFooter> */}
     </Card>
   );
 }

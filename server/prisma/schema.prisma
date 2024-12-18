@@ -197,6 +197,8 @@ model ProjectProposal {
   approvals          ProjectApproval[]
   currentApprovalStep UserPosition     @default(CEC_HEAD)
   notifications    Notification[]
+  schoolYearId Int
+  schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id])
 
   @@index([departmentId])
   @@index([programId])
@@ -205,6 +207,7 @@ model ProjectProposal {
   @@index([communityId])
   @@index([bannerProgramId])
   @@index([currentApprovalStep])
+  @@index([schoolYearId])
   @@map("project_proposals")
 }
 
@@ -260,11 +263,14 @@ model Activity {
   bannerProgramId   Int?
   bannerProgram     BannerProgram? @relation(fields: [bannerProgramId], references: [id])
   notifications    Notification[]
+  schoolYearId Int
+  schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id])
 
   @@index([departmentId])
   @@index([partnerCommunityId])
   @@index([status])
   @@index([bannerProgramId])
+  @@index([schoolYearId])
   @@map("activities")
 }
 
@@ -420,4 +426,24 @@ model Notification {
   @@index([proposalId])
   @@index([activityId])
   @@map("notifications")
+}
+
+model SchoolYear {
+  id            Int       @id @default(autoincrement())
+  year          String    @unique // e.g., "2023-2024"
+  startDate     DateTime
+  endDate       DateTime
+  isCurrent     Boolean   @default(false)
+  status        String    @default("ACTIVE") // ACTIVE, CLOSED, UPCOMING
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relationships
+  projectProposals ProjectProposal[]
+  activities       Activity[]
+  announcements    Announcement[]
+
+  @@index([isCurrent])
+  @@index([status])
+  @@map("school_years")
 }

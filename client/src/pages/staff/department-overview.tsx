@@ -305,21 +305,16 @@ export default function StaffDepartmentOverviewPage() {
             
             {/* Department Information */}
             <div className="space-y-4">
-              <div className="space-y-2">
+              <div className="space-y-2 flex gap-4 items-center">
                 <h1 className="text-3xl font-bold tracking-tight">
                   {departmentData?.department.name}
                 </h1>
-                <div className="flex items-center gap-3">
                   <Badge 
                     variant="secondary" 
-                    className="px-3 py-1 text-sm font-medium bg-primary/10 text-primary hover:bg-primary/15"
+                    className="px-3 py-1 text-sm font-medium bg-secondary text-gray-900 hover:bg-secondary/15"
                   >
                     {departmentData?.department.abbreviation}
                   </Badge>
-                  <span className="text-sm font-medium text-muted-foreground">
-                    Extension Department
-                  </span>
-                </div>
               </div>
               <p className="text-sm leading-relaxed text-muted-foreground max-w-[600px]">
                 {departmentData?.department.description}

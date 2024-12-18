@@ -8,9 +8,19 @@ import {
 } from "@/types/user.types";
 import api from "@/lib/api";
 
+interface SchoolYear {
+  id: number;
+  year: string;
+  startDate: string;
+  endDate: string;
+  isCurrent: boolean;
+  status: string;
+}
+
 interface AuthState {
   user: User | null;
   token: string | null;
+  currentSchoolYear: SchoolYear | null;
   isLoading: boolean;
   error: string | null;
   initialized: boolean;
@@ -31,6 +41,7 @@ interface AuthState {
   ) => Promise<void>;
   updateProfile: (data: ProfileUpdateData) => Promise<void>;
   updatePassword: (data: PasswordUpdateData) => Promise<void>;
+  setCurrentSchoolYear: (schoolYear: SchoolYear | null) => void;
 }
 
 const useAuth = create<AuthState>()(
@@ -39,6 +50,7 @@ const useAuth = create<AuthState>()(
       return {
         user: null,
         token: null,
+        currentSchoolYear: null,
         isLoading: false,
         error: null,
         initialized: false,
@@ -78,6 +90,7 @@ const useAuth = create<AuthState>()(
 
             set({
               user: data.user,
+              currentSchoolYear: data.currentSchoolYear,
               isLoading: false,
               error: null,
             });
@@ -99,6 +112,7 @@ const useAuth = create<AuthState>()(
             get().setToken(null);
             set({
               user: null,
+              currentSchoolYear: null,
               isLoading: false,
               error: null,
             });
@@ -196,6 +210,10 @@ const useAuth = create<AuthState>()(
             });
           }
         },
+
+        setCurrentSchoolYear: (schoolYear: SchoolYear | null) => {
+          set({ currentSchoolYear: schoolYear });
+        },
       };
     },
     {
@@ -203,6 +221,7 @@ const useAuth = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        currentSchoolYear: state.currentSchoolYear,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

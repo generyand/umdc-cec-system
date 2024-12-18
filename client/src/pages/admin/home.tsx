@@ -18,6 +18,8 @@ import {
   Clock,
   GraduationCap,
   CalendarDays,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -124,68 +126,120 @@ export default function HomePage() {
     <div className="mx-auto space-y-8 w-full">
       {/* Welcome Section with Stats */}
       <div className="space-y-6">
-        <div className="bg-primary rounded-lg overflow-hidden">
-          {/* Top Welcome Bar */}
-          <div className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="space-y-1">
-              <h2 className="text-4xl font-bold text-primary-foreground">
-                Welcome back, {user?.firstName}! 👋
-              </h2>
-              <p className="text-sm text-primary-foreground/80">
-                {user?.department?.name || "Community Extension Center"}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4 text-primary-foreground/90 text-sm">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>
-                  {new Date().toLocaleDateString("en-US", {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </span>
+        {/* Welcome Banner with Gradient Overlay */}
+        <div className="relative bg-primary rounded-xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary"></div>
+          
+          {/* Content Container */}
+          <div className="relative px-8 py-6">
+            {/* Top Section */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              {/* Welcome Text & User Info */}
+              <div className="flex items-center gap-4">
+                <div className="hidden md:flex h-12 w-12 rounded-full bg-white/10 items-center justify-center">
+                  <UserCircle className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-primary-foreground"> Welcome back, {user?.firstName} 👋</h1>
+                  <p className="text-sm text-primary-foreground/80">{user?.department?.name || user?.position}</p>
+                </div>
               </div>
-              <Separator orientation="vertical" className="h-4 bg-primary-foreground/20" />
-              <div className="flex items-center gap-2">
-                <GraduationCap className="w-4 h-4" />
-                <span>SY {currentSchoolYear?.year || "Not set"}</span>
-              </div>
-            </div>
-          </div>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 border-t border-primary-foreground/10">
-            <div className="p-4 text-center hover:bg-primary-foreground/5 transition-colors">
-              <div className="flex flex-col items-center gap-1">
-                <Target className="w-5 h-5 text-primary-foreground/70" />
-                <span className="text-2xl font-bold text-primary-foreground">4</span>
-                <span className="text-xs text-primary-foreground/70">Banner Programs</span>
+              {/* Date & School Year Info */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm text-primary-foreground/80">
+                <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full">
+                  <Calendar className="w-4 h-4" />
+                  <span>
+                    {new Date().toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric"
+                    })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full">
+                  <GraduationCap className="w-4 h-4" />
+                  <span>SY {currentSchoolYear?.year || "Not set"}</span>
+                </div>
               </div>
             </div>
 
-            <div className="p-4 text-center border-l border-primary-foreground/10 hover:bg-primary-foreground/5 transition-colors">
-              <div className="flex flex-col items-center gap-1">
-                <Building2 className="w-5 h-5 text-primary-foreground/70" />
-                <span className="text-2xl font-bold text-primary-foreground">5</span>
-                <span className="text-xs text-primary-foreground/70">Partner Communities</span>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+              {/* Banner Programs */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 hover:bg-white/15 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-primary-foreground/70">
+                      Banner Programs
+                    </p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">4</p>
+                  </div>
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Target className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-1 text-xs text-primary-foreground/60">
+                  <TrendingUp className="w-3 h-3" />
+                  <span>2 new this month</span>
+                </div>
               </div>
-            </div>
 
-            <div className="p-4 text-center border-l border-primary-foreground/10 hover:bg-primary-foreground/5 transition-colors">
-              <div className="flex flex-col items-center gap-1">
-                <Activity className="w-5 h-5 text-primary-foreground/70" />
-                <span className="text-2xl font-bold text-primary-foreground">12</span>
-                <span className="text-xs text-primary-foreground/70">Active Projects</span>
+              {/* Partner Communities */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 hover:bg-white/15 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-primary-foreground/70">
+                      Partner Communities
+                    </p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">5</p>
+                  </div>
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Building2 className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-1 text-xs text-primary-foreground/60">
+                  <Users className="w-3 h-3" />
+                  <span>Active partnerships</span>
+                </div>
               </div>
-            </div>
 
-            <div className="p-4 text-center border-l border-primary-foreground/10 hover:bg-primary-foreground/5 transition-colors">
-              <div className="flex flex-col items-center gap-1">
-                <CalendarDays className="w-5 h-5 text-primary-foreground/70" />
-                <span className="text-2xl font-bold text-primary-foreground">8</span>
-                <span className="text-xs text-primary-foreground/70">Upcoming Activities</span>
+              {/* Active Projects */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 hover:bg-white/15 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-primary-foreground/70">
+                      Active Projects
+                    </p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">12</p>
+                  </div>
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Activity className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-1 text-xs text-primary-foreground/60">
+                  <Clock className="w-3 h-3" />
+                  <span>In progress</span>
+                </div>
+              </div>
+
+              {/* Upcoming Activities */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 hover:bg-white/15 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-primary-foreground/70">
+                      Upcoming Activities
+                    </p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">8</p>
+                  </div>
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <CalendarDays className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-1 text-xs text-primary-foreground/60">
+                  <Calendar className="w-3 h-3" />
+                  <span>This month</span>
+                </div>
               </div>
             </div>
           </div>

@@ -12,6 +12,11 @@ import {
   ClipboardList,
   BookOpen,
   Target,
+  UserCircle,
+  GraduationCap,
+  CalendarDays,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -19,11 +24,22 @@ import { cn, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
-import { Separator } from "@/components/ui/separator";
+import { UserPosition } from "@/types/user.types";
 
 export default function StaffHomePage() {
-  const { user } = useAuth();
+  const { user, currentSchoolYear } = useAuth();
   const navigate = useNavigate();
+
+  const formatPosition = (position: UserPosition) => {
+    if (position === UserPosition.CEC_HEAD) {
+      return "Community Extension Center Head";
+    } else if (position === UserPosition.VP_DIRECTOR) {
+      return "VP Director";
+    } else if (position === UserPosition.CHIEF_OPERATION_OFFICER) {
+      return "Chief Operation Officer";
+    }
+    return position;
+  };
 
   const quickLinks = [
     {
@@ -85,40 +101,103 @@ export default function StaffHomePage() {
   return (
     <div className="mx-auto space-y-8 w-full">
       {/* Welcome Section */}
-      <div className="flex flex-col gap-4 justify-between items-start p-6 bg-primary rounded-lg shadow-md md:flex-row md:items-center">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight text-primary-foreground">
-            Welcome back, {user?.firstName}! 👋
-          </h1>
-          <p className="text-lg text-primary-foreground">
-            {user?.department?.name || "Extension Staff"}
-          </p>
-          <p className="text-sm text-primary-foreground">
-            {new Date().toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
-        </div>
+      <div className="space-y-6">
+        {/* Welcome Banner with Gradient Overlay */}
+        <div className="relative bg-primary rounded-xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary"></div>
+          
+          {/* Content Container */}
+          <div className="relative px-8 py-6">
+            {/* Top Section */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              {/* Welcome Text & User Info */}
+              <div className="flex items-center gap-4">
+                <div className="hidden md:flex h-12 w-12 rounded-full bg-white/10 items-center justify-center">
+                  <UserCircle className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-primary-foreground"> Welcome back, {user?.firstName} 👋</h1>
+                  <p className="text-sm text-primary-foreground/80">{user?.department?.name || formatPosition(user?.position as UserPosition)}</p>
+                </div>
+              </div>
 
-        {/* Quick Stats */}
-        <div className="flex gap-6 items-center">
-          <div className="flex flex-col items-center">
-            <div className="text-2xl font-bold text-primary-foreground">3</div>
-            <div className="text-sm text-primary-foreground">Active Projects</div>
-          </div>
-          <Separator orientation="vertical" className="h-12" />
-          <div className="flex flex-col items-center">
-            <div className="text-2xl font-bold text-primary-foreground">2</div>
-            <div className="text-sm text-primary-foreground">Pending Reports</div>
-          </div>
-          <Separator orientation="vertical" className="h-12" />
-          <div className="flex flex-col items-center">
-            <div className="text-2xl font-bold text-primary-foreground">5</div>
-            <div className="text-sm text-primary-foreground">
-              Upcoming Activities
+              {/* Date & School Year Info */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm text-primary-foreground/80">
+                <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full">
+                  <Calendar className="w-4 h-4" />
+                  <span>
+                    {new Date().toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric"
+                    })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full">
+                  <GraduationCap className="w-4 h-4" />
+                  <span>SY {currentSchoolYear?.year || "Not set"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+              {/* Active Projects */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 hover:bg-white/15 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-primary-foreground/70">
+                      Active Projects
+                    </p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">3</p>
+                  </div>
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Activity className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-1 text-xs text-primary-foreground/60">
+                  <Clock className="w-3 h-3" />
+                  <span>In progress</span>
+                </div>
+              </div>
+
+              {/* Pending Reports */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 hover:bg-white/15 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-primary-foreground/70">
+                      Pending Reports
+                    </p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">2</p>
+                  </div>
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <FileText className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-1 text-xs text-primary-foreground/60">
+                  <AlertCircle className="w-3 h-3" />
+                  <span>Need attention</span>
+                </div>
+              </div>
+
+              {/* Upcoming Activities */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 hover:bg-white/15 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-primary-foreground/70">
+                      Upcoming Activities
+                    </p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">5</p>
+                  </div>
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <CalendarDays className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-1 text-xs text-primary-foreground/60">
+                  <Calendar className="w-3 h-3" />
+                  <span>This month</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

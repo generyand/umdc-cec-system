@@ -28,10 +28,22 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
+import { UserPosition } from "@/types/user.types";
 
 export default function HomePage() {
   const { user, currentSchoolYear } = useAuth();
   const navigate = useNavigate();
+
+  const formatPosition = (position: UserPosition) => {
+    if (position === UserPosition.CEC_HEAD) {
+      return "Community Extension Center Head";
+    } else if (position === UserPosition.VP_DIRECTOR) {
+      return "VP Director";
+    } else if (position === UserPosition.CHIEF_OPERATION_OFFICER) {
+      return "Chief Operation Officer";
+    }
+    return position;
+  };
 
   const quickLinks = [
     {
@@ -141,7 +153,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold text-primary-foreground"> Welcome back, {user?.firstName} 👋</h1>
-                  <p className="text-sm text-primary-foreground/80">{user?.department?.name || user?.position}</p>
+                  <p className="text-sm text-primary-foreground/80">{user?.department?.name || formatPosition(user?.position as UserPosition)}</p>
                 </div>
               </div>
 

@@ -23,6 +23,18 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useNavigate, Link } from "react-router-dom";
+import * as DepartmentLogos from "@/assets/images/department-logos";
+
+// Add logo mapping
+const departmentLogoMap: {[key: string]: string} = {
+  DAE: DepartmentLogos.DAELogo,
+  DASE: DepartmentLogos.DASELogo,
+  DBA: DepartmentLogos.DBALogo,
+  DCJE: DepartmentLogos.DCJELogo,
+  DTE: DepartmentLogos.DTELogo,
+  DTP: DepartmentLogos.DTPLogo,
+  SHS: DepartmentLogos.SHSLogo,
+};
 
 export default function DepartmentPage() {
   const { id } = useParams<{ id: string }>();
@@ -193,10 +205,6 @@ export default function DepartmentPage() {
     <div className="mx-auto space-y-8 w-full">
       {/* Breadcrumb */}
       <nav className="flex items-center text-sm text-muted-foreground">
-        <Link to="/admin" className="transition-colors hover:text-foreground">
-          Admin
-        </Link>
-        <ChevronRight className="mx-2 w-4 h-4" />
         <Link
           to="/admin/academic-departments"
           className="transition-colors hover:text-foreground"
@@ -209,32 +217,49 @@ export default function DepartmentPage() {
         </span>
       </nav>
 
-      {/* Back Button */}
-      <Button
-        variant="ghost"
-        className="flex gap-2 items-center hover:bg-accent/50"
-        onClick={() => navigate(-1)}
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Back to Departments</span>
-      </Button>
+      {/* Replace the header section */}
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-r from-card to-primary/5">
+        <div className="flex flex-col gap-6 p-8 md:flex-row md:items-center md:justify-between">
+          {/* Left Section: Logo and Department Info */}
+          <div className="flex items-start gap-8">
+            {/* Department Logo */}
+            {departmentData?.department.abbreviation && departmentLogoMap[departmentData.department.abbreviation] && (
+              <div className="relative flex shrink-0 items-center justify-center bg-white min-w-[100px] min-h-[100px] max-h-[100px]">
+                <img
+                  src={departmentLogoMap[departmentData.department.abbreviation]}
+                  alt={`${departmentData.department.abbreviation} Logo`}
+                  className="w-full h-24 object-contain transition-transform hover:scale-105"
+                />
+              </div>
+            )}
+            
+            {/* Department Information */}
+            <div className="space-y-4">
+              <div className="space-y-2 flex gap-4 items-center">
+                <h1 className="text-3xl font-bold tracking-tight">
+                  {departmentData.department.name}
+                </h1>
+                <Badge 
+                  variant="secondary" 
+                  className="px-3 py-1 text-sm font-medium bg-secondary text-gray-900 hover:bg-secondary/15"
+                >
+                  {departmentData.department.abbreviation}
+                </Badge>
+              </div>
+              <p className="text-sm leading-relaxed text-muted-foreground max-w-[600px]">
+                {departmentData.department.description}
+              </p>
+            </div>
+          </div>
 
-      {/* Header Section */}
-      <div className="flex flex-col gap-6 p-6 rounded-lg border md:flex-row md:items-center md:justify-between bg-card">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            {departmentData.department.name}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {departmentData.department.abbreviation}
-          </p>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            {departmentData.department.description}
-          </p>
+          
         </div>
+        
+        {/* Decorative gradient */}
+        <div className="absolute right-0 top-0 -z-10 h-full w-1/2 bg-gradient-to-l from-secondary/5 to-transparent" />
       </div>
 
-      {/* Quick Stats */}
+      {/* Update Quick Stats styling */}
       <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
         {stats.map((stat, index) => (
           <Card key={index} className="p-6">
@@ -243,16 +268,10 @@ export default function DepartmentPage() {
                 className={cn(
                   "flex items-center justify-center w-12 h-12 rounded-lg shrink-0",
                   stat.iconBgColor,
-                  "transition-colors duration-200 group-hover:bg-primary/20"
+                  "transition-colors duration-200"
                 )}
               >
-                <stat.icon
-                  className={cn(
-                    "w-6 h-6",
-                    stat.iconColor,
-                    "transition-colors duration-200"
-                  )}
-                />
+                <stat.icon className={cn("w-6 h-6", stat.iconColor)} />
               </div>
               <div>
                 <p className="mb-1 text-sm font-medium text-muted-foreground">
@@ -272,9 +291,9 @@ export default function DepartmentPage() {
         ))}
       </div>
 
-      {/* Programs Grid */}
+      {/* Update Banner Programs styling */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Academic Programs */}
+        {/* Keep Academic Programs section, just update the card styling */}
         <div className="lg:col-span-2">
           <Card className="h-[600px] flex flex-col">
             <div className="flex-shrink-0 p-6 border-b">
@@ -390,7 +409,7 @@ export default function DepartmentPage() {
           </Card>
         </div>
 
-        {/* Banner Programs */}
+        {/* Update Banner Programs styling */}
         <div className="lg:col-span-1">
           <Card className="h-[600px]">
             <div className="p-6 border-b">
@@ -403,7 +422,7 @@ export default function DepartmentPage() {
               {departmentData.bannerPrograms.map((program) => (
                 <div
                   key={program.id}
-                  className="p-4 text-white bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg"
+                  className="p-4 text-primary-foreground bg-gradient-to-br from-primary to-primary/80 rounded-lg shadow-sm hover:shadow-md transition-all"
                 >
                   <div className="flex justify-between items-start">
                     <div className="space-y-2">
@@ -422,7 +441,7 @@ export default function DepartmentPage() {
                     </div>
                     <Badge
                       variant="secondary"
-                      className="text-white bg-white/10 shrink-0"
+                      className="text-white bg-secondary/80 shrink-0"
                     >
                       Started {program.yearStarted}
                     </Badge>
@@ -434,9 +453,9 @@ export default function DepartmentPage() {
         </div>
       </div>
 
-      {/* Activities Section */}
+      {/* Update Activities section styling */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Upcoming Activities */}
+        {/* Update activity cards with new styling */}
         <Card className="h-[600px] flex flex-col">
           <div className="flex-shrink-0 p-6 border-b">
             <div className="flex justify-between items-center">

@@ -340,6 +340,10 @@ model Announcement {
   status      String   @default("active") // e.g., "active", "archived", "scheduled"
   category    String   // e.g., "event", "update", "alert"
   expirationDate DateTime?
+  
+  // Add the school year relation
+  schoolYearId Int?
+  schoolYear   SchoolYear? @relation(fields: [schoolYearId], references: [id])
 
   // Metadata
   createdAt   DateTime @default(now())
@@ -348,6 +352,7 @@ model Announcement {
   @@index([priority])
   @@index([status])
   @@index([category])
+  @@index([schoolYearId])
   @@map("announcements")
 }
 

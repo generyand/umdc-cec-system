@@ -18,6 +18,7 @@ import {
   MoreHorizontal,
   FileText,
   CalendarClock,
+  Plus,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
@@ -287,26 +288,65 @@ export default function StaffDepartmentOverviewPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col gap-6 p-6 rounded-lg border md:flex-row md:items-center md:justify-between bg-card">
-        <div className="flex items-center gap-6">
-          {/* Department Logo */}
-          {departmentData?.department.abbreviation && departmentLogoMap[departmentData.department.abbreviation] && (
-            <img
-              src={departmentLogoMap[departmentData.department.abbreviation]}
-              alt={`${departmentData.department.abbreviation} Logo`}
-              className="w-16 h-16 object-contain"
-            />
-          )}
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold">{departmentData?.department.name}</h1>
-            <p className="text-sm text-muted-foreground">
-              {departmentData?.department.abbreviation}
-            </p>
-            <p className="text-sm text-muted-foreground max-w-[600px]">
-              {departmentData?.department.description}
-            </p>
+      <div className="relative overflow-hidden rounded-lg border bg-gradient-to-r from-card to-primary/5">
+        <div className="flex flex-col gap-6 p-8 md:flex-row md:items-center md:justify-between">
+          {/* Left Section: Logo and Department Info */}
+          <div className="flex items-start gap-8 ">
+            {/* Department Logo with Container */}
+            {departmentData?.department.abbreviation && departmentLogoMap[departmentData.department.abbreviation] && (
+              <div className="relative flex shrink-0 items-center justify-center bg-white    min-w-[100px] min-h-[100px] max-h-[100px]">
+                <img
+                  src={departmentLogoMap[departmentData.department.abbreviation]}
+                  alt={`${departmentData.department.abbreviation} Logo`}
+                  className="w-full h-24 object-contain transition-transform hover:scale-105"
+                />
+              </div>
+            )}
+            
+            {/* Department Information */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold tracking-tight">
+                  {departmentData?.department.name}
+                </h1>
+                <div className="flex items-center gap-3">
+                  <Badge 
+                    variant="secondary" 
+                    className="px-3 py-1 text-sm font-medium bg-primary/10 text-primary hover:bg-primary/15"
+                  >
+                    {departmentData?.department.abbreviation}
+                  </Badge>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Extension Department
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm leading-relaxed text-muted-foreground max-w-[600px]">
+                {departmentData?.department.description}
+              </p>
+            </div>
+          </div>
+
+          {/* Right Section: Quick Actions */}
+          <div className="flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row shrink-0">
+            <Button 
+              variant="outline" 
+              className="gap-2 border-accent/20 hover:bg-accent/90 hover:border-accent/30"
+            >
+              <Calendar className="h-4 w-4" />
+              View Calendar
+            </Button>
+            <Button 
+              className="gap-2 bg-primary hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4" />
+              Create Activity Proposal
+            </Button>
           </div>
         </div>
+
+        {/* Optional: Decorative Elements */}
+        <div className="absolute right-0 top-0 -z-10 h-full w-1/2 bg-gradient-to-l from-secondary/5 to-transparent" />
       </div>
 
       {/* Quick Stats */}
@@ -471,7 +511,7 @@ export default function StaffDepartmentOverviewPage() {
               {departmentData.bannerPrograms.map((program) => (
                 <div
                   key={program.id}
-                  className="p-4 text-white bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg"
+                  className="p-4 text-primary-foreground bg-gradient-to-br from-primary to-primary/80 rounded-lg shadow-sm hover:shadow-md transition-all"
                 >
                   <div className="flex justify-between items-start">
                     <div className="space-y-2">
@@ -490,7 +530,7 @@ export default function StaffDepartmentOverviewPage() {
                     </div>
                     <Badge
                       variant="secondary"
-                      className="text-white bg-white/10 shrink-0"
+                      className="text-white bg-secondary/80 shrink-0"
                     >
                       Started {program.yearStarted}
                     </Badge>

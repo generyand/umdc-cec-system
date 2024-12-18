@@ -6,10 +6,10 @@ import { ApiError } from "../utils/errors.js";
 export const getDashboardStats: RequestHandler = async (req, res) => {
   try {
     const [
-      bannerProgramCount,
-      partnerCommunityCount,
-      activeProjectCount,
-      upcomingActivityCount
+      bannerProgramsCount,
+      partnerCommunitiesCount,
+      activeProjectsCount,
+      upcomingActivitiesCount
     ] = await Promise.all([
       prisma.bannerProgram.count({
         where: { status: "ACTIVE" }
@@ -28,10 +28,10 @@ export const getDashboardStats: RequestHandler = async (req, res) => {
     res.status(200).json({
       success: true,
       data: {
-        bannerProgramCount,
-        partnerCommunityCount,
-        activeProjectCount,
-        upcomingActivityCount
+        bannerProgramsCount,
+        partnerCommunitiesCount,
+        activeProjectsCount,
+        upcomingActivitiesCount
       }
     });
   } catch (error) {

@@ -29,10 +29,31 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { UserPosition } from "@/types/user.types";
+import { dashboardApi } from "@/services/api/dashboard.service";
+import { useQuery } from "@tanstack/react-query";
 
 export default function HomePage() {
   const { user, currentSchoolYear } = useAuth();
   const navigate = useNavigate();
+
+  const { data: dashboardStatsData, isLoading: isDashboardStatsLoading } = useQuery({
+    queryKey: ["dashboardStats"],
+    queryFn: () => dashboardApi.getDashboardStats(),
+  });
+
+  const dashboardStats = dashboardStatsData?.data;
+
+  console.log(dashboardStats);
+
+  const { data: dashboardOverviewData, isLoading: isDashboardOverviewLoading } = useQuery({
+    queryKey: ["dashboardOverview"],
+    queryFn: () => dashboardApi.getDashboardOverview(),
+  });
+
+  const dashboardOverview = dashboardOverviewData?.data;
+
+  console.log(dashboardOverview);
+
 
   const formatPosition = (position: UserPosition) => {
     if (position === UserPosition.CEC_HEAD) {
@@ -185,7 +206,7 @@ export default function HomePage() {
                     <p className="text-sm font-medium text-primary-foreground/70">
                       Banner Programs
                     </p>
-                    <p className="text-2xl font-bold text-primary-foreground mt-1">4</p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">{dashboardStats?.bannerProgramsCount || 0}</p>
                   </div>
                   <div className="p-2 bg-white/10 rounded-lg">
                     <Target className="w-5 h-5 text-primary-foreground" />
@@ -204,7 +225,7 @@ export default function HomePage() {
                     <p className="text-sm font-medium text-primary-foreground/70">
                       Partner Communities
                     </p>
-                    <p className="text-2xl font-bold text-primary-foreground mt-1">5</p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">{dashboardStats?.partnerCommunitiesCount || 0}</p>
                   </div>
                   <div className="p-2 bg-white/10 rounded-lg">
                     <Building2 className="w-5 h-5 text-primary-foreground" />
@@ -223,7 +244,7 @@ export default function HomePage() {
                     <p className="text-sm font-medium text-primary-foreground/70">
                       Active Projects
                     </p>
-                    <p className="text-2xl font-bold text-primary-foreground mt-1">12</p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">{dashboardStats?.activeProjectsCount || 0}</p>
                   </div>
                   <div className="p-2 bg-white/10 rounded-lg">
                     <Activity className="w-5 h-5 text-primary-foreground" />
@@ -242,7 +263,7 @@ export default function HomePage() {
                     <p className="text-sm font-medium text-primary-foreground/70">
                       Upcoming Activities
                     </p>
-                    <p className="text-2xl font-bold text-primary-foreground mt-1">8</p>
+                    <p className="text-2xl font-bold text-primary-foreground mt-1">{dashboardStats?.upcomingActivitiesCount || 0}</p>
                   </div>
                   <div className="p-2 bg-white/10 rounded-lg">
                     <CalendarDays className="w-5 h-5 text-primary-foreground" />

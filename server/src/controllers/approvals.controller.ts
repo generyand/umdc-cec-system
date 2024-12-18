@@ -278,10 +278,21 @@ export const approveProposal: RequestHandler = async (req, res) => {
               description: proposal.description,
               targetDate: proposal.targetDate,
               status: "UPCOMING",
-              departmentId: proposal.departmentId,
-              partnerCommunityId: proposal.communityId!,
-              proposalId: proposal.id,
-              bannerProgramId: proposal.bannerProgramId || undefined,
+              department: {
+                connect: { id: proposal.departmentId }
+              },
+              partnerCommunity: {
+                connect: proposal.communityId ? { id: proposal.communityId } : undefined
+              },
+              proposal: {
+                connect: { id: proposal.id }
+              },
+              bannerProgram: {
+                connect: proposal.bannerProgramId ? { id: proposal.bannerProgramId } : undefined
+              },
+              schoolYear: {
+                connect: { id: proposal.schoolYearId }
+              }
             },
           });
 

@@ -60,7 +60,7 @@ const FormsAndTemplates = () => {
               className="h-28 w-auto transition-transform hover:scale-105"
             />
             <img 
-              src="/src/assets/images/cec-logo.png" 
+              src="/src/assets/images/cec-logo.webp" 
               alt="Community Extension Center Logo" 
               className="h-28 w-auto transition-transform hover:scale-105"
             />

@@ -442,10 +442,6 @@ export default function AcademicDepartmentsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-6">
         <nav className="flex items-center text-sm text-muted-foreground">
-          <Link to="/admin" className="transition-colors hover:text-foreground">
-            Admin
-          </Link>
-          <ChevronRight className="mx-2 w-4 h-4" />
           <span className="font-medium text-foreground">
             Academic Departments
           </span>

@@ -24,6 +24,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as DepartmentLogos from "@/assets/images/department-logos";
+import { useNavigate } from "react-router-dom";
 
 type LogoMapping = {
   [key: string]: string;
@@ -210,6 +211,7 @@ const getBadgeVariant = (status: string) => {
 
 export default function StaffDepartmentOverviewPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Get department data using React Query
   const {
@@ -327,12 +329,18 @@ export default function StaffDepartmentOverviewPage() {
             <Button 
               variant="outline" 
               className="gap-2 border-accent/20 hover:bg-accent/90 hover:border-accent/30"
+              onClick={() => {
+                navigate("/staff/calendar");
+              }}
             >
               <Calendar className="h-4 w-4" />
               View Calendar
             </Button>
             <Button 
               className="gap-2 bg-primary hover:bg-primary/90"
+              onClick={() => {
+                navigate("/staff/proposals/new");
+              }}
             >
               <Plus className="h-4 w-4" />
               Create Activity Proposal

@@ -1,10 +1,19 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ArrowLeft, Download, Printer, FileSpreadsheet } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft, Download, Printer, FileSpreadsheet, Clock, Calendar } from "lucide-react";
 import { reportsApi } from "@/services/api/reports.service";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { 
+  DAELogo, 
+  DASELogo, 
+  DBALogo, 
+  DCJELogo, 
+  DTELogo, 
+  DTPLogo, 
+  SHSLogo 
+} from "@/assets/images/department-logos";
 
 // Add this CSS either in a separate file or in your global styles
 const printStyles = `
@@ -92,6 +101,17 @@ const printStyles = `
   }
 `;
 
+// Add a logo mapping object
+const departmentLogos: { [key: string]: string } = {
+  DAE: DAELogo,
+  DASE: DASELogo,
+  DBA: DBALogo,
+  DCJE: DCJELogo,
+  DTE: DTELogo,
+  DTP: DTPLogo,
+  SHS: SHSLogo,
+};
+
 export default function NumberOfBannerProgramsPerDepartmentReport() {
   const navigate = useNavigate();
   const { currentSchoolYear } = useAuth();
@@ -115,34 +135,74 @@ export default function NumberOfBannerProgramsPerDepartmentReport() {
       <style>{printStyles}</style>
 
       <div className="print-container space-y-6 max-w-[1200px] mx-auto p-6">
-        {/* Mark the entire header section as no-print */}
-        <div className="header-section no-print">
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex gap-4 items-center">
-              <Button variant="ghost" onClick={() => navigate(-1)}>
-                <ArrowLeft className="mr-2 w-4 h-4" />
-                Back
-              </Button>
-              <div>
-                <h1 className="text-2xl font-bold">Banner Programs per Department Report</h1>
-                <p className="text-muted-foreground">
-                  School Year {currentSchoolYear.year} • Generated on {new Date(reportData.data.metadata.generatedAt).toLocaleString()}
-                </p>
-              </div>
+        {/* Header Section */}
+        <div className="header-section no-print space-y-8">
+          {/* Top Navigation Row */}
+          <div className="flex items-center justify-between">
+            {/* Back Button */}
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate(-1)}
+              className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-base font-medium">Back</span>
+            </Button>
+
+            {/* Logos */}
+            <div className="flex items-center gap-4">
+              <img 
+                src="/src/assets/images/cec-logo.webp" 
+                alt="UM Logo" 
+                className="h-12 w-auto"
+              />
+              <img 
+                src="/src/assets/images/umdc-logo.png" 
+                alt="CE Logo" 
+                className="h-12 w-auto"
+              />
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => window.print()}>
-                <Printer className="mr-2 w-4 h-4" />
-                Print
-              </Button>
-              <Button variant="outline">
-                <FileSpreadsheet className="mr-2 w-4 h-4" />
-                Export to Excel
-              </Button>
-              <Button>
-                <Download className="mr-2 w-4 h-4" />
-                Download PDF
-              </Button>
+          </div>
+
+          {/* Report Title and Actions Row */}
+          <div className="space-y-4">
+            {/* Title */}
+            <h1 className="text-2xl font-bold">
+              Banner Programs per Department Report
+            </h1>
+
+            {/* Metadata and Actions */}
+            <div className="flex items-center justify-between">
+              {/* Report Metadata */}
+              <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  School Year {currentSchoolYear.year}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  Generated on {new Date(reportData.data.metadata.generatedAt).toLocaleString()}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3">
+                <Button 
+                  variant="ghost"
+                  onClick={() => window.print()}
+                  className="hover:bg-yellow-500 text-black font-medium"
+                >
+                  <Printer className="w-4 h-4 mr-2" />
+                  Print Report
+                </Button>
+                <Button 
+                  variant="default"
+                  className="bg-primary hover:bg-primary/90 text-white font-medium"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download PDF
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -166,27 +226,27 @@ export default function NumberOfBannerProgramsPerDepartmentReport() {
             <table className="print-table w-full border-collapse">
               <thead>
                 <tr className="bg-muted/50">
-                  <th className="border px-4 py-2 text-left">Dept.</th>
-                  <th className="border px-4 py-2 text-center" colSpan={3}>
+                  <th className="border px-4 py-2 text-left text-primary font-bold">Dept.</th>
+                  <th className="border px-4 py-2 text-center text-primary font-bold" colSpan={3}>
                     Number of Academic Programs
                   </th>
-                  <th className="border px-4 py-2 text-center">
+                  <th className="border px-4 py-2 text-center text-primary font-bold">
                     Number of Banner Programs
                   </th>
-                  <th className="border px-4 py-2 text-center" colSpan={2}>
+                  <th className="border px-4 py-2 text-center text-primary font-bold" colSpan={2}>
                     Number of Banner Projects Implemented
                   </th>
-                  <th className="border px-4 py-2 text-center">Remarks</th>
+                  <th className="border px-4 py-2 text-center text-primary font-bold">Remarks</th>
                 </tr>
                 <tr className="bg-muted/30">
-                  <th className="border px-4 py-2"></th>
-                  <th className="border px-4 py-2 text-center">Total</th>
-                  <th className="border px-4 py-2 text-center">Active</th>
-                  <th className="border px-4 py-2 text-center">Inactive</th>
-                  <th className="border px-4 py-2"></th>
-                  <th className="border px-4 py-2 text-center">Target</th>
-                  <th className="border px-4 py-2 text-center">Actual</th>
-                  <th className="border px-4 py-2"></th>
+                  <th className="border px-4 py-2 text-primary font-bold"></th>
+                  <th className="border px-4 py-2 text-center text-primary font-bold">Total</th>
+                  <th className="border px-4 py-2 text-center text-primary font-bold">Active</th>
+                  <th className="border px-4 py-2 text-center text-primary font-bold">Inactive</th>
+                  <th className="border px-4 py-2 text-primary font-bold"></th>
+                  <th className="border px-4 py-2 text-center text-primary font-bold">Target</th>
+                  <th className="border px-4 py-2 text-center text-primary font-bold">Actual</th>
+                  <th className="border px-4 py-2 text-primary font-bold"></th>
                 </tr>
               </thead>
               <tbody>
@@ -247,27 +307,51 @@ export default function NumberOfBannerProgramsPerDepartmentReport() {
           {reportData.data.departments.map((dept) => (
             <Card key={dept.id} className="print-content">
               <div className="p-6 print:p-0">
-                <h3 className="text-lg font-semibold mb-4">{dept.name}</h3>
+                {/* Department Header with Logo */}
+                <div className="flex items-center gap-4 mb-6">
+                  <img 
+                    src={departmentLogos[dept.code]} 
+                    alt={`${dept.code} Logo`} 
+                    className="h-12 w-12 object-contain"
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold">{dept.name}</h3>
+                    <p className="text-sm text-muted-foreground">{dept.code}</p>
+                  </div>
+                </div>
+
                 <table className="print-table w-full border-collapse">
                   <thead>
                     <tr className="bg-muted/50">
-                      <th rowSpan={2} className="border px-4 py-2 text-left">Dept.</th>
-                      <th colSpan={2} className="border px-4 py-2 text-center text-red-600">
+                      <th rowSpan={2} className="border px-4 py-2 text-left text-primary font-bold">
+                        Dept.
+                      </th>
+                      <th colSpan={2} className="border px-4 py-2 text-center text-primary font-bold">
                         Number of Academic Programs
                       </th>
-                      <th rowSpan={2} className="border px-4 py-2 text-center">
+                      <th rowSpan={2} className="border px-4 py-2 text-center text-primary font-bold">
                         Number of Banner Programs
                       </th>
-                      <th colSpan={2} className="border px-4 py-2 text-center">
+                      <th colSpan={2} className="border px-4 py-2 text-center text-primary font-bold">
                         Number of Banner Projects Implemented
                       </th>
-                      <th rowSpan={2} className="border px-4 py-2 text-center">Remarks</th>
+                      <th rowSpan={2} className="border px-4 py-2 text-center text-primary font-bold">
+                        Remarks
+                      </th>
                     </tr>
                     <tr className="bg-muted/50">
-                      <th className="border px-4 py-2 text-center">Active</th>
-                      <th className="border px-4 py-2 text-center">Inactive</th>
-                      <th className="border px-4 py-2 text-center">Target</th>
-                      <th className="border px-4 py-2 text-center">Actual</th>
+                      <th className="border px-4 py-2 text-center text-primary font-bold">
+                        Active
+                      </th>
+                      <th className="border px-4 py-2 text-center text-primary font-bold">
+                        Inactive
+                      </th>
+                      <th className="border px-4 py-2 text-center text-primary font-bold">
+                        Target
+                      </th>
+                      <th className="border px-4 py-2 text-center text-primary font-bold">
+                        Actual
+                      </th>
                     </tr>
                   </thead>
                   <tbody>

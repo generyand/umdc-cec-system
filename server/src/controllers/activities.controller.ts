@@ -10,6 +10,17 @@ export const createActivity: RequestHandler = async (
   try {
     const { proposalId } = req.body;
 
+    // Get current school year
+    const currentSchoolYear = await prisma.schoolYear.findFirst({
+      where: {
+        isCurrent: true,
+      },
+    });
+
+    if (!currentSchoolYear) {
+      throw new ApiError(400, "No active school year found");
+    }
+
     // Fetch the proposal details
     const proposal = await prisma.projectProposal.findUnique({
       where: { id: proposalId },
@@ -34,9 +45,6 @@ export const createActivity: RequestHandler = async (
       throw new ApiError(404, "Proposal not found");
     }
 
-    // Extract the first attachment ID if it exists
-    // const proposalFileId = proposal.attachments.length > 0 ? proposal.attachments[0].id : null;
-
     // Prepare data for new activity
     const activityData: any = {
       title: proposal.title,
@@ -45,6 +53,8 @@ export const createActivity: RequestHandler = async (
       status: "UPCOMING", // Default status
       department: { connect: { id: proposal.departmentId } },
       proposal: { connect: { id: proposal.id } },
+      // Add school year connection
+      schoolYear: { connect: { id: currentSchoolYear.id } },
     };
 
     // Conditionally add optional fields
@@ -61,6 +71,9 @@ export const createActivity: RequestHandler = async (
     // Create the new activity
     const newActivity = await prisma.activity.create({
       data: activityData,
+      include: {
+        schoolYear: true, // Include school year in the response
+      },
     });
 
     res.status(201).json({

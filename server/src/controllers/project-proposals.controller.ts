@@ -193,6 +193,17 @@ export const createProposal: RequestHandler = async (req, res) => {
 
     console.log("🔍 Processing proposal data:", proposalData);
 
+    // Get current school year
+    const currentSchoolYear = await prisma.schoolYear.findFirst({
+      where: {
+        isCurrent: true,
+      },
+    });
+
+    if (!currentSchoolYear) {
+      throw new ApiError(400, "No active school year found");
+    }
+
     // Destructure to remove partnerCommunity and use it for community connection
     const { partnerCommunity, ...restData } = proposalData;
 
@@ -202,6 +213,12 @@ export const createProposal: RequestHandler = async (req, res) => {
       bannerProgram: {
         connect: {
           id: Number(proposalData.bannerProgram.connect.id),
+        },
+      },
+      // Add school year connection
+      schoolYear: {
+        connect: {
+          id: currentSchoolYear.id,
         },
       },
       // Add other necessary field transformations
@@ -219,7 +236,7 @@ export const createProposal: RequestHandler = async (req, res) => {
       },
       user: {
         connect: {
-          id: req.user?.id, // Assuming you have user data in the request
+          id: req.user?.id,
         },
       },
     };

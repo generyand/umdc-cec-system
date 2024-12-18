@@ -72,6 +72,23 @@ const printStyles = `
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
+
+    /* Department detail tables */
+    .department-detail {
+      page-break-inside: avoid;
+      margin-bottom: 2cm;
+    }
+
+    /* Ensure proper spacing between tables */
+    .print-table + .print-table {
+      margin-top: 1cm;
+    }
+
+    /* Department headers */
+    .department-header {
+      margin-bottom: 0.5cm;
+      page-break-after: avoid;
+    }
   }
 `;
 
@@ -142,9 +159,10 @@ export default function NumberOfBannerProgramsPerDepartmentReport() {
           </p>
         </div>
 
-        {/* Main Report Table */}
-        <Card className="print-content">
+        {/* Overview Table */}
+        <Card className="print-content mb-8">
           <div className="p-6 print:p-0">
+            <h3 className="text-lg font-semibold mb-4">Overview</h3>
             <table className="print-table w-full border-collapse">
               <thead>
                 <tr className="bg-muted/50">
@@ -223,6 +241,92 @@ export default function NumberOfBannerProgramsPerDepartmentReport() {
             </table>
           </div>
         </Card>
+
+        {/* Detailed Department Tables */}
+        <div className="space-y-8">
+          {reportData.data.departments.map((dept) => (
+            <Card key={dept.id} className="print-content">
+              <div className="p-6 print:p-0">
+                <h3 className="text-lg font-semibold mb-4">{dept.name} ({dept.code})</h3>
+                <table className="print-table w-full border-collapse">
+                  <thead>
+                    <tr className="bg-muted/50">
+                      <th rowSpan={2} className="border px-4 py-2 text-left">Dept.</th>
+                      <th colSpan={2} className="border px-4 py-2 text-center text-red-600">
+                        Number of Academic Programs
+                      </th>
+                      <th rowSpan={2} className="border px-4 py-2 text-center">
+                        Number of Banner Programs
+                      </th>
+                      <th colSpan={2} className="border px-4 py-2 text-center">
+                        Number of Banner Projects Implemented
+                      </th>
+                      <th rowSpan={2} className="border px-4 py-2 text-center">Remarks</th>
+                    </tr>
+                    <tr className="bg-muted/50">
+                      <th className="border px-4 py-2 text-center">Active</th>
+                      <th className="border px-4 py-2 text-center">Inactive</th>
+                      <th className="border px-4 py-2 text-center">Target</th>
+                      <th className="border px-4 py-2 text-center">Actual</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dept.academicPrograms.programs.map((program) => (
+                      <tr key={program.id}>
+                        <td className="border px-4 py-2">
+                          {program.abbreviation}
+                        </td>
+                        <td className="border px-4 py-2 text-center">
+                          {program.status === "ACTIVE" ? program.abbreviation : "-"}
+                        </td>
+                        <td className="border px-4 py-2 text-center">
+                          {program.status === "INACTIVE" ? program.abbreviation : "-"}
+                        </td>
+                        <td className="border px-4 py-2 text-center">
+                          {program.bannerProgramsCount}
+                        </td>
+                        <td className="border px-4 py-2 text-center">
+                          {/* Add target count when available */}
+                          -
+                        </td>
+                        <td className="border px-4 py-2 text-center">
+                          {/* Add actual count when available */}
+                          -
+                        </td>
+                        <td className="border px-4 py-2 text-center">-</td>
+                      </tr>
+                    ))}
+                    {/* Department Total Row */}
+                    <tr className="bg-muted/50 font-bold">
+                      <td className="border px-4 py-2">TOTAL</td>
+                      <td className="border px-4 py-2 text-center">
+                        {dept.academicPrograms.active}
+                      </td>
+                      <td className="border px-4 py-2 text-center">
+                        {dept.academicPrograms.inactive}
+                      </td>
+                      <td className="border px-4 py-2 text-center">
+                        {dept.bannerPrograms.count}
+                      </td>
+                      <td className="border px-4 py-2 text-center">
+                        {dept.bannerProjects.target}
+                      </td>
+                      <td className="border px-4 py-2 text-center">
+                        {dept.bannerProjects.actual} 
+                        {dept.bannerProjects.target > 0 && (
+                          <span className="text-sm">
+                            {' '}({dept.bannerProjects.completionRate}%)
+                          </span>
+                        )}
+                      </td>
+                      <td className="border px-4 py-2 text-center">-</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          ))}
+        </div>
 
         {/* Report Metadata - Print Only */}
         <div className="print-footer hidden print:block">

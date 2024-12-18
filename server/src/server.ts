@@ -20,6 +20,7 @@ import testRoutes from "./routes/tests/test.routes.js";
 import formOptionsRoutes from "./routes/form-options/form-options.route.js";
 import notificationsRoutes from "./routes/notifications/notifications.route.js";
 import reportsRoutes from "./routes/reports/reports.route.js";
+import dashboardRoutes from "./routes/dashboard/dashboard.routes.js";
 
 async function createServer() {
   const app = express();
@@ -50,6 +51,7 @@ async function createServer() {
   app.use("/api/form-options", formOptionsRoutes);
   app.use("/api/notifications", notificationsRoutes);
   app.use("/api/reports", reportsRoutes);
+  app.use("/api/dashboard", dashboardRoutes);
 
   app.use(errorHandler);
 

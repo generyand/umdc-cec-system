@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Card,
   CardContent,
@@ -86,15 +85,15 @@ export default function StaffHomePage() {
   return (
     <div className="mx-auto space-y-8 w-full">
       {/* Welcome Section */}
-      <div className="flex flex-col gap-4 justify-between items-start p-6 bg-gradient-to-r to-transparent rounded-lg md:flex-row md:items-center from-primary/10">
+      <div className="flex flex-col gap-4 justify-between items-start p-6 bg-primary rounded-lg shadow-md md:flex-row md:items-center">
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">
+          <h1 className="text-4xl font-bold tracking-tight text-primary-foreground">
             Welcome back, {user?.firstName}! 👋
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-primary-foreground">
             {user?.department?.name || "Extension Staff"}
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-primary-foreground">
             {new Date().toLocaleDateString("en-US", {
               weekday: "long",
               year: "numeric",
@@ -107,18 +106,18 @@ export default function StaffHomePage() {
         {/* Quick Stats */}
         <div className="flex gap-6 items-center">
           <div className="flex flex-col items-center">
-            <div className="text-2xl font-bold text-primary">3</div>
-            <div className="text-sm text-muted-foreground">Active Projects</div>
+            <div className="text-2xl font-bold text-primary-foreground">3</div>
+            <div className="text-sm text-primary-foreground">Active Projects</div>
           </div>
           <Separator orientation="vertical" className="h-12" />
           <div className="flex flex-col items-center">
-            <div className="text-2xl font-bold text-primary">2</div>
-            <div className="text-sm text-muted-foreground">Pending Reports</div>
+            <div className="text-2xl font-bold text-primary-foreground">2</div>
+            <div className="text-sm text-primary-foreground">Pending Reports</div>
           </div>
           <Separator orientation="vertical" className="h-12" />
           <div className="flex flex-col items-center">
-            <div className="text-2xl font-bold text-primary">5</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-2xl font-bold text-primary-foreground">5</div>
+            <div className="text-sm text-primary-foreground">
               Upcoming Activities
             </div>
           </div>
@@ -131,15 +130,17 @@ export default function StaffHomePage() {
           <Button
             key={link.title}
             variant="outline"
-            className="flex flex-col items-start p-6 space-y-3 h-auto rounded-lg transition-transform transform hover:scale-105 hover:shadow-lg hover:bg-primary/10 hover:border-primary"
+            className="group flex flex-col items-start p-6 space-y-3 h-auto rounded-lg transition-all duration-300 hover:scale-102 hover:shadow-md border-muted-foreground/20"
             onClick={() => navigate(link.href)}
           >
-            <div className="p-3 rounded-full bg-primary/20">
-              <link.icon className="w-6 h-6 text-primary" />
+            <div className="p-3 rounded-full bg-primary/10 transition-colors duration-300 group-hover:bg-primary/20">
+              <link.icon className="w-6 h-6 text-primary transition-colors duration-300 group-hover:text-primary/80" />
             </div>
             <div className="text-left">
-              <div className="font-semibold text-primary">{link.title}</div>
-              <div className="mt-1 text-sm text-muted-foreground">
+              <div className="font-semibold text-primary/90 transition-colors duration-300 group-hover:text-primary">
+                {link.title}
+              </div>
+              <div className="mt-1 text-sm text-muted-foreground/80">
                 {link.description}
               </div>
             </div>
@@ -150,7 +151,7 @@ export default function StaffHomePage() {
       {/* Dashboard Content */}
       <div className="grid gap-8 md:grid-cols-2">
         {/* My Activities Card */}
-        <Card>
+        <Card className="md:col-span-1">
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
@@ -162,7 +163,7 @@ export default function StaffHomePage() {
                   Your ongoing and upcoming activities
                 </CardDescription>
               </div>
-              <Button variant="ghost" size="sm">
+              <Button variant="outline" size="sm">
                 View All
               </Button>
             </div>
@@ -173,7 +174,7 @@ export default function StaffHomePage() {
                 {myActivities.map((activity, index) => (
                   <div
                     key={index}
-                    className="p-4 rounded-lg transition-colors hover:bg-muted/50"
+                    className="p-4 space-y-3 rounded-lg transition-colors hover:bg-muted/50"
                   >
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
@@ -188,6 +189,11 @@ export default function StaffHomePage() {
                             ? "default"
                             : "secondary"
                         }
+                        className={cn(
+                          "capitalize",
+                          activity.status === "ongoing" &&
+                            "bg-primary/10 text-primary"
+                        )}
                       >
                         {activity.status}
                       </Badge>
@@ -203,7 +209,7 @@ export default function StaffHomePage() {
         </Card>
 
         {/* Announcements Card */}
-        <Card>
+        <Card className="md:col-span-1">
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
@@ -213,7 +219,7 @@ export default function StaffHomePage() {
                 </CardTitle>
                 <CardDescription>Important updates and notices</CardDescription>
               </div>
-              <Button variant="ghost" size="sm">
+              <Button variant="outline" size="sm">
                 View All
               </Button>
             </div>
@@ -241,8 +247,16 @@ export default function StaffHomePage() {
                         variant={
                           announcement.priority === "high"
                             ? "destructive"
-                            : "secondary"
+                            : announcement.priority === "medium"
+                            ? "secondary"
+                            : "outline"
                         }
+                        className={cn(
+                          announcement.priority === "high" && "bg-red-500",
+                          announcement.priority === "medium" && "bg-yellow-500",
+                          announcement.priority === "low" && "bg-green-500",
+                          "text-white"
+                        )}
                       >
                         {announcement.priority}
                       </Badge>

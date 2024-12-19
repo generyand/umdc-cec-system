@@ -7,15 +7,12 @@ import {
   Users,
   Target,
   Calendar,
-  ArrowUpRight,
   ArchiveIcon,
   FlagIcon,
   ClipboardListIcon,
   CalendarCheck,
   Clock,
   MapPin,
-  Users2,
-  MoreHorizontal,
   FileText,
   CalendarClock,
   Plus,
@@ -179,22 +176,6 @@ const DepartmentOverviewSkeleton = () => {
   );
 };
 
-// Add type definitions for your data structure
-interface Activity {
-  id: number;
-  title: string;
-  description: string;
-  status: "ONGOING" | "UPCOMING" | "COMPLETED";
-  targetDate: string;
-  bannerProgram: {
-    name: string;
-    abbreviation: string;
-  };
-  partnerCommunity: {
-    name: string;
-  };
-}
-
 // First, add the getBadgeVariant helper function at the top level
 const getBadgeVariant = (status: string) => {
   switch (status) {
@@ -208,6 +189,87 @@ const getBadgeVariant = (status: string) => {
       return "default";
   }
 };
+
+// Define the ActivityCard component
+function ActivityCard({ activity }: { activity: any }) {
+  const navigate = useNavigate();
+
+  return (
+    <Card 
+      className="overflow-hidden transition-all hover:shadow-md cursor-pointer group"
+      onClick={() => navigate(`/staff/events-and-activities/activity-management/${activity.id}`)}
+    >
+      <CardContent className="p-4">
+        <div className="space-y-3">
+          {/* Status Badge */}
+          <div className="flex items-center justify-between">
+            <Badge 
+              variant={getBadgeVariant(activity.status)}
+              className="w-fit"
+            >
+              {activity.status}
+            </Badge>
+            {/* <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button> */}
+          </div>
+
+          {/* Title */}
+          <h4 className="font-medium line-clamp-2 group-hover:text-primary transition-colors">
+            {activity.title}
+          </h4>
+
+          {/* Description */}
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {activity.description}
+          </p>
+
+          {/* Banner Program (if exists) */}
+          {activity.bannerProgram && (
+            <div className="flex items-start gap-2 text-sm">
+              <FileText className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium">{activity.bannerProgram.abbreviation}</p>
+                <p className="text-xs text-muted-foreground">
+                  {activity.bannerProgram.name}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Partner Community */}
+          {activity.partnerCommunity && (
+            <div className="flex items-start gap-2 text-sm">
+              <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium">{activity.partnerCommunity.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {activity.partnerCommunity.address}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Date */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+            {new Date(activity.targetDate).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function StaffDepartmentOverviewPage() {
   const { user } = useAuth();
@@ -249,6 +311,8 @@ export default function StaffDepartmentOverviewPage() {
   }
 
   const departmentData = response.data;
+
+  console.log("department activities: ", departmentData.activities);
 
   console.log(departmentData);
 
@@ -396,9 +460,7 @@ export default function StaffDepartmentOverviewPage() {
                     Department's academic programs
                   </p>
                 </div>
-                <Button variant="outline" size="sm">
-                  View All
-                </Button>
+                
               </div>
             </div>
             <div className="grid flex-1 grid-cols-2 gap-6 p-6 min-h-0">
@@ -562,9 +624,7 @@ export default function StaffDepartmentOverviewPage() {
                   Scheduled activities and events
                 </p>
               </div>
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
+              
             </div>
           </div>
           <div className="overflow-y-auto flex-1 p-6 scrollbar-thin">
@@ -573,70 +633,7 @@ export default function StaffDepartmentOverviewPage() {
                 ?.filter(activity => activity.status === "UPCOMING")
                 .sort((a, b) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime())
                 .map((activity) => (
-                  <Card 
-                    key={activity.id}
-                    className="overflow-hidden transition-all hover:shadow-md cursor-pointer group"
-                  >
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        {/* Status Badge */}
-                        <div className="flex items-center justify-between">
-                          <Badge variant={getBadgeVariant(activity.status)}>
-                            {activity.status}
-                          </Badge>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        {/* Title */}
-                        <h4 className="font-medium line-clamp-2 group-hover:text-primary transition-colors">
-                          {activity.title}
-                        </h4>
-
-                        {/* Description */}
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {activity.description}
-                        </p>
-
-                        {/* Banner Program */}
-                        {activity.bannerProgram && (
-                          <div className="flex items-start gap-2 text-sm">
-                            <FileText className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                            <div>
-                              <p className="font-medium">{activity.bannerProgram.abbreviation}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {activity.bannerProgram.name}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Partner Community */}
-                        {activity.partnerCommunity && (
-                          <div className="flex items-start gap-2 text-sm">
-                            <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                            <div>
-                              <p className="font-medium">{activity.partnerCommunity.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {activity.partnerCommunity.address}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Date */}
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          {new Date(activity.targetDate).toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <ActivityCard key={activity.id} activity={activity} />
                 ))}
 
               {departmentData?.activities?.filter(a => a.status === "UPCOMING").length === 0 && (
@@ -667,9 +664,7 @@ export default function StaffDepartmentOverviewPage() {
                   Currently running activities
                 </p>
               </div>
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
+              
             </div>
           </div>
           <div className="overflow-y-auto flex-1 p-6 scrollbar-thin">
@@ -728,29 +723,35 @@ export default function StaffDepartmentOverviewPage() {
             <div className="flex justify-between items-center">
               <div>
                 <div className="flex gap-2 items-center">
-                  <h2 className="text-xl font-semibold">
-                    Completed Activities
-                  </h2>
+                  <h2 className="text-xl font-semibold">Completed Activities</h2>
                   <span className="px-2 py-0.5 text-xs font-medium text-muted-foreground bg-muted rounded-full">
-                    0
+                    {departmentData?.activities?.filter(a => a.status === "COMPLETED").length || 0}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Past activities and events
                 </p>
               </div>
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
+             
             </div>
           </div>
           <div className="overflow-y-auto flex-1 p-6 scrollbar-thin">
-            <div className="flex flex-col justify-center items-center p-8 text-center">
-              <CalendarCheck className="mb-4 w-12 h-12 text-muted-foreground/50" />
-              <h3 className="text-lg font-semibold">No Completed Activities</h3>
-              <p className="text-sm text-muted-foreground">
-                There are no completed activities to display.
-              </p>
+            <div className="space-y-4">
+              {departmentData?.activities
+                ?.filter(activity => activity.status === "COMPLETED")
+                .map((activity) => (
+                  <ActivityCard key={activity.id} activity={activity} />
+                ))}
+
+              {departmentData?.activities?.filter(a => a.status === "COMPLETED").length === 0 && (
+                <div className="flex flex-col justify-center items-center p-8 text-center">
+                  <CalendarCheck className="mb-4 w-12 h-12 text-muted-foreground/50" />
+                  <h3 className="text-lg font-semibold">No Completed Activities</h3>
+                  <p className="text-sm text-muted-foreground">
+                    There are no completed activities to display.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </Card>

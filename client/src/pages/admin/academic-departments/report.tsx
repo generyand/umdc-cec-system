@@ -121,8 +121,6 @@ export default function NumberOfBannerProgramsPerDepartmentReport() {
     queryFn: reportsApi.getDepartmentReports,
   });
 
-  alert("Wassup");
-
   if (isLoading) {
     return <div>Loading report...</div>;
   }

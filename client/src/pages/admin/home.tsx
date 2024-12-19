@@ -368,6 +368,69 @@ export default function HomePage() {
           </CardContent>
         </Card>
 
+        {/* Pending Approvals Card */}
+        <Card className="md:col-span-1">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="flex gap-2 items-center">
+                  <AlertCircle className="w-5 h-5 text-primary" />
+                  Pending Approvals
+                </CardTitle>
+                <CardDescription>Proposals awaiting your review</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => navigate("/admin/administration/approvals")}>View All</Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[300px] pr-4">
+              <div className="space-y-4">
+                {overview?.pendingApprovals.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground">
+                    <CheckCircle className="h-8 w-8 mb-2" />
+                    <p>No pending approvals</p>
+                  </div>
+                ) : (
+                  overview?.pendingApprovals.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-4 rounded-lg border transition-colors hover:bg-muted/50 cursor-pointer"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <h4 className="font-medium">{item.title}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              By {item.user.firstName} {item.user.lastName}
+                            </p>
+                          </div>
+                          <Badge 
+                            variant="secondary" 
+                            className={cn(
+                              "shrink-0",
+                              item.currentApprovalStep === "CEC_HEAD" && "bg-blue-500/10 text-blue-500",
+                              item.currentApprovalStep === "VP_DIRECTOR" && "bg-purple-500/10 text-purple-500",
+                              item.currentApprovalStep === "CHIEF_OPERATION_OFFICER" && "bg-amber-500/10 text-amber-500"
+                            )}
+                          >
+                            {item.currentApprovalStep === "CEC_HEAD" && "CEC Head"}
+                            {item.currentApprovalStep === "VP_DIRECTOR" && "VP Director"}
+                            {item.currentApprovalStep === "CHIEF_OPERATION_OFFICER" && "Chief Officer"}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <Clock className="mr-1 h-3 w-3" />
+                          {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
         {/* Announcements Card */}
         <Card className="md:col-span-1">
           <CardHeader className="flex flex-row justify-between items-center">
@@ -479,68 +542,7 @@ export default function HomePage() {
           </CardContent>
         </Card>
 
-        {/* Pending Approvals Card */}
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <div>
-                <CardTitle className="flex gap-2 items-center">
-                  <AlertCircle className="w-5 h-5 text-primary" />
-                  Pending Approvals
-                </CardTitle>
-                <CardDescription>Proposals awaiting your review</CardDescription>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => navigate("/admin/administration/approvals")}>View All</Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[300px] pr-4">
-              <div className="space-y-4">
-                {overview?.pendingApprovals.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground">
-                    <CheckCircle className="h-8 w-8 mb-2" />
-                    <p>No pending approvals</p>
-                  </div>
-                ) : (
-                  overview?.pendingApprovals.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-4 rounded-lg border transition-colors hover:bg-muted/50 cursor-pointer"
-                    >
-                      <div className="space-y-3">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <h4 className="font-medium">{item.title}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              By {item.user.firstName} {item.user.lastName}
-                            </p>
-                          </div>
-                          <Badge 
-                            variant="secondary" 
-                            className={cn(
-                              "shrink-0",
-                              item.currentApprovalStep === "CEC_HEAD" && "bg-blue-500/10 text-blue-500",
-                              item.currentApprovalStep === "VP_DIRECTOR" && "bg-purple-500/10 text-purple-500",
-                              item.currentApprovalStep === "CHIEF_OPERATION_OFFICER" && "bg-amber-500/10 text-amber-500"
-                            )}
-                          >
-                            {item.currentApprovalStep === "CEC_HEAD" && "CEC Head"}
-                            {item.currentApprovalStep === "VP_DIRECTOR" && "VP Director"}
-                            {item.currentApprovalStep === "CHIEF_OPERATION_OFFICER" && "Chief Officer"}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <Clock className="mr-1 h-3 w-3" />
-                          {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </ScrollArea>
-          </CardContent>
-        </Card>
+        
       </div>
     </div>
   );

@@ -22,30 +22,6 @@ const formTemplates: FormTemplate[] = [
     fileUrl: '/src/assets/documents/project-proposal-template.docx',
     fileType: 'DOCX'
   },
-  {
-    id: '2',
-    title: 'Activity Report Template',
-    description: 'Template for documenting and reporting community extension activities.',
-    fileName: 'activity-report-template.docx',
-    fileUrl: '/src/assets/documents/templates/activity-report-template.docx',
-    fileType: 'DOCX'
-  },
-  {
-    id: '3',
-    title: 'Budget Planning Sheet',
-    description: 'Excel template for project budget planning and tracking.',
-    fileName: 'budget-planning-template.xlsx',
-    fileUrl: '/src/assets/documents/templates/budget-planning-template.xlsx',
-    fileType: 'XLSX'
-  },
-  {
-    id: '4',
-    title: 'Evaluation Form',
-    description: 'Form for evaluating the impact and success of extension projects.',
-    fileName: 'evaluation-form.docx',
-    fileUrl: '/src/assets/documents/templates/evaluation-form.docx',
-    fileType: 'DOCX'
-  }
 ];
 
 const FormsAndTemplates = () => {

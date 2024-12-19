@@ -59,6 +59,8 @@ interface ReportData {
 export const reportsApi = {
   getDepartmentReports: async () => {
     const response = await api.get<ApiResponse<ReportData>>("/api/reports/banner-programs-per-department");
+
+    console.log(response.data);
     return response.data;
   },
 };

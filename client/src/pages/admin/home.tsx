@@ -20,6 +20,7 @@ import {
   CalendarDays,
   TrendingUp,
   Users,
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -31,6 +32,48 @@ import { Separator } from "@/components/ui/separator";
 import { UserPosition } from "@/types/user.types";
 import { dashboardApi } from "@/services/api/dashboard.service";
 import { useQuery } from "@tanstack/react-query";
+import { format, formatDistanceToNow } from "date-fns";
+
+interface DashboardOverview {
+  data: {
+    recentActivities: {
+      id: string;
+      title: string;
+      targetDate: string;
+      department: {
+        name: string;
+        abbreviation: string;
+      };
+    }[];
+    announcements: {
+      id: string;
+      title: string;
+      content: string;
+      status: string;
+      createdAt: string;
+    }[];
+    departments: {
+      id: string;
+      name: string;
+      abbreviation: string;
+      _count: {
+        activities: number;
+        projectProposals: number;
+      };
+    }[];
+    pendingApprovals: {
+      id: string;
+      title: string;
+      status: string;
+      currentApprovalStep: number;
+      createdAt: string;
+      user: {
+        firstName: string;
+        lastName: string;
+      };
+    }[];
+  };
+}
 
 export default function HomePage() {
   const { user, currentSchoolYear } = useAuth();
@@ -45,14 +88,14 @@ export default function HomePage() {
 
   console.log(dashboardStats);
 
-  const { data: dashboardOverviewData, isLoading: isDashboardOverviewLoading } = useQuery({
+  const { data: dashboardOverview, isLoading: isDashboardOverviewLoading } = useQuery<DashboardOverview>({
     queryKey: ["dashboardOverview"],
     queryFn: () => dashboardApi.getDashboardOverview(),
   });
 
-  const dashboardOverview = dashboardOverviewData?.data;
+  const overview = dashboardOverview?.data;
 
-  console.log(dashboardOverview);
+  console.log(overview);
 
 
   const formatPosition = (position: UserPosition) => {
@@ -80,79 +123,6 @@ export default function HomePage() {
       href: "/admin/events-and-activities/calendar",
       icon: Calendar,
     },
-  ];
-
-  const recentActivity = [
-    {
-      user: "Dr. Santos",
-      action: "submitted a new proposal for",
-      project: "Community Health Initiative",
-      time: "2 hours ago",
-      department: "College of Nursing",
-    },
-    {
-      user: "Prof. Garcia",
-      action: "updated the status of",
-      project: "Digital Literacy Program",
-      time: "4 hours ago",
-      department: "College of Computing",
-    },
-    {
-      user: "Dean Reyes",
-      action: "approved the proposal for",
-      project: "Youth Development Workshop",
-      time: "5 hours ago",
-      department: "College of Education",
-    },
-  ];
-
-  const announcements = [
-    {
-      title: "Proposal Deadline Extension",
-      content:
-        "Extension program proposals for Q2 2024 deadline extended to April 15",
-      date: "March 25, 2024",
-      priority: "high",
-    },
-    {
-      title: "New Reporting Guidelines",
-      content: "Updated impact assessment templates now available",
-      date: "March 23, 2024",
-      priority: "medium",
-    },
-    {
-      title: "System Maintenance",
-      content: "Scheduled maintenance on March 30, 2024, from 10 PM to 2 AM",
-      date: "March 22, 2024",
-      priority: "low",
-    },
-  ];
-
-  const departmentPerformance = [
-    {
-      name: "DAE",
-      fullName: "Department of Accounting Education",
-      programs: 6,
-      participation: 88,
-      status: "active",
-      activePrograms: [
-        "Financial Literacy Workshop",
-        "Basic Bookkeeping for SMEs",
-      ],
-    },
-    // Add 2-3 more departments for initial display
-  ];
-
-  const pendingApprovals = [
-    {
-      id: 1,
-      title: "Community Financial Education Workshop",
-      department: "DAE",
-      submittedBy: "Prof. Garcia",
-      status: "pending_review",
-      submitDate: "2024-03-20",
-    },
-    // Add 2-3 more items for initial display
   ];
 
   return (
@@ -311,41 +281,33 @@ export default function HomePage() {
             <div>
               <CardTitle className="flex gap-2 items-center">
                 <Activity className="w-5 h-5 text-primary" />
-                Recent Activities
+                Activities
               </CardTitle>
               <CardDescription>Latest updates and events</CardDescription>
             </div>
-            <Button variant="ghost" size="sm">
-              View All
-            </Button>
+            <Button variant="ghost" size="sm">View All</Button>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[300px] pr-4">
               <div className="space-y-4">
-                {recentActivity.map((activity, index) => (
+                {overview?.recentActivities.map((activity) => (
                   <div
-                    key={index}
-                    className="flex items-start p-3 space-x-3 text-sm rounded-lg transition-colors hover:bg-muted/50"
+                    key={activity.id}
+                    className="flex items-start p-4 space-x-4 text-sm rounded-lg transition-colors hover:bg-muted/50"
                   >
-                    <div className="mt-2 w-2 h-2 rounded-full bg-primary shrink-0" />
-                    <div>
-                      <p className="leading-relaxed">
-                        <span className="font-semibold text-primary">
-                          {activity.user}
-                        </span>{" "}
-                        {activity.action}{" "}
-                        <span className="font-medium cursor-pointer hover:text-primary">
-                          {activity.project}
+                    <div className="mt-1.5 w-2 h-2 rounded-full bg-primary shrink-0" />
+                    <div className="space-y-1 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-primary">
+                          {activity.title}
                         </span>
-                      </p>
-                      <div className="flex gap-2 items-center mt-1">
-                        <Badge variant="secondary" className="text-xs">
-                          {activity.department}
+                        <Badge variant="outline" className="text-xs">
+                          {activity.department.abbreviation}
                         </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {activity.time}
-                        </span>
                       </div>
+                      <p className="text-xs text-muted-foreground">
+                        {format(new Date(activity.targetDate), "PPP")} at {format(new Date(activity.targetDate), "p")}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -364,53 +326,31 @@ export default function HomePage() {
               </CardTitle>
               <CardDescription>Important updates and notices</CardDescription>
             </div>
-            <Button variant="ghost" size="sm">
-              View All
-            </Button>
+            <Button variant="ghost" size="sm">View All</Button>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[300px] pr-4">
               <div className="space-y-4">
-                {announcements.map((announcement, index) => (
+                {overview?.announcements.map((announcement) => (
                   <div
-                    key={index}
-                    className={cn(
-                      "space-y-2 p-4 rounded-lg transition-colors",
-                      "hover:bg-muted/50",
-                      announcement.priority === "high" &&
-                        "border-l-4 border-red-500",
-                      announcement.priority === "medium" &&
-                        "border-l-4 border-yellow-500",
-                      announcement.priority === "low" &&
-                        "border-l-4 border-green-500"
-                    )}
+                    key={announcement.id}
+                    className="p-4 rounded-lg border transition-colors hover:bg-muted/50"
                   >
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-medium">{announcement.title}</h4>
-                      <Badge
-                        variant={
-                          announcement.priority === "high"
-                            ? "destructive"
-                            : announcement.priority === "medium"
-                            ? "secondary"
-                            : "outline"
-                        }
-                        className={cn(
-                          announcement.priority === "high" && "bg-red-500",
-                          announcement.priority === "medium" && "bg-yellow-500",
-                          announcement.priority === "low" && "bg-green-500",
-                          "text-white"
-                        )}
-                      >
-                        {announcement.priority}
-                      </Badge>
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between gap-4">
+                        <h4 className="font-medium leading-none">{announcement.title}</h4>
+                        <Badge variant="outline" className="shrink-0">
+                          {announcement.status}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {announcement.content}
+                      </p>
+                      <div className="flex items-center text-xs text-muted-foreground">
+                        <Clock className="mr-1 h-3 w-3" />
+                        {formatDistanceToNow(new Date(announcement.createdAt), { addSuffix: true })}
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {announcement.content}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {announcement.date}
-                    </p>
                   </div>
                 ))}
               </div>
@@ -418,7 +358,7 @@ export default function HomePage() {
           </CardContent>
         </Card>
 
-        {/* Department Performance Card */}
+        {/* Department Overview Card */}
         <Card className="md:col-span-1">
           <CardHeader>
             <div className="flex justify-between items-center">
@@ -427,58 +367,44 @@ export default function HomePage() {
                   <Building2 className="w-5 h-5 text-primary" />
                   Department Overview
                 </CardTitle>
-                <CardDescription>
-                  Active programs and participation
-                </CardDescription>
+                <CardDescription>Program statistics by department</CardDescription>
               </div>
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
+              <Button variant="outline" size="sm">View All</Button>
             </div>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[300px] pr-4">
               <div className="space-y-4">
-                {departmentPerformance.map((dept) => (
+                {overview?.departments.map((dept) => (
                   <div
-                    key={dept.name}
-                    className="p-4 space-y-3 rounded-lg transition-colors hover:bg-muted/50"
+                    key={dept.id}
+                    className="p-4 rounded-lg border transition-colors hover:bg-muted/50"
                   >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="flex gap-2 items-center">
-                          <span className="font-medium">{dept.name}</span>
-                          <Badge variant="outline">
-                            {dept.programs} programs
-                          </Badge>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">{dept.name}</h4>
+                          <p className="text-sm text-muted-foreground">{dept.abbreviation}</p>
                         </div>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {dept.fullName}
-                        </p>
+                        <Badge 
+                          variant="outline"
+                          className={cn(
+                            "capitalize",
+                            dept._count.activities > 0 ? "bg-green-500/10 text-green-500" : "bg-yellow-500/10 text-yellow-500"
+                          )}
+                        >
+                          {dept._count.activities > 0 ? "Active" : "No Activities"}
+                        </Badge>
                       </div>
-                      <Badge
-                        variant="secondary"
-                        className={cn(
-                          "capitalize",
-                          dept.status === "active" &&
-                            "bg-green-500/10 text-green-500"
-                        )}
-                      >
-                        {dept.status}
-                      </Badge>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Active Programs:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {dept.activePrograms.map((program) => (
-                          <Badge
-                            key={program}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {program}
-                          </Badge>
-                        ))}
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-1">
+                          <Activity className="h-4 w-4 text-muted-foreground" />
+                          <span>{dept._count.activities} Activities</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <FilePlus className="h-4 w-4 text-muted-foreground" />
+                          <span>{dept._count.projectProposals} Proposals</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -497,39 +423,45 @@ export default function HomePage() {
                   <AlertCircle className="w-5 h-5 text-primary" />
                   Pending Approvals
                 </CardTitle>
-                <CardDescription>Items requiring attention</CardDescription>
+                <CardDescription>Proposals awaiting your review</CardDescription>
               </div>
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
+              <Button variant="outline" size="sm">View All</Button>
             </div>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[300px] pr-4">
               <div className="space-y-4">
-                {pendingApprovals.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-4 rounded-lg transition-colors cursor-pointer hover:bg-muted/50"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-1">
-                        <p className="font-medium">{item.title}</p>
-                        <div className="flex gap-2 items-center text-sm">
-                          <Badge variant="outline">{item.department}</Badge>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="text-muted-foreground">
-                            {item.submittedBy}
-                          </span>
+                {overview?.pendingApprovals.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground">
+                    <CheckCircle className="h-8 w-8 mb-2" />
+                    <p>No pending approvals</p>
+                  </div>
+                ) : (
+                  overview?.pendingApprovals.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-4 rounded-lg border transition-colors hover:bg-muted/50 cursor-pointer"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <h4 className="font-medium">{item.title}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              By {item.user.firstName} {item.user.lastName}
+                            </p>
+                          </div>
+                          <Badge variant="secondary" className="shrink-0">
+                            Step {item.currentApprovalStep}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <Clock className="mr-1 h-3 w-3" />
+                          {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
                         </div>
                       </div>
-                      <Badge variant="secondary">Pending Review</Badge>
                     </div>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Submitted on {formatDate(item.submitDate)}
-                    </p>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </ScrollArea>
           </CardContent>

@@ -10,13 +10,10 @@ import {
   ArchiveIcon,
   FlagIcon,
   ClipboardListIcon,
-  ArrowUpRight,
-  ArrowLeft,
   CalendarCheck,
   CalendarClock,
   ChevronRight,
   Calendar,
-  MoreHorizontal,
   FileText,
   MapPin,
 } from "lucide-react";
@@ -139,15 +136,6 @@ export default function DepartmentPage() {
               >
                 {activity.status}
               </Badge>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
             </div>
 
             {/* Title */}

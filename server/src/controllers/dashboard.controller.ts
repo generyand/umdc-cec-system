@@ -3,7 +3,7 @@ import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../utils/errors.js";
 
 // Get quick stats for dashboard
-export const getDashboardStats: RequestHandler = async (req, res) => {
+export const getAdminDashboardStats: RequestHandler = async (req, res) => {
   try {
     const [
       bannerProgramsCount,
@@ -41,7 +41,7 @@ export const getDashboardStats: RequestHandler = async (req, res) => {
 };
 
 // Get dashboard overview data
-export const getDashboardOverview: RequestHandler = async (req, res) => {
+export const getAdminDashboardOverview: RequestHandler = async (req, res) => {
   try {
     const userId = req.user?.id;
 
@@ -141,3 +141,21 @@ export const getDashboardOverview: RequestHandler = async (req, res) => {
     throw new ApiError(500, "Failed to fetch dashboard overview");
   }
 };
+
+export const getStaffDashboardStats: RequestHandler = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    console.error("❌ Error fetching dashboard stats:", error);
+    throw new ApiError(500, "Failed to fetch dashboard stats");
+  }
+}
+
+export const getStaffDashboardOverview: RequestHandler = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    console.error("❌ Error fetching dashboard overview:", error);
+    throw new ApiError(500, "Failed to fetch dashboard overview");
+  }
+}

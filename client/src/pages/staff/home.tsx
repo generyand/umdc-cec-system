@@ -166,7 +166,7 @@ export default function StaffHomePage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-medium text-primary-foreground/70">
-                      Pending Reports
+                      Academic Programs
                     </p>
                     <p className="text-2xl font-bold text-primary-foreground mt-1">2</p>
                   </div>
@@ -176,7 +176,7 @@ export default function StaffHomePage() {
                 </div>
                 <div className="mt-2 flex items-center gap-1 text-xs text-primary-foreground/60">
                   <AlertCircle className="w-3 h-3" />
-                  <span>Need attention</span>
+                  <span>Active programs</span>
                 </div>
               </div>
 

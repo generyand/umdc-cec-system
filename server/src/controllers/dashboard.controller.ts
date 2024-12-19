@@ -90,20 +90,33 @@ export const getDashboardOverview: RequestHandler = async (req, res) => {
       // Pending Approvals for the user
       prisma.projectProposal.findMany({
         where: {
-          approvals: {
-            some: {
-              approverUserId: userId,
-              status: "PENDING"
-            }
+          status: "PENDING",
+          currentApprovalStep: {
+            equals: userId?.position === "CEC_HEAD" 
+              ? "CEC_HEAD" 
+              : userId?.position === "VP_DIRECTOR" 
+                ? "VP_DIRECTOR" 
+                : userId?.position === "CHIEF_OPERATION_OFFICER" 
+                  ? "CHIEF_OPERATION_OFFICER" 
+                  : undefined
           }
         },
         take: 5,
+        orderBy: {
+          createdAt: 'desc'
+        },
         select: {
           id: true,
           title: true,
           status: true,
           currentApprovalStep: true,
           createdAt: true,
+          department: {
+            select: {
+              name: true,
+              abbreviation: true
+            }
+          },
           user: {
             select: {
               firstName: true,

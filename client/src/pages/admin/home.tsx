@@ -65,7 +65,7 @@ interface DashboardOverview {
       id: string;
       title: string;
       status: string;
-      currentApprovalStep: number;
+      currentApprovalStep: string;
       createdAt: string;
       user: {
         firstName: string;
@@ -124,6 +124,19 @@ export default function HomePage() {
       icon: Calendar,
     },
   ];
+
+  const formatApprovalStep = (step: string) => {
+    switch (step) {
+      case "CEC_HEAD":
+        return "CEC Head Review";
+      case "VP_DIRECTOR":
+        return "VP Director Review";
+      case "CHIEF_OPERATION_OFFICER":
+        return "Chief Operation Officer Review";
+      default:
+        return step;
+    }
+  };
 
   return (
     <div className="mx-auto space-y-8 w-full">
@@ -450,8 +463,18 @@ export default function HomePage() {
                               By {item.user.firstName} {item.user.lastName}
                             </p>
                           </div>
-                          <Badge variant="secondary" className="shrink-0">
-                            Step {item.currentApprovalStep}
+                          <Badge 
+                            variant="secondary" 
+                            className={cn(
+                              "shrink-0",
+                              item.currentApprovalStep === "CEC_HEAD" && "bg-blue-500/10 text-blue-500",
+                              item.currentApprovalStep === "VP_DIRECTOR" && "bg-purple-500/10 text-purple-500",
+                              item.currentApprovalStep === "CHIEF_OPERATION_OFFICER" && "bg-amber-500/10 text-amber-500"
+                            )}
+                          >
+                            {item.currentApprovalStep === "CEC_HEAD" && "CEC Head"}
+                            {item.currentApprovalStep === "VP_DIRECTOR" && "VP Director"}
+                            {item.currentApprovalStep === "CHIEF_OPERATION_OFFICER" && "Chief Officer"}
                           </Badge>
                         </div>
                         <div className="flex items-center text-xs text-muted-foreground">

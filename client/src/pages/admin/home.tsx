@@ -138,6 +138,45 @@ export default function HomePage() {
     }
   };
 
+  // Add this mock data
+  const mockAnnouncements = [
+    {
+      id: "1",
+      title: "System Maintenance Notice",
+      content: "The extension system will undergo scheduled maintenance this weekend. Please save all your work in advance.",
+      priority: "HIGH",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString() // 1 hour ago
+    },
+    {
+      id: "2",
+      title: "New Project Guidelines Released",
+      content: "Updated guidelines for community extension projects are now available. Please review the new documentation before submitting your proposals.",
+      priority: "MEDIUM",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() // 1 day ago
+    },
+    {
+      id: "3",
+      title: "Upcoming Training Workshop",
+      content: "Join us for a virtual workshop on community engagement strategies next week. Registration is now open for all department heads and faculty members.",
+      priority: "MEDIUM",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString() // 2 days ago
+    },
+    {
+      id: "4",
+      title: "Q2 Report Submission Reminder",
+      content: "Please submit your quarterly extension activity reports by the end of this month. Late submissions may affect project evaluations.",
+      priority: "HIGH",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString() // 3 days ago
+    },
+    {
+      id: "5",
+      title: "New Partnership Opportunity",
+      content: "A new community partner has expressed interest in collaborating with our extension programs. Details will be discussed in the next meeting.",
+      priority: "LOW",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString() // 4 days ago
+    }
+  ];
+
   return (
     <div className="mx-auto space-y-8 w-full">
       {/* Welcome Section with Stats */}
@@ -298,7 +337,7 @@ export default function HomePage() {
               </CardTitle>
               <CardDescription>Latest updates and events</CardDescription>
             </div>
-            <Button variant="ghost" size="sm">View All</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/events-and-activities/activity-management")}>View All</Button>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[300px] pr-4">
@@ -344,16 +383,29 @@ export default function HomePage() {
           <CardContent>
             <ScrollArea className="h-[300px] pr-4">
               <div className="space-y-4">
-                {overview?.announcements.map((announcement) => (
+                {mockAnnouncements.map((announcement) => (
                   <div
                     key={announcement.id}
-                    className="p-4 rounded-lg border transition-colors hover:bg-muted/50"
+                    className={cn(
+                      "p-4 rounded-lg border transition-colors hover:bg-muted/50",
+                      announcement.priority === "HIGH" && "border-l-4 border-red-500",
+                      announcement.priority === "MEDIUM" && "border-l-4 border-yellow-500",
+                      announcement.priority === "LOW" && "border-l-4 border-green-500"
+                    )}
                   >
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-4">
                         <h4 className="font-medium leading-none">{announcement.title}</h4>
-                        <Badge variant="outline" className="shrink-0">
-                          {announcement.status}
+                        <Badge 
+                          variant="outline" 
+                          className={cn(
+                            "shrink-0",
+                            announcement.priority === "HIGH" && "bg-red-500/10 text-red-500",
+                            announcement.priority === "MEDIUM" && "bg-yellow-500/10 text-yellow-500",
+                            announcement.priority === "LOW" && "bg-green-500/10 text-green-500"
+                          )}
+                        >
+                          {announcement.priority}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-2">
@@ -382,7 +434,7 @@ export default function HomePage() {
                 </CardTitle>
                 <CardDescription>Program statistics by department</CardDescription>
               </div>
-              <Button variant="outline" size="sm">View All</Button>
+              <Button variant="outline" size="sm" onClick={() => navigate("/admin/academic-departments")}>View All</Button>
             </div>
           </CardHeader>
           <CardContent>
@@ -438,7 +490,7 @@ export default function HomePage() {
                 </CardTitle>
                 <CardDescription>Proposals awaiting your review</CardDescription>
               </div>
-              <Button variant="outline" size="sm">View All</Button>
+              <Button variant="outline" size="sm" onClick={() => navigate("/admin/administration/approvals")}>View All</Button>
             </div>
           </CardHeader>
           <CardContent>

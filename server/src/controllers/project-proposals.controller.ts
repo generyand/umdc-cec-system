@@ -570,7 +570,6 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
     console.log("🔄 Starting resubmission for proposal:", proposalId);
     console.log("📝 Raw proposal data:", req.body);
     console.log("📝 Parsed proposal data:", proposalData);
-    console.log("📝 Files:", proposalData.files);
 
     if (!proposalData) {
       throw new ApiError(400, "No proposal data provided");
@@ -588,7 +587,7 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
         approvals: {
           orderBy: { approvedAt: "desc" },
         },
-        attachments: true, // Include current attachments
+        attachments: true,
       },
     });
 
@@ -610,21 +609,65 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
       throw new ApiError(400, "No return record found");
     }
 
-    // Process resubmission in a transaction
-    let uploadedAttachments: Array<{
-      fileName: string;
-      fileUrl: string;
-      fileSize: number;
-      fileType: string;
-    }> = [];
-    
-    // Handle file uploads BEFORE the transaction
+    // First, handle database operations
+    const updatedProposal = await prisma.projectProposal.update({
+      where: { id: proposal.id },
+      data: {
+        title: proposalData.title,
+        description: proposalData.description,
+        department: {
+          connect: { id: parseInt(proposalData.department) }
+        },
+        community: {
+          connect: { id: parseInt(proposalData.partnerCommunity) }
+        },
+        targetBeneficiaries: proposalData.targetBeneficiaries,
+        targetArea: proposalData.targetArea,
+        targetDate: new Date(proposalData.targetDate),
+        venue: proposalData.venue,
+        budget: new Decimal(proposalData.budget),
+        status: "RESUBMITTED",
+        currentApprovalStep: returnedApproval.approverPosition,
+      },
+      include: {
+        approvals: {
+          include: {
+            approver: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+          orderBy: { approvedAt: "desc" },
+        },
+        attachments: true,
+      },
+    });
+
+    // Update the approval status
+    await prisma.projectApproval.update({
+      where: {
+        proposalId_approverPosition: {
+          proposalId: proposal.id,
+          approverPosition: returnedApproval.approverPosition,
+        },
+      },
+      data: {
+        status: "PENDING",
+        approverUserId: null,
+        comment: null,
+        approvedAt: null,
+      },
+    });
+
+    // Then handle file uploads if present
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       console.log("📎 Processing file uploads...");
       
-      // Delete old files from storage first
+      // Delete old files from storage
       for (const attachment of proposal.attachments) {
-        const filePath = attachment.fileUrl.split("/").pop(); // Get filename from URL
+        const filePath = attachment.fileUrl.split("/").pop();
         if (filePath) {
           const { error } = await supabase.storage
             .from("project-proposal-attachments")
@@ -636,111 +679,48 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
         }
       }
 
+      // Delete old attachment records
+      await prisma.projectAttachment.deleteMany({
+        where: { proposalId: proposal.id },
+      });
+
       // Upload new files
-      uploadedAttachments = await Promise.all(
-        req.files.map(async (file) => {
-          const fileName = `${Date.now()}-${file.originalname}`;
-          const filePath = `proposals/${proposal.id}/${fileName}`;
+      for (const file of req.files) {
+        const fileName = `${Date.now()}-${file.originalname}`;
+        const filePath = `proposals/${proposal.id}/${fileName}`;
 
-          const { data, error } = await supabase.storage
-            .from("project-proposal-attachments")
-            .upload(filePath, file.buffer, {
-              contentType: file.mimetype,
-              upsert: false,
-            });
+        const { data, error } = await supabase.storage
+          .from("project-proposal-attachments")
+          .upload(filePath, file.buffer, {
+            contentType: file.mimetype,
+            upsert: false,
+          });
 
-          if (error) {
-            console.error("Upload error:", error);
-            throw new ApiError(500, `Failed to upload file: ${error.message}`);
-          }
+        if (error) {
+          console.error("Upload error:", error);
+          throw new ApiError(500, `Failed to upload file: ${error.message}`);
+        }
 
-          const {
-            data: { publicUrl },
-          } = supabase.storage
-            .from("project-proposal-attachments")
-            .getPublicUrl(filePath);
+        const {
+          data: { publicUrl },
+        } = supabase.storage
+          .from("project-proposal-attachments")
+          .getPublicUrl(filePath);
 
-          return {
+        // Create new attachment record
+        await prisma.projectAttachment.create({
+          data: {
+            proposalId: proposal.id,
             fileName: file.originalname,
             fileUrl: publicUrl,
             fileSize: file.size,
             fileType: file.mimetype,
-          };
-        })
-      );
-    }
-
-    // Now do the database transaction (fast operations only)
-    const updatedProposal = await prisma.$transaction(async (prisma) => {
-      // Delete old attachment records if new files were uploaded
-      if (uploadedAttachments.length > 0) {
-        await prisma.projectAttachment.deleteMany({
-          where: { proposalId: proposal.id },
-        });
-
-        // Create new attachment records
-        await prisma.projectAttachment.createMany({
-          data: uploadedAttachments.map(attachment => ({
-            proposalId: proposal.id,
-            ...attachment,
-          })),
+          },
         });
       }
+    }
 
-      // Update the existing approval record
-      await prisma.projectApproval.update({
-        where: {
-          proposalId_approverPosition: {
-            proposalId: proposal.id,
-            approverPosition: returnedApproval.approverPosition,
-          },
-        },
-        data: {
-          status: "PENDING",
-          approverUserId: null,
-          comment: null,
-          approvedAt: null,
-        },
-      });
-
-      // Update proposal with new data and status
-      return await prisma.projectProposal.update({
-        where: { id: proposal.id },
-        data: {
-          title: proposalData.title,
-          description: proposalData.description,
-          department: {
-            connect: { id: parseInt(proposalData.department) }
-          },
-          community: {
-            connect: { id: parseInt(proposalData.partnerCommunity) }
-          },
-          targetBeneficiaries: proposalData.targetBeneficiaries,
-          targetArea: proposalData.targetArea,
-          targetDate: new Date(proposalData.targetDate),
-          venue: proposalData.venue,
-          budget: new Decimal(proposalData.budget),
-          status: "RESUBMITTED",
-          currentApprovalStep: returnedApproval.approverPosition,
-        },
-        include: {
-          approvals: {
-            include: {
-              approver: {
-                select: {
-                  firstName: true,
-                  lastName: true,
-                },
-              },
-            },
-            orderBy: { approvedAt: "desc" },
-          },
-          attachments: true,
-        },
-      });
-    });
-
-    // Create notification AFTER the transaction
+    // Create notification
     const currentApprover = await prisma.user.findFirst({
       where: {
         position: returnedApproval.approverPosition,
@@ -772,16 +752,39 @@ export const resubmitProposal: RequestHandler = async (req, res) => {
       });
     }
 
+    // Get the final updated proposal with all changes
+    const finalProposal = await prisma.projectProposal.findUnique({
+      where: { id: proposal.id },
+      include: {
+        approvals: {
+          include: {
+            approver: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+          orderBy: { approvedAt: "desc" },
+        },
+        attachments: true,
+      },
+    });
+
+    if (!finalProposal) {
+      throw new ApiError(404, "Failed to retrieve updated proposal");
+    }
+
     // Format response
     res.status(200).json({
       success: true,
       message: "Proposal resubmitted successfully",
       data: {
-        id: updatedProposal.id,
-        status: updatedProposal.status,
-        currentStep: updatedProposal.currentApprovalStep,
-        attachments: updatedProposal.attachments,
-        revisionHistory: updatedProposal.approvals.map((approval) => ({
+        id: finalProposal.id,
+        status: finalProposal.status,
+        currentStep: finalProposal.currentApprovalStep,
+        attachments: finalProposal.attachments,
+        revisionHistory: finalProposal.approvals.map((approval) => ({
           role: approval.approverPosition,
           status: approval.status,
           comment: approval.comment,

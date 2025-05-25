@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ArrowLeft } from "lucide-react";
+import { ChevronRight, ArrowLeft, Wallet } from "lucide-react";
 import {
   Calendar,
   Building2,
@@ -15,7 +15,6 @@ import {
   Phone,
   Mail,
   Target,
-  DollarSign,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { activitiesApi } from "@/services/api/activities.service";
@@ -167,7 +166,7 @@ const ActivityDetailsPage = () => {
                   </div>
                 </div>
                 <div className="flex gap-3 items-start">
-                  <DollarSign className="mt-1 w-5 h-5 text-primary" />
+                  <Wallet className="mt-1 w-5 h-5 text-primary" />
                   <div>
                     <h3 className="text-sm font-medium">Budget</h3>
                     <p className="text-sm text-muted-foreground">

@@ -296,22 +296,7 @@ export const approveProposal: RequestHandler = async (req, res) => {
             },
           });
 
-          // Create final approval notification
-          await NotificationService.createNotification({
-            title: "Proposal Fully Approved! 🎉",
-            content: `Your proposal "${proposal.title}" has been fully approved and is now ready for implementation.`,
-            type: "PROPOSAL_STATUS",
-            userId: proposal.userId,
-            priority: "HIGH",
-            proposalId: proposal.id,
-            departmentId: proposal.departmentId,
-            actionUrl: `/staff/proposals/${proposal.id}`,
-            actionLabel: "View Proposal",
-          });
-
-          console.log("🔍 Notification created successfully");
-
-          return approvedProposal;
+          return { proposal: approvedProposal, isFinalApproval: true, nextStep: null };
         } else {
           // Get the next approver(s) for notification
           const nextApprovers = await prisma.user.findMany({
@@ -328,44 +313,64 @@ export const approveProposal: RequestHandler = async (req, res) => {
             },
           });
 
-          // Notify proposal owner of progress
-          await NotificationService.createNotification({
-            title: "Proposal Moves to Next Step",
-            content: `Your proposal "${proposal.title}" has been approved by ${user.position} and moved to the next approval step.`,
-            type: "PROPOSAL_STATUS",
-            userId: proposal.userId,
-            priority: "HIGH",
-            proposalId: proposal.id,
-            departmentId: proposal.departmentId,
-            actionUrl: `/staff/proposals/${proposal.id}`,
-            actionLabel: "View Progress",
-          });
-
-          // Notify next approvers
-          await NotificationService.createBulkNotifications(
-            nextApprovers.map((approver) => ({
-              title: "New Proposal Needs Review",
-              content: `A proposal "${proposal.title}" requires your review as ${nextStep}.`,
-              type: "PROPOSAL_STATUS",
-              userId: approver.id,
-              priority: "HIGH",
-              proposalId: proposal.id,
-              departmentId: proposal.departmentId,
-              actionUrl: `/admin/community-engagement/project-proposals/${proposal.id}`,
-              actionLabel: "Review Proposal",
-            }))
-          );
-
-          console.log("🔍 Notification created successfully");
-
-          return updatedProposal;
+          return { proposal: updatedProposal, isFinalApproval: false, nextStep, nextApprovers };
         }
       })();
 
       return result;
+    }, {
+      timeout: 15000, // Increase timeout to 15 seconds
     });
 
-    console.log("📊 Proposal updated:", updatedProposal);
+    // Move notifications outside the transaction for better performance
+    if (updatedProposal.isFinalApproval) {
+      // Create final approval notification
+      await NotificationService.createNotification({
+        title: "Proposal Fully Approved! 🎉",
+        content: `Your proposal "${proposal.title}" has been fully approved and is now ready for implementation.`,
+        type: "PROPOSAL_STATUS",
+        userId: proposal.userId,
+        priority: "HIGH",
+        proposalId: proposal.id,
+        departmentId: proposal.departmentId,
+        actionUrl: `/staff/proposals/${proposal.id}`,
+        actionLabel: "View Proposal",
+      });
+    } else {
+      // Notify proposal owner of progress
+      await NotificationService.createNotification({
+        title: "Proposal Moves to Next Step",
+        content: `Your proposal "${proposal.title}" has been approved by ${user.position} and moved to the next approval step.`,
+        type: "PROPOSAL_STATUS",
+        userId: proposal.userId,
+        priority: "HIGH",
+        proposalId: proposal.id,
+        departmentId: proposal.departmentId,
+        actionUrl: `/staff/proposals/${proposal.id}`,
+        actionLabel: "View Progress",
+      });
+
+      // Notify next approvers
+      if (updatedProposal.nextApprovers) {
+        await NotificationService.createBulkNotifications(
+          updatedProposal.nextApprovers.map((approver) => ({
+            title: "New Proposal Needs Review",
+            content: `A proposal "${proposal.title}" requires your review as ${updatedProposal.nextStep}.`,
+            type: "PROPOSAL_STATUS",
+            userId: approver.id,
+            priority: "HIGH",
+            proposalId: proposal.id,
+            departmentId: proposal.departmentId,
+            actionUrl: `/admin/community-engagement/project-proposals/${proposal.id}`,
+            actionLabel: "Review Proposal",
+          }))
+        );
+      }
+    }
+
+    console.log("🔍 Notification created successfully");
+
+    console.log("📊 Proposal updated:", updatedProposal.proposal);
 
     // 4. Get the updated proposal with all details
     const finalProposal = await prisma.projectProposal.findUnique({

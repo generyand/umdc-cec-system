@@ -44,6 +44,7 @@ UMDC-CECMS empowers faculty members, staff, and administrators to efficiently ma
 - TypeScript
 - PostgreSQL
 - Prisma ORM
+- [Supabase](https://supabase.com) (Authentication, Storage, and Real-time Database)
 
 ### Backend Dependencies
 
@@ -98,6 +99,85 @@ UMDC-CECMS empowers faculty members, staff, and administrators to efficiently ma
 ## 🛠️ Installation
 
 1. Clone the repository
+   ```bash
+   git clone https://github.com/generyand/umdc-cec-system.git
+   cd umdc-cec-system
+   ```
+
+2. Install dependencies
+   ```bash
+   # Install backend dependencies
+   cd server
+   npm install
+
+   # Install frontend dependencies
+   cd ../client
+   npm install
+   ```
+
+3. Set up environment variables
+   - Copy `.env.example` to `.env` in both frontend and backend directories
+   - Update the environment variables with your configuration
+
+4. Set up the database
+   ```bash
+   # Navigate to backend directory
+   cd backend
+
+   # Generate Prisma client
+   npx prisma generate
+
+   # Run database migrations
+   npx prisma migrate dev
+   ```
+
+5. Start the development servers
+   ```bash
+   # Start backend server (from backend directory)
+   npm run dev
+
+   # Start frontend server (from frontend directory)
+   npm run dev
+   ```
+
+6. Access the application
+   - Frontend: http://localhost:5173
+   - Backend: http://localhost:3000
+
+## Environment Variables
+
+### Backend (.env)
+```env
+# Environment
+NODE_ENV=production
+PORT=3000
+FRONTEND_URL=http://localhost:5173
+
+# JWT Configuration
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRES_IN=24h
+
+# Supabase Configuration (Required)
+# Get these values from your Supabase project settings
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# Connect to Supabase via connection pooling
+DATABASE_URL=""
+
+# Direct connection to the database. Used for migrations
+DIRECT_URL=""
+
+```
+
+### Frontend (.env)
+```env
+# API Configuration
+VITE_API_URL=http://localhost:3000
+```
+
+> **Note**: This project uses Supabase for authentication, storage, and real-time database features. You'll need to create a Supabase project and configure it before running the application. Visit [Supabase](https://supabase.com) to create your project and get the required configuration values.
 
 ## 👥 Contributing
 

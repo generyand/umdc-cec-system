@@ -192,7 +192,7 @@ function DepartmentCard({
           to={`/admin/academic-departments/${id}`}
           className="flex flex-1 gap-4 items-start p-4"
         >
-          <div className="p-2 rounded-lg transition-colors bg-primary/10 group-hover:bg-primary/20 outline outline-1 outline-primary/20">
+          <div className="p-2 rounded-lg transition-colors outline outline-1 outline-neutral-200">
             <div className="w-10 aspect-square">
               {getLogoByAbbreviation(abbreviation)}
             </div>

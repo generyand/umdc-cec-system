@@ -21,6 +21,7 @@ import formOptionsRoutes from "./routes/form-options/form-options.route.js";
 import notificationsRoutes from "./routes/notifications/notifications.route.js";
 import reportsRoutes from "./routes/reports/reports.route.js";
 import dashboardRoutes from "./routes/dashboard/dashboard.routes.js";
+import schoolYearsRoutes from "./routes/school-years/school-years.route.js";
 
 async function createServer() {
   const app = express();
@@ -52,6 +53,7 @@ async function createServer() {
   app.use("/api/notifications", notificationsRoutes);
   app.use("/api/reports", reportsRoutes);
   app.use("/api/dashboard", dashboardRoutes);
+  app.use("/api/school-years", schoolYearsRoutes);
 
   app.use(errorHandler);
 

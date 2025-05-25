@@ -10,6 +10,7 @@ async function main() {
   await prisma.academicProgram.deleteMany();
   await prisma.department.deleteMany();
   await prisma.partnerCommunity.deleteMany();
+  await prisma.schoolYear.deleteMany();
 
   // Seed departments first (your existing department seed)
   const departments = [
@@ -472,6 +473,38 @@ async function main() {
       data: community,
     });
     console.log(`Created partner community: ${partnerCommunity.name}`);
+  }
+
+  // Add school years seeding
+  const schoolYears = [
+    {
+      year: "2023-2024",
+      startDate: new Date("2023-06-01"),
+      endDate: new Date("2024-05-31"),
+      isCurrent: true,
+      status: "ACTIVE"
+    },
+    {
+      year: "2022-2023",
+      startDate: new Date("2022-06-01"),
+      endDate: new Date("2023-05-31"),
+      isCurrent: false,
+      status: "COMPLETED"
+    },
+    {
+      year: "2024-2025",
+      startDate: new Date("2024-06-01"),
+      endDate: new Date("2025-05-31"),
+      isCurrent: false,
+      status: "UPCOMING"
+    }
+  ];
+
+  for (const schoolYear of schoolYears) {
+    const createdSchoolYear = await prisma.schoolYear.create({
+      data: schoolYear
+    });
+    console.log(`Created school year: ${createdSchoolYear.year}`);
   }
 
   console.log("Seeding finished.");
